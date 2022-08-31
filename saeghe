@@ -1,4 +1,14 @@
 #!/usr/bin/env php
 <?php
 
-echo 'hello world';
+initialize();
+
+function initialize()
+{
+    $filename = getopt('', ['config::'])['config'] ?? 'build.json';
+
+    file_put_contents(
+        $_SERVER['PWD'] . '/' . $filename,
+        json_encode(['packages' => []], JSON_PRETTY_PRINT) . PHP_EOL
+    );
+}

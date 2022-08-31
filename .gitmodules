@@ -1,0 +1,3 @@
+[submodule "Packages/test-runner"]
+	path = Packages/test-runner
+	url = git@github.com:saeghe/test-runner.git
