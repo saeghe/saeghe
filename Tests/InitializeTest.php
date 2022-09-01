@@ -2,6 +2,8 @@
 
 namespace Tests\InitializeTest;
 
+use TestRunner\Assertions\File;
+
 $initialContent = <<<EOD
 {
     "packages": []
@@ -16,11 +18,8 @@ test(
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe");
 
-        assert(file_exists($buildConfig), 'Config file does not exists: ' . $output);
-
-        assert($initialContent === file_get_contents($buildConfig),
-            'Config file content is not correct after running initialize!'
-        );
+        File\assertExists($buildConfig, 'Config file does not exists: ' . $output);
+        File\assertContent($buildConfig, $initialContent, 'Config file content is not correct after running initialize!');
 
         return $buildConfig;
     },
@@ -34,11 +33,8 @@ test(
     case: function ($buildConfig, $configPath) use ($initialContent) {
         $output = shell_exec("{$_SERVER['PWD']}/saeghe --config=$buildConfig");
 
-        assert(file_exists($configPath), 'Custom config file does not exists: ' . $output);
-
-        assert($initialContent === file_get_contents($_SERVER['PWD'] . '/' . $buildConfig),
-            'Custom config file content is not correct after running initialize!'
-        );
+        File\assertExists($configPath, 'Custom config file does not exists: ' . $output);
+        File\assertContent($configPath, $initialContent, 'Custom config file content is not correct after running initialize!');
 
         return $configPath;
     },
