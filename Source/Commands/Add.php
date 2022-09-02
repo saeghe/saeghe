@@ -7,29 +7,15 @@ use Exception;
 function run()
 {
     $project = getopt('', ['project::'])['project'] ?? '';
-    $path = getopt('', ['path::'])['path'] ?? throw new Exception('Package is required to add a path!');
+    $package['path'] = getopt('', ['path::'])['path'] ?? throw new Exception('Package is required to add a path!');
 
     $projectDirectory = $_SERVER['PWD'] . '/' . $project;
+
     $packagesDirectory = findOrCreatePackagesDirectory($projectDirectory);
-    $packageName = detectName($path);
-    [$version, $hash] = clonePackage($packagesDirectory, $packageName, $path);
-    $namespace = namespaceFromName($packageName);
-
-    $config = findOrCreateBuildJsonFile($projectDirectory);
-    $config['packages'][$namespace] = [
-        'path' => $path,
-        'version' => $version,
-    ];
-
-    $lockContent = findOrCreateBuildLockFile($projectDirectory);
-    $lockContent[$namespace] = [
-        'path' => $path,
-        'version' => $version,
-        'hash' => $hash,
-    ];
-
-    saveBuildJson($projectDirectory, $config);
-    saveBuildLock($projectDirectory, $lockContent);
+    $package = clonePackage($packagesDirectory, $package);
+    $package['namespace'] = namespaceFromName($package['name']);
+    findOrCreateBuildJsonFile($projectDirectory, $package);
+    findOrCreateBuildLockFile($projectDirectory, $package);
 }
 
 function namespaceFromName($packageName)
@@ -48,26 +34,40 @@ function detectName($package)
     return substr_replace($name, '', -4);
 }
 
-function findOrCreateBuildJsonFile($path)
+function findOrCreateBuildJsonFile($projectDirectory, $package)
 {
-    $configFile = $path . '/build.json';
+    $configFile = $projectDirectory . '/build.json';
 
     if (! file_exists($configFile)) {
         file_put_contents($configFile, json_encode([], JSON_PRETTY_PRINT));
     }
 
-    return json_decode(file_get_contents($configFile), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents($configFile), true, JSON_THROW_ON_ERROR);
+
+    $config['packages'][$package['namespace']] = [
+        'path' => $package['path'],
+        'version' => $package['version'],
+    ];
+
+    file_put_contents($projectDirectory . '/build.json', json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
-function findOrCreateBuildLockFile($path)
+function findOrCreateBuildLockFile($projectDirectory, $package)
 {
-    $configFile = $path . '/build.lock';
+    $configFile = $projectDirectory . '/build.lock';
 
     if (! file_exists($configFile)) {
         file_put_contents($configFile, json_encode([], JSON_PRETTY_PRINT));
     }
 
-    return json_decode(file_get_contents($configFile), true, JSON_THROW_ON_ERROR);
+    $lockContent = json_decode(file_get_contents($configFile), true, JSON_THROW_ON_ERROR);
+
+    $lockContent[$package['namespace']] = [
+        'path' => $package['path'],
+        'version' => $package['version'],
+        'hash' => trim($package['hash']),
+    ];
+    file_put_contents($projectDirectory . '/build.lock', json_encode($lockContent, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
 function findOrCreatePackagesDirectory($projectDirectory)
@@ -81,22 +81,14 @@ function findOrCreatePackagesDirectory($projectDirectory)
     return $packagesDirectory;
 }
 
-function clonePackage($packageDirectory, $name, $path)
+function clonePackage($packageDirectory, $package)
 {
-    [$owner, $repo] = explode('/', $name);
-    $destination = "$packageDirectory/$owner/$repo";
-    shell_exec("git clone $path $destination");
-    $hash = shell_exec("git --git-dir=$destination/.git rev-parse HEAD");
+    $package['name'] = detectName($package['path']);
+    [$package['owner'], $package['repo']] = explode('/', $package['name']);
+    $package['destination'] = "$packageDirectory/{$package['owner']}/{$package['repo']}";
+    shell_exec("git clone {$package['path']} {$package['destination']}");
+    $package['hash'] = shell_exec("git --git-dir={$package['destination']}/.git rev-parse HEAD");
+    $package['version'] = 'dev-master';
 
-    return ['dev-master', trim($hash)];
-}
-
-function saveBuildJson($projectDirectory, $config)
-{
-    file_put_contents($projectDirectory . '/build.json', json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
-}
-
-function saveBuildLock($projectDirectory, $lockContent)
-{
-    file_put_contents($projectDirectory . '/build.lock', json_encode($lockContent, JSON_PRETTY_PRINT) . PHP_EOL);
+    return $package;
 }
