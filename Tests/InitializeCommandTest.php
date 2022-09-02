@@ -2,7 +2,7 @@
 
 namespace Tests\InitializeTest;
 
-use TestRunner\Assertions\File;
+use Saeghe\TestRunner\Assertions\File;
 
 $initialContent = <<<EOD
 {
@@ -16,7 +16,7 @@ test(
     case: function () use ($initialContent) {
         $buildConfig = $_SERVER['PWD'] . '/build.json';
 
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe");
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize");
 
         File\assertExists($buildConfig, 'Config file does not exists: ' . $output);
         File\assertContent($buildConfig, $initialContent, 'Config file content is not correct after running initialize!');
@@ -31,7 +31,7 @@ test(
 test(
     title: 'it makes a new config file with given filename',
     case: function ($buildConfig, $configPath) use ($initialContent) {
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe --config=$buildConfig");
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --config=$buildConfig");
 
         File\assertExists($configPath, 'Custom config file does not exists: ' . $output);
         File\assertContent($configPath, $initialContent, 'Custom config file content is not correct after running initialize!');
