@@ -11,21 +11,28 @@ test(
         assertSimplePackageAddedToBuildConfig('Simple Package does not added to config file properly! ' . $output);
         assertPackagesDirectoryCreatedForEmptyProject('Package directory does not created.' . $output);
         assertSimplePackageCloned('Simple package does not cloned!' . $output);
-
+        assertBuildLockHasDesiredData('Data is the lock files is not what we want.' . $output);
     },
     before: function () {
-        deleteEmptyProjectBuildFile();
+        deleteEmptyProjectBuildJson();
+        deleteEmptyProjectBuildLock();
         deleteEmptyProjectPackagesDirectory();
     },
     after: function () {
         deleteEmptyProjectPackagesDirectory();
-        deleteEmptyProjectBuildFile();
+        deleteEmptyProjectBuildJson();
+        deleteEmptyProjectBuildLock();
     }
 );
 
-function deleteEmptyProjectBuildFile()
+function deleteEmptyProjectBuildJson()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/Tests/Fixtures/EmptyProject/build.json');
+}
+
+function deleteEmptyProjectBuildLock()
+{
+    shell_exec('rm -f ' . $_SERVER['PWD'] . '/Tests/Fixtures/EmptyProject/build.lock');
 }
 
 function deleteEmptyProjectPackagesDirectory()
@@ -65,3 +72,9 @@ function assertSimplePackageAddedToBuildConfig($message)
     );
 }
 
+function assertBuildLockHasDesiredData($message)
+{
+    $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/Tests/Fixtures/EmptyProject/build.lock'), true, JSON_THROW_ON_ERROR);
+
+    assert('75b2a44dc07ac5486b19da8cd911e664299c8090' === $lock['Saeghe\SimplePackage']['hash'], $message);
+}
