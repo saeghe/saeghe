@@ -14,9 +14,9 @@ EOD;
 test(
     title: 'it makes a new default config file',
     case: function () use ($initialContent) {
-        $buildConfig = $_SERVER['PWD'] . '/build.json';
+        $buildConfig = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json';
 
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize");
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject");
 
         File\assertExists($buildConfig, 'Config file does not exists: ' . $output);
         File\assertContent($buildConfig, $initialContent, 'Config file content is not correct after running initialize!');

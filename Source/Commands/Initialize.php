@@ -4,15 +4,16 @@ namespace Saeghe\Saeghe\Commands\Initialize;
 
 function run()
 {
+    global $projectRoot;
     $filename = getopt('', ['config::'])['config'] ?? 'build.json';
 
-    makeBuildJsonFile($filename);
+    makeBuildJsonFile($projectRoot . $filename);
 }
 
-function makeBuildJsonFile($filename)
+function makeBuildJsonFile($filepath)
 {
     file_put_contents(
-        $_SERVER['PWD'] . '/' . $filename,
+        $filepath,
         json_encode(['packages' => []], JSON_PRETTY_PRINT) . PHP_EOL
     );
 }
