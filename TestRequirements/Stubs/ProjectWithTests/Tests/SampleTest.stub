@@ -1,0 +1,14 @@
+<?php
+
+namespace Tests\SampleTest;
+
+require_once '$environmentBuildPath/Source/SampleFile.php';
+
+use ProjectWithTests\SampleFile;
+
+test(
+    title: 'this is not going to run',
+    case: function () {
+        SampleFile\anImportantFunction();
+    },
+);

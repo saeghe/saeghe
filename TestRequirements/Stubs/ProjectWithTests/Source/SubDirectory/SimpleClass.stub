@@ -1,0 +1,12 @@
+<?php
+
+namespace ProjectWithTests\SubDirectory;
+
+require_once '$environmentBuildPath/Source/SampleFile.php';
+
+use function ProjectWithTests\SampleFile\anImportantFunction;
+
+class SimpleClass
+{
+
+}

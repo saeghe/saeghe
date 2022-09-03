@@ -66,6 +66,8 @@ function findOrCreateBuildLockFile($projectDirectory, $package)
         'path' => $package['path'],
         'version' => $package['version'],
         'hash' => trim($package['hash']),
+        'owner' => trim($package['owner']),
+        'repo' => trim($package['repo']),
     ];
     file_put_contents($projectDirectory . '/build.lock', json_encode($lockContent, JSON_PRETTY_PRINT) . PHP_EOL);
 }
@@ -88,7 +90,7 @@ function clonePackage($packageDirectory, $package)
     $package['destination'] = "$packageDirectory/{$package['owner']}/{$package['repo']}";
     shell_exec("git clone {$package['path']} {$package['destination']}");
     $package['hash'] = shell_exec("git --git-dir={$package['destination']}/.git rev-parse HEAD");
-    $package['version'] = 'dev-master';
+    $package['version'] = 'development';
 
     return $package;
 }

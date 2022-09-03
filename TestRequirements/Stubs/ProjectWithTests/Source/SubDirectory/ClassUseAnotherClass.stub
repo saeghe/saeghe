@@ -1,0 +1,13 @@
+<?php
+
+namespace ProjectWithTests\SubDirectory;
+
+require_once '$environmentBuildPath/Source/SubDirectory/SimpleClass.php';
+
+use ProjectWithTests\SubDirectory\SimpleClass;
+use Exception;
+
+class ClassUseAnotherClass extends SimpleClass
+{
+
+}
