@@ -5,15 +5,18 @@ namespace Saeghe\Saeghe\Commands\Initialize;
 function run()
 {
     global $projectRoot;
+
     $filename = getopt('', ['config::'])['config'] ?? 'build.json';
+    $packagesDirectory = getopt('', ['packages-directory::'])['packages-directory'] ?? null;
 
-    makeBuildJsonFile($projectRoot . $filename);
-}
+    $config = ['packages' => []];
 
-function makeBuildJsonFile($filepath)
-{
+    if ($packagesDirectory) {
+        $config['packages-directory'] = $packagesDirectory;
+    }
+
     file_put_contents(
-        $filepath,
-        json_encode(['packages' => []], JSON_PRETTY_PRINT) . PHP_EOL
+        $projectRoot . $filename,
+        json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL
     );
 }

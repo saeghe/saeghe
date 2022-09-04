@@ -74,7 +74,9 @@ function findOrCreateBuildLockFile($projectDirectory, $package)
 
 function findOrCreatePackagesDirectory($projectDirectory)
 {
-    $packagesDirectory = $projectDirectory . '/Packages';
+    global $setting;
+
+    $packagesDirectory = $projectDirectory . '/' . $setting['packages-directory'];
 
     if (! file_exists($packagesDirectory)) {
         mkdir($packagesDirectory);

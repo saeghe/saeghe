@@ -1,14 +1,16 @@
 <?php
 
-namespace Tests\AddCommandTest;
+namespace Tests\AddWithCustomPackagesDirectoryCommandTest;
 
 use Saeghe\TestRunner\Assertions\File;
 
 test(
-    title: 'it should add package to the project',
+    title: 'it should add package to the given directory',
     case: function () {
+        shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --path=git@github.com:saeghe/simple-package.git");
 
+        assertPackageDirectoryAddedToConfig('Config does not contains the custom package directory!');
         assertBuildCreatedForSimpleProject('Config file is not created!' . $output);
         assertSimplePackageAddedToBuildConfig('Simple Package does not added to config file properly! ' . $output);
         assertPackagesDirectoryCreatedForEmptyProject('Package directory does not created.' . $output);
@@ -39,7 +41,17 @@ function deleteEmptyProjectBuildLock()
 
 function deleteEmptyProjectPackagesDirectory()
 {
-    shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
+    shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor');
+}
+
+function assertPackageDirectoryAddedToConfig($message)
+{
+    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json'), true, JSON_THROW_ON_ERROR);
+
+    assert(
+        $config['packages-directory'] === 'vendor',
+        $message
+    );
 }
 
 function assertBuildCreatedForSimpleProject($message)
@@ -49,15 +61,15 @@ function assertBuildCreatedForSimpleProject($message)
 
 function assertPackagesDirectoryCreatedForEmptyProject($message)
 {
-    File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages', $message);
+    File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor', $message);
 }
 
 function assertSimplePackageCloned($message)
 {
     assert(
-        File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package')
-        && File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/build.json')
-        && File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/README.md'),
+        File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package')
+        && File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/build.json')
+        && File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/README.md'),
         $message
     );
 }
@@ -80,9 +92,9 @@ function assertBuildLockHasDesiredData($message)
 
     assert(
         'git@github.com:saeghe/simple-package.git' === $lock['Saeghe\SimplePackage']['path']
-        &&'development' === $lock['Saeghe\SimplePackage']['version']
-        &&'saeghe' === $lock['Saeghe\SimplePackage']['owner']
-        &&'simple-package' === $lock['Saeghe\SimplePackage']['repo']
+        && 'development' === $lock['Saeghe\SimplePackage']['version']
+        && 'saeghe' === $lock['Saeghe\SimplePackage']['owner']
+        && 'simple-package' === $lock['Saeghe\SimplePackage']['repo']
         && 'b649264405b12b95f40034c8d022ec3bbd35cabb' === $lock['Saeghe\SimplePackage']['hash'],
         $message
     );

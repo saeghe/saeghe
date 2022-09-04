@@ -1,0 +1,12 @@
+<?php
+
+namespace ProjectWithTests\SampleFile;
+
+require_once '$environmentBuildPath/vendor/saeghe/simple-package/Source/AUsefulClass.php';
+
+use Saeghe\SimplePackage\AUsefulClass;
+
+class FileWithPackageDependency
+{
+
+}

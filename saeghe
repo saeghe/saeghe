@@ -11,16 +11,18 @@ $config = getopt('', ['config::'])['config'] ?? 'build.json';
 $projectRoot = strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SERVER['PWD'] . '/';
 $configPath = $projectRoot . $config;
 
-$setting = [];
-if (file_exists($configPath)) {
-    $setting = json_decode(json: file_get_contents($configPath), associative: true, flags: JSON_THROW_ON_ERROR);
-}
+$setting = file_exists($configPath) ? json_decode(json: file_get_contents($configPath), associative: true, flags: JSON_THROW_ON_ERROR) : [];
+
+$setting = [
+    'packages-directory' => $setting['packages-directory'] ?? 'Packages',
+    'map' => $setting['map'] ?? [],
+    'packages' => $setting['packages'] ?? [],
+    'entry-points' => $setting['entry-points'] ?? [],
+    'executables' => $setting['executables'] ?? [],
+];
 
 $lockPath = str_replace('.json', '.lock', $configPath);
-$lockSetting = [];
-if (file_exists($lockPath)) {
-    $lockSetting = json_decode(json: file_get_contents($lockPath), associative: true, flags: JSON_THROW_ON_ERROR);
-}
+$lockSetting = file_exists($lockPath) ? json_decode(json: file_get_contents($lockPath), associative: true, flags: JSON_THROW_ON_ERROR) : [];
 
 $command = getopt('', ['command::'])['command'] ?? 'help';
 

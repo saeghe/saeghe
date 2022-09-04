@@ -26,10 +26,11 @@ function run()
 function buildPackagesEntryPoints($buildDirectory)
 {
     global $projectRoot;
+    global $setting;
     global $lockSetting;
 
     foreach ($lockSetting as $namespace => $package) {
-        $packagePath = 'Packages/' . $package['owner'] . '/' . $package['repo'] . '/';
+        $packagePath = $setting['packages-directory'] . '/' . $package['owner'] . '/' . $package['repo'] . '/';
         $packageConfig = $projectRoot . $packagePath . 'build.json';
         $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
 
@@ -60,10 +61,11 @@ function buildEntryPoints($buildDirectory)
 function addExecutables()
 {
     global $projectRoot;
+    global $setting;
     global $lockSetting;
 
     foreach ($lockSetting as $namespace => $package) {
-        $packagePath = 'Packages/' . $package['owner'] . '/' . $package['repo'] . '/';
+        $packagePath = $setting['packages-directory'] . '/' . $package['owner'] . '/' . $package['repo'] . '/';
         $packageConfig = $projectRoot . $packagePath . 'build.json';
         $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
 
@@ -174,8 +176,8 @@ function applyFileModifications($origin)
         $namespaces[$namespace] = $source;
     });
 
-    array_walk($lockSetting, function ($package, $namespace) use (&$namespaces, $projectRoot) {
-        $packagePath = 'Packages/' . $package['owner'] . '/' . $package['repo'] . '/';
+    array_walk($lockSetting, function ($package, $namespace) use (&$namespaces, $projectRoot, $setting) {
+        $packagePath = $setting['packages-directory'] . '/' . $package['owner'] . '/' . $package['repo'] . '/';
         $packageConfig = $projectRoot . $packagePath . 'build.json';
         $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
 

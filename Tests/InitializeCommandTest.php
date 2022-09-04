@@ -11,6 +11,14 @@ $initialContent = <<<EOD
 
 EOD;
 
+$initialContentWithPackagesDirectory = <<<EOD
+{
+    "packages": [],
+    "packages-directory": "vendor"
+}
+
+EOD;
+
 test(
     title: 'it makes a new default config file',
     case: function () use ($initialContent) {
@@ -48,5 +56,22 @@ test(
     },
     after: function ($configPath) {
         shell_exec('rm -f ' . $configPath);
+    }
+);
+
+test(
+    title: 'it makes a new config file with given packages directory',
+    case: function () use ($initialContentWithPackagesDirectory) {
+        $buildConfig = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json';
+
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
+
+        File\assertExists($buildConfig, 'Config file does not exists: ' . $output);
+        File\assertContent($buildConfig, $initialContentWithPackagesDirectory, 'Config file content is not correct after running initialize!');
+
+        return $buildConfig;
+    },
+    after: function ($buildConfig) {
+        shell_exec('rm -f ' . $buildConfig);
     }
 );
