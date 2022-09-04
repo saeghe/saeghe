@@ -3,8 +3,10 @@
 namespace Tests\SampleTest;
 
 require_once '$environmentBuildPath/Source/SampleFile.php';
+require_once '$environmentBuildPath/Tests/Helper.php';
 
 use ProjectWithTests\SampleFile;
+use Tests\Helper;
 
 test(
     title: 'this is not going to run',

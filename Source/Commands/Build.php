@@ -6,19 +6,55 @@ use Generator;
 
 function run()
 {
-    $project = getopt('', ['project::'])['project'] ?? '';
+    global $project;
+    global $projectRoot;
+
     $environment = getopt('', ['environment::'])['environment'] ?? 'development';
 
     $buildDirectory = resetEnvironmentBuildDirectory($project, $environment);
-    $filesAndDirectories = findProjectFilesAndDirectoriesForBuild($project);
-
-    $projectPath = $_SERVER['PWD'] . '/' . $project;
+    $filesAndDirectories = findProjectFilesAndDirectoriesForBuild();
 
     foreach ($filesAndDirectories as $fileOrDirectory) {
-        build($fileOrDirectory, $projectPath, $buildDirectory);
+        build($fileOrDirectory, $projectRoot, $buildDirectory);
     }
 
     addExecutables();
+    buildEntryPoints($buildDirectory);
+    buildPackagesEntryPoints($buildDirectory);
+}
+
+function buildPackagesEntryPoints($buildDirectory)
+{
+    global $projectRoot;
+    global $lockSetting;
+
+    foreach ($lockSetting as $namespace => $package) {
+        $packagePath = 'Packages/' . $package['owner'] . '/' . $package['repo'] . '/';
+        $packageConfig = $projectRoot . $packagePath . 'build.json';
+        $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
+
+        if (isset($packageSetting['entry-points'])) {
+            foreach ($packageSetting['entry-points'] as $entrypoint) {
+                $origin = $projectRoot . $packagePath . $entrypoint;
+                $destination = $buildDirectory . '/' . $packagePath . $entrypoint;
+                compileFile($origin, $destination);
+            }
+        }
+    }
+}
+
+function buildEntryPoints($buildDirectory)
+{
+    global $projectRoot;
+    global $setting;
+
+    if (! isset($setting['entry-points'])) {
+        return;
+    }
+
+    foreach ($setting['entry-points'] as $entrypoint) {
+        compileFile($projectRoot . $entrypoint, $buildDirectory . '/' . $entrypoint);
+    }
 }
 
 function addExecutables()
@@ -45,30 +81,33 @@ function resetEnvironmentBuildDirectory($project, $environment)
 {
     $buildDirectory = $_SERVER['PWD'] . '/' . $project . '/builds/' . $environment;
 
-    shell_exec('rm -fR ' . $buildDirectory);
-
-    mkdir($buildDirectory, 0777, true);
+    if (file_exists($buildDirectory)) {
+        shell_exec('rm -fR ' . $buildDirectory . '/*');
+    } else {
+        mkdir($buildDirectory, 0755, true);
+    }
 
     return $buildDirectory;
 }
 
-function findProjectFilesAndDirectoriesForBuild($project)
+function findProjectFilesAndDirectoriesForBuild()
 {
-    $projectPath = $_SERVER['PWD'] . '/' . $project;
+    global $projectRoot;
+    global $setting;
 
     $excludedPaths = array_map(
-        function ($excludedPath) use ($projectPath) {
-            return $projectPath . '/' . $excludedPath;
+        function ($excludedPath) use ($projectRoot) {
+            return $projectRoot . '/' . $excludedPath;
         },
-        ['.', '..', 'builds', '.git']
+        array_merge(['.', '..', 'builds', '.git'], $setting['entry-points'] ?? [])
     );
 
-    $filesAndDirectories = scandir($projectPath);
+    $filesAndDirectories = scandir($projectRoot);
 
     return array_filter(
         $filesAndDirectories,
-        function ($fileOrDirectory) use ($projectPath, $excludedPaths) {
-            $fileOrDirectoryPath = $projectPath . '/' . $fileOrDirectory;
+        function ($fileOrDirectory) use ($projectRoot, $excludedPaths) {
+            $fileOrDirectoryPath = $projectRoot . '/' . $fileOrDirectory;
             return ! in_array($fileOrDirectoryPath, $excludedPaths);
         },
     );
@@ -95,15 +134,20 @@ function build($fileOrDirectory, $from, $to)
         return;
     }
     if (fileNeedsModification($origin)) {
-        $modifiedFile = applyFileModifications($origin);
-        file_put_contents($destination, $modifiedFile);
-        chmod($destination, fileperms($origin) & 0x0FFF);
-        clearstatcache();
+        compileFile($origin, $destination);
 
         return;
     }
 
     intactCopy($origin, $destination);
+}
+
+function compileFile($origin, $destination)
+{
+    $modifiedFile = applyFileModifications($origin);
+    file_put_contents($destination, $modifiedFile);
+    chmod($destination, fileperms($origin) & 0x0FFF);
+    clearstatcache();
 }
 
 function fileNeedsModification($file)
@@ -177,13 +221,30 @@ function addRequires($requireStatements, $file)
 {
     $content = '';
 
+    $requiresAdded = false;
+
     foreach (readLines($file) as $line) {
         $content .= $line;
 
         if (str_starts_with($line, 'namespace')) {
+            $requiresAdded = true;
             $content .= PHP_EOL;
             $content .= implode(PHP_EOL, $requireStatements);
             $content .= PHP_EOL;
+        }
+    }
+
+    if (! $requiresAdded) {
+        $content = '';
+        foreach (readLines($file) as $line) {
+            $content .= $line;
+
+            if (! $requiresAdded && str_starts_with($line, '<?php')) {
+                $requiresAdded = true;
+                $content .= PHP_EOL;
+                $content .= implode(PHP_EOL, $requireStatements);
+                $content .= PHP_EOL;
+            }
         }
     }
 

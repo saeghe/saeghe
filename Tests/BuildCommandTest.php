@@ -18,6 +18,8 @@ test(
         assertFilePermissionsAreSame('Files permission are not same!' . $output);
         assertGitDirectoryExcluded('Build copied the git directory!' . $output);
         assertExecutablesAreLinked('Executable files did not linked' . $output);
+        assertBuildForProjectEntryPoints('Project entry point does not built properly!' . $output);
+        assertBuildForPackagesEntryPoints('Packages entry point does not built properly!' . $output);
     },
     before: function () {
         deleteBuildDirectory();
@@ -147,6 +149,30 @@ function assertExecutablesAreLinked($message)
         is_link($linkFile)
         && readlink($linkFile) === $linkSource
         ,
+        $message
+    );
+}
+
+function assertBuildForProjectEntryPoints($message)
+{
+    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
+
+    assert(
+        file_exists($environmentBuildPath . '/entry-point')
+        && file_get_contents($environmentBuildPath . '/entry-point') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/entry-point.stub')),
+        $message
+    );
+}
+
+function assertBuildForPackagesEntryPoints($message)
+{
+    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/SimplePackage';
+
+    assert(
+        file_exists($environmentBuildPath . '/Packages/saeghe/simple-package/entry-point')
+        && file_get_contents($environmentBuildPath . '/Packages/saeghe/simple-package/entry-point') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/entry-point.stub')),
         $message
     );
 }

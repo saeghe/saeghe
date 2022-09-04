@@ -2,5 +2,8 @@
     "map": {
         "ProjectWithTests": "Source",
         "Tests": "Tests"
-    }
+    },
+    "entry-points": [
+        "entry-point"
+    ]
 }

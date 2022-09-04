@@ -1,0 +1,5 @@
+#!/usr/bin/env php
+<?php
+
+use ProjectWithTests\SubDirectory\SimpleClass;
+use ProjectWithTests\SubDirectory\ClassUseAnotherClass;

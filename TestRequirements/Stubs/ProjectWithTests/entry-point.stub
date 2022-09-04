@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+
+require_once '$environmentBuildPath/Source/SubDirectory/SimpleClass.php';
+require_once '$environmentBuildPath/Source/SubDirectory/ClassUseAnotherClass.php';
+
+use ProjectWithTests\SubDirectory\SimpleClass;
+use ProjectWithTests\SubDirectory\ClassUseAnotherClass;
