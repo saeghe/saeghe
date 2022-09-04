@@ -17,6 +17,28 @@ function run()
     foreach ($filesAndDirectories as $fileOrDirectory) {
         build($fileOrDirectory, $projectPath, $buildDirectory);
     }
+
+    addExecutables();
+}
+
+function addExecutables()
+{
+    global $projectRoot;
+    global $lockSetting;
+
+    foreach ($lockSetting as $namespace => $package) {
+        $packagePath = 'Packages/' . $package['owner'] . '/' . $package['repo'] . '/';
+        $packageConfig = $projectRoot . $packagePath . 'build.json';
+        $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
+
+        if (isset($packageSetting['executables'])) {
+            foreach ($packageSetting['executables'] as $linkName => $source) {
+                $target = $projectRoot . 'builds/development/' . $packagePath . $source;
+                $link = $projectRoot . 'builds/development/' . $linkName;
+                symlink($target, $link);
+            }
+        }
+    }
 }
 
 function resetEnvironmentBuildDirectory($project, $environment)
@@ -38,7 +60,7 @@ function findProjectFilesAndDirectoriesForBuild($project)
         function ($excludedPath) use ($projectPath) {
             return $projectPath . '/' . $excludedPath;
         },
-        ['.', '..', 'builds']
+        ['.', '..', 'builds', '.git']
     );
 
     $filesAndDirectories = scandir($projectPath);
@@ -54,11 +76,17 @@ function findProjectFilesAndDirectoriesForBuild($project)
 
 function build($fileOrDirectory, $from, $to)
 {
+    if (in_array($fileOrDirectory, ['.git'])) {
+        return;
+    }
+
     $origin = $from . '/' . $fileOrDirectory;
     $destination = $to . '/' . $fileOrDirectory;
 
     if (is_dir($origin)) {
-        mkdir($destination);
+        umask(0);
+        mkdir($destination, fileperms($origin) & 0x0FFF);
+        clearstatcache();
         $filesAndDirectories = allFilesAndDirectories($origin);
         foreach ($filesAndDirectories as $fileOrDirectory) {
             build($fileOrDirectory, $origin, $destination);
@@ -69,11 +97,13 @@ function build($fileOrDirectory, $from, $to)
     if (fileNeedsModification($origin)) {
         $modifiedFile = applyFileModifications($origin);
         file_put_contents($destination, $modifiedFile);
+        chmod($destination, fileperms($origin) & 0x0FFF);
+        clearstatcache();
 
         return;
     }
 
-    copy($origin, $destination);
+    intactCopy($origin, $destination);
 }
 
 function fileNeedsModification($file)
@@ -173,4 +203,12 @@ function readLines(string $source): Generator
         }
         fclose($fileHandler);
     }
+}
+
+function intactCopy($origin, $destination)
+{
+    umask(0);
+    copy($origin, $destination);
+    chmod($destination, fileperms($origin) & 0x0FFF);
+    clearstatcache();
 }

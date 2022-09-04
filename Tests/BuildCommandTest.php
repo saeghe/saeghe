@@ -15,6 +15,9 @@ test(
         assertFileWithPackageDependencyHasBeenBuilt('File with package dependency has not been built properly!' . $output);
         assertNonePhpFilesHasNotBeenBuilt('None PHP files has been built properly!' . $output);
         assertTestsHasBeenBuilt('Test files has not been built properly!' . $output);
+        assertFilePermissionsAreSame('Files permission are not same!' . $output);
+        assertGitDirectoryExcluded('Build copied the git directory!' . $output);
+        assertExecutablesAreLinked('Executable files did not linked' . $output);
     },
     before: function () {
         deleteBuildDirectory();
@@ -97,6 +100,53 @@ function assertFileWithPackageDependencyHasBeenBuilt($message)
     assert(
         file_exists($environmentBuildPath . '/Source/FileWithPackageDependency.php')
         && file_get_contents($environmentBuildPath . '/Source/FileWithPackageDependency.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/FileWithPackageDependency.stub')),
+        $message
+    );
+}
+
+function assertFilePermissionsAreSame($message)
+{
+    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+
+    assert(
+        fileperms($environmentBuildPath . '/PublicDirectory')
+        ===
+        fileperms($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/PublicDirectory'),
+        'Directory permission is not set properly!' . $message
+    );
+    assert(
+        fileperms($environmentBuildPath . '/PublicDirectory/ExecutableFile.php')
+        ===
+        fileperms($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/PublicDirectory/ExecutableFile.php'),
+        'PHP file permission is not set properly!' . $message
+    );
+    assert(
+        fileperms($environmentBuildPath . '/PublicDirectory/AnotherExecutableFile')
+        ===
+        fileperms($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/PublicDirectory/AnotherExecutableFile'),
+        'Other file permission is not set properly!' . $message
+    );
+}
+
+function assertGitDirectoryExcluded($message)
+{
+    assert(
+        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/.git')
+        &&
+        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/.git'),
+        $message
+    );
+}
+
+function assertExecutablesAreLinked($message)
+{
+    $linkFile = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/run-executable';
+    $linkSource = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/run.php';
+
+    assert(
+        is_link($linkFile)
+        && readlink($linkFile) === $linkSource
+        ,
         $message
     );
 }
