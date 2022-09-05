@@ -6,16 +6,30 @@ use Exception;
 
 function run()
 {
-    $project = getopt('', ['project::'])['project'] ?? '';
     $package['path'] = getopt('', ['path::'])['path'] ?? throw new Exception('Package is required to add a path!');
 
-    $projectDirectory = $_SERVER['PWD'] . '/' . $project;
+    $packagesDirectory = findOrCreatePackagesDirectory();
 
-    $packagesDirectory = findOrCreatePackagesDirectory($projectDirectory);
+    add($package, $packagesDirectory);
+}
+
+function add($package, $packagesDirectory)
+{
+    global $projectRoot;
+
     $package = clonePackage($packagesDirectory, $package);
     $package['namespace'] = namespaceFromName($package['name']);
-    findOrCreateBuildJsonFile($projectDirectory, $package);
-    findOrCreateBuildLockFile($projectDirectory, $package);
+    findOrCreateBuildJsonFile($projectRoot, $package);
+    findOrCreateBuildLockFile($projectRoot, $package);
+
+    $packagePath = $packagesDirectory . '/' . $package['owner'] . '/' . $package['repo'] . '/';
+    $packageConfig = $packagePath . 'build.json';
+    if (file_exists($packageConfig)) {
+        $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
+        foreach ($packageSetting['packages'] as $namespace => $subPackage) {
+            add($subPackage, $packagesDirectory);
+        }
+    }
 }
 
 function namespaceFromName($packageName)
@@ -72,11 +86,12 @@ function findOrCreateBuildLockFile($projectDirectory, $package)
     file_put_contents($projectDirectory . '/build.lock', json_encode($lockContent, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
-function findOrCreatePackagesDirectory($projectDirectory)
+function findOrCreatePackagesDirectory()
 {
+    global $projectRoot;
     global $setting;
 
-    $packagesDirectory = $projectDirectory . '/' . $setting['packages-directory'];
+    $packagesDirectory = $projectRoot . $setting['packages-directory'];
 
     if (! file_exists($packagesDirectory)) {
         mkdir($packagesDirectory);

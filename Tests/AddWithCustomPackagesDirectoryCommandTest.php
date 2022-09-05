@@ -7,7 +7,6 @@ use Saeghe\TestRunner\Assertions\File;
 test(
     title: 'it should add package to the given directory',
     case: function () {
-        shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --path=git@github.com:saeghe/simple-package.git");
 
         assertPackageDirectoryAddedToConfig('Config does not contains the custom package directory!');
@@ -21,6 +20,7 @@ test(
         deleteEmptyProjectBuildJson();
         deleteEmptyProjectBuildLock();
         deleteEmptyProjectPackagesDirectory();
+        shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
     },
     after: function () {
         deleteEmptyProjectPackagesDirectory();
@@ -95,7 +95,7 @@ function assertBuildLockHasDesiredData($message)
         && 'development' === $lock['Saeghe\SimplePackage']['version']
         && 'saeghe' === $lock['Saeghe\SimplePackage']['owner']
         && 'simple-package' === $lock['Saeghe\SimplePackage']['repo']
-        && 'b649264405b12b95f40034c8d022ec3bbd35cabb' === $lock['Saeghe\SimplePackage']['hash'],
+        && 'bb176a6c76fb1248aa4d4844a78fd484a9c5b318' === $lock['Saeghe\SimplePackage']['hash'],
         $message
     );
 }

@@ -5,8 +5,6 @@ namespace Tests\BuildCommandTest;
 test(
     title: 'it should build the project',
     case: function () {
-        shell_exec($_SERVER['PWD'] . '/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --path=git@github.com:saeghe/simple-package.git');
-
         $output = shell_exec($_SERVER['PWD'] . '/saeghe --command=build --project=TestRequirements/Fixtures/ProjectWithTests');
 
         assertBuildDirectoryExists('Build directory has not been created!' . $output);
@@ -25,6 +23,7 @@ test(
         deleteBuildDirectory();
         deletePackagesDirectory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
+        shell_exec($_SERVER['PWD'] . '/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --path=git@github.com:saeghe/simple-package.git');
     },
     after: function () {
         deleteBuildDirectory();
