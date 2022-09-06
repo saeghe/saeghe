@@ -95,7 +95,7 @@ function assertBuildLockHasDesiredData($message)
         && 'development' === $lock['Saeghe\SimplePackage']['version']
         && 'saeghe' === $lock['Saeghe\SimplePackage']['owner']
         && 'simple-package' === $lock['Saeghe\SimplePackage']['repo']
-        && 'bb176a6c76fb1248aa4d4844a78fd484a9c5b318' === $lock['Saeghe\SimplePackage']['hash'],
+        && '3db611bcd9fe6732e011f61bd36ca60ff42f4946' === $lock['Saeghe\SimplePackage']['hash'],
         $message
     );
 }

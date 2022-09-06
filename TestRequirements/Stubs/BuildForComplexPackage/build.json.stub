@@ -1,0 +1,13 @@
+{
+    "packages-directory": "vendor",
+    "map": {
+        "Saeghe\\ComplexPackage": "src",
+        "Tests": "tests"
+    },
+    "packages": {
+        "Saeghe\\SimplePackage": {
+            "path": "git@github.com:saeghe\/simple-package.git",
+            "version": "development"
+        }
+    }
+}

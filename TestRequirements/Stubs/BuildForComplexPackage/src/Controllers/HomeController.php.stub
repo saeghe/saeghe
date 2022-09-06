@@ -1,0 +1,21 @@
+<?php
+
+namespace Saeghe\ComplexPackage\Controllers;
+
+require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Models/User.php';
+require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Helpers.php';
+require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Helpers.php';
+
+use Saeghe\ComplexPackage\Models\User;
+use function Saeghe\ComplexPackage\Helpers\helper1;
+use function Saeghe\ComplexPackage\Helpers\helper2;
+
+class HomeController extends Controller
+{
+    public function __invoke()
+    {
+        $user = new User();
+        helper1();
+        helper2();
+    }
+}

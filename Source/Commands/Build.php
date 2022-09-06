@@ -3,126 +3,81 @@
 namespace Saeghe\Saeghe\Commands\Build;
 
 use Generator;
+use Saeghe\Cli\IO\Write;
+use function Saeghe\Cli\IO\Read\argument;
 
 function run()
 {
-    global $project;
     global $projectRoot;
+    global $setting;
+    global $lockSetting;
+    global $packagesDirectory;
+    $environment = argument('environment', 'development');
 
-    $environment = getopt('', ['environment::'])['environment'] ?? 'development';
+    $buildDirectory = findOrCreateBuildDirectory($projectRoot, $environment);
+    $packagesBuildDirectory = findOrCreatePackagesBuildDirectory($buildDirectory, $setting);
+    $replaceMap = makeReplaceMap($setting, $lockSetting, $buildDirectory, $packagesDirectory, $packagesBuildDirectory);
+    compilePackages($packagesDirectory, $packagesBuildDirectory, $lockSetting, $replaceMap);
+    compileProjectFiles($projectRoot, $buildDirectory, $packagesBuildDirectory, $setting, $lockSetting, $replaceMap);
+    addExecutables($buildDirectory, $packagesBuildDirectory, $lockSetting);
 
-    $buildDirectory = resetEnvironmentBuildDirectory($project, $environment);
-    $filesAndDirectories = findProjectFilesAndDirectoriesForBuild();
+    Write\success('Build finished successfully.');
+}
+
+function addExecutables($buildDirectory, $packagesBuildDirectory, $packages)
+{
+    foreach ($packages as $package => $meta) {
+        $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
+        $packageConfig = $packageBuildDirectory . '/build.json';
+        if (file_exists($packageConfig)) {
+            $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
+
+            if (isset($packageSetting['executables'])) {
+                foreach ($packageSetting['executables'] as $linkName => $source) {
+                    $target = $packageBuildDirectory . $source;
+                    $link = $buildDirectory . $linkName;
+                    symlink($target, $link);
+                }
+            }
+        }
+    }
+}
+
+function compilePackages($packagesDirectory, $packagesBuildDirectory, $packages, $replaceMap)
+{
+    foreach ($packages as $package => $meta) {
+        $packageDirectory = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
+        $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
+        if (! file_exists($packageBuildDirectory)) {
+            mkdir($packageBuildDirectory, 0755, true);
+        }
+        $packageConfig = $packageDirectory . '/build.json';
+
+        $packageSetting = file_exists($packageConfig)
+            ? json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR)
+            : ['map' => [], 'packages' => []];
+
+        $filesAndDirectories = shouldCompileFilesAndDirectories($packageDirectory, $packageSetting);
+
+        foreach ($filesAndDirectories as $fileOrDirectory) {
+            compile($fileOrDirectory, $packageDirectory, $packageBuildDirectory, $replaceMap, $packageSetting);
+        }
+    }
+}
+
+function compileProjectFiles($projectRoot, $buildDirectory, $packagesBuildDirectory, $setting, $lockSetting, $replaceMap)
+{
+    $filesAndDirectories = shouldCompileFilesAndDirectories($projectRoot, $setting);
 
     foreach ($filesAndDirectories as $fileOrDirectory) {
-        build($fileOrDirectory, $projectRoot, $buildDirectory);
-    }
-
-    addExecutables();
-    buildEntryPoints($buildDirectory);
-    buildPackagesEntryPoints($buildDirectory);
-}
-
-function buildPackagesEntryPoints($buildDirectory)
-{
-    global $projectRoot;
-    global $setting;
-    global $lockSetting;
-
-    foreach ($lockSetting as $namespace => $package) {
-        $packagePath = $setting['packages-directory'] . '/' . $package['owner'] . '/' . $package['repo'] . '/';
-        $packageConfig = $projectRoot . $packagePath . 'build.json';
-        $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
-
-        if (isset($packageSetting['entry-points'])) {
-            foreach ($packageSetting['entry-points'] as $entrypoint) {
-                $origin = $projectRoot . $packagePath . $entrypoint;
-                $destination = $buildDirectory . '/' . $packagePath . $entrypoint;
-                compileFile($origin, $destination);
-            }
-        }
+        compile($fileOrDirectory, $projectRoot, $buildDirectory, $replaceMap, $setting);
     }
 }
 
-function buildEntryPoints($buildDirectory)
+function compile($fileOrDirectory, $from, $to, $replaceMap, $setting)
 {
-    global $projectRoot;
-    global $setting;
-
-    if (! isset($setting['entry-points'])) {
-        return;
-    }
-
-    foreach ($setting['entry-points'] as $entrypoint) {
-        compileFile($projectRoot . $entrypoint, $buildDirectory . '/' . $entrypoint);
-    }
-}
-
-function addExecutables()
-{
-    global $projectRoot;
-    global $setting;
-    global $lockSetting;
-
-    foreach ($lockSetting as $namespace => $package) {
-        $packagePath = $setting['packages-directory'] . '/' . $package['owner'] . '/' . $package['repo'] . '/';
-        $packageConfig = $projectRoot . $packagePath . 'build.json';
-        $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
-
-        if (isset($packageSetting['executables'])) {
-            foreach ($packageSetting['executables'] as $linkName => $source) {
-                $target = $projectRoot . 'builds/development/' . $packagePath . $source;
-                $link = $projectRoot . 'builds/development/' . $linkName;
-                symlink($target, $link);
-            }
-        }
-    }
-}
-
-function resetEnvironmentBuildDirectory($project, $environment)
-{
-    $buildDirectory = $_SERVER['PWD'] . '/' . $project . '/builds/' . $environment;
-
-    if (file_exists($buildDirectory)) {
-        shell_exec('rm -fR ' . $buildDirectory . '/*');
-    } else {
-        mkdir($buildDirectory, 0755, true);
-    }
-
-    return $buildDirectory;
-}
-
-function findProjectFilesAndDirectoriesForBuild()
-{
-    global $projectRoot;
-    global $setting;
-
-    $excludedPaths = array_map(
-        function ($excludedPath) use ($projectRoot) {
-            return $projectRoot . '/' . $excludedPath;
-        },
-        array_merge(['.', '..', 'builds', '.git'], $setting['entry-points'] ?? [])
-    );
-
-    $filesAndDirectories = scandir($projectRoot);
-
-    return array_filter(
-        $filesAndDirectories,
-        function ($fileOrDirectory) use ($projectRoot, $excludedPaths) {
-            $fileOrDirectoryPath = $projectRoot . '/' . $fileOrDirectory;
-            return ! in_array($fileOrDirectoryPath, $excludedPaths);
-        },
-    );
-}
-
-function build($fileOrDirectory, $from, $to)
-{
-    if (in_array($fileOrDirectory, ['.git'])) {
-        return;
-    }
-
-    $origin = $from . '/' . $fileOrDirectory;
-    $destination = $to . '/' . $fileOrDirectory;
+    $origin = $from . (str_ends_with($from, '/') ? '' : '/') . $fileOrDirectory;
+    $destination = $to . (str_ends_with($to, '/') ? '' : '/') . $fileOrDirectory;
 
     if (is_dir($origin)) {
         umask(0);
@@ -130,13 +85,14 @@ function build($fileOrDirectory, $from, $to)
         clearstatcache();
         $filesAndDirectories = allFilesAndDirectories($origin);
         foreach ($filesAndDirectories as $fileOrDirectory) {
-            build($fileOrDirectory, $origin, $destination);
+            compile($fileOrDirectory, $origin, $destination, $replaceMap, $setting);
         }
 
         return;
     }
-    if (fileNeedsModification($origin)) {
-        compileFile($origin, $destination);
+
+    if (fileNeedsModification($origin, $setting)) {
+        compileFile($origin, $destination, $replaceMap);
 
         return;
     }
@@ -144,71 +100,22 @@ function build($fileOrDirectory, $from, $to)
     intactCopy($origin, $destination);
 }
 
-function compileFile($origin, $destination)
+function compileFile($origin, $destination, $replaceMap)
 {
-    $modifiedFile = applyFileModifications($origin);
+    $modifiedFile = applyFileModifications($origin, $replaceMap);
     file_put_contents($destination, $modifiedFile);
     chmod($destination, fileperms($origin) & 0x0FFF);
     clearstatcache();
 }
 
-function fileNeedsModification($file)
+function applyFileModifications($origin, $replaceMap)
 {
-    return str_ends_with($file, '.php');
-}
-
-function allFilesAndDirectories($origin)
-{
-    $filesAndDirectories = scandir($origin);
-
-    return array_filter($filesAndDirectories, fn ($fileOrDirectory) => ! in_array($fileOrDirectory, ['.', '..']));
-}
-
-function applyFileModifications($origin)
-{
-    global $projectRoot;
-    global $setting;
-    global $lockSetting;
-
     $requireStatements = [];
-    $namespaces = [];
-    array_walk($setting['map'], function ($source, $namespace) use (&$namespaces) {
-        $namespaces[$namespace] = $source;
-    });
-
-    array_walk($lockSetting, function ($package, $namespace) use (&$namespaces, $projectRoot, $setting) {
-        $packagePath = $setting['packages-directory'] . '/' . $package['owner'] . '/' . $package['repo'] . '/';
-        $packageConfig = $projectRoot . $packagePath . 'build.json';
-        $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
-
-        foreach ($packageSetting['map'] as $namespace => $source) {
-            $namespaces[$namespace] = $packagePath . $source;
-        }
-    });
 
     foreach (readLines($origin) as $line) {
-        foreach ($namespaces as $namespace => $source) {
-            if (
-                str_starts_with($line, "use $namespace")
-                || str_starts_with($line, "use function $namespace")
-            ) {
-                $line = trim($line);
-                if (str_starts_with($line, "use function $namespace")) {
-                    $line = str_replace('use function ', '', $line);
-                    $line = str_replace($namespace, $source, $line);
-                    $function = strrpos($line, '\\');
-                    $line = substr($line, 0, strlen($line)  - (strlen($line) - $function));
-                    $line .= ".php";
-                } else {
-                    $line = str_replace('use ', '', $line);
-                    $line = str_replace(';', '.php', $line);
-                    $line = str_replace($namespace, $source, $line);
-                }
-
-                $path = $projectRoot . 'builds/development/' . str_replace('\\', '/', $line);
-
-                $requireStatements[] = "require_once '$path';";
-            }
+        $path = findRequirePath($line, $replaceMap);
+        if ($path) {
+            $requireStatements[] = "require_once '$path';";
         }
     }
 
@@ -217,6 +124,33 @@ function applyFileModifications($origin)
     }
 
     return file_get_contents($origin);
+}
+
+function findRequirePath($line, $replaceMap)
+{
+    $detectedPath = null;
+
+    foreach ($replaceMap as $namespace => $path) {
+        if (
+            str_starts_with($line, "use $namespace")
+            || str_starts_with($line, "use function $namespace")
+        ) {
+            $line = trim($line);
+            if (str_starts_with($line, "use function $namespace")) {
+                $line = str_replace("use function $namespace", $path, $line);
+                $function = strrpos($line, '\\');
+                $line = substr($line, 0, strlen($line)  - (strlen($line) - $function));
+                $line .= ".php";
+            } else {
+                $line = str_replace("use $namespace", $path, $line);
+                $line = str_replace(';', '.php', $line);
+            }
+
+            $detectedPath = str_replace('\\', '/', $line);
+        }
+    }
+
+    return $detectedPath;
 }
 
 function addRequires($requireStatements, $file)
@@ -251,6 +185,96 @@ function addRequires($requireStatements, $file)
     }
 
     return $content;
+}
+
+function makeReplaceMap($setting, $lockSetting, $buildDirectory, $packagesDirectory, $packagesBuildDirectory)
+{
+    $replaceMap = [];
+
+    foreach ($lockSetting as $namespace => $meta) {
+        $packageSource = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
+        $packageBuild = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
+        $packageConfig =  $packageSource . 'build.json';
+        $packageLockFile =  $packageSource . 'build.lock';
+        $subSetting = file_exists($packageConfig)
+            ? json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR)
+            : ['map' => [], 'packages' => []];
+        $subLockSetting = file_exists($packageLockFile)
+            ? json_decode(json: file_get_contents($packageLockFile), associative: true, flags: JSON_THROW_ON_ERROR)
+            : [];
+
+        $replaceMap = array_merge(
+            $replaceMap,
+            makeReplaceMap($subSetting, $subLockSetting, $packageBuild, $packagesDirectory, $packagesBuildDirectory)
+        );
+    }
+
+    array_walk($setting['map'], function ($source, $namespace) use (&$replaceMap, $buildDirectory) {
+        $replaceMap[$namespace] = $buildDirectory . $source;
+    });
+
+    return $replaceMap;
+}
+
+function shouldCompileFilesAndDirectories($path, $setting)
+{
+    $excludedPaths = array_map(
+        function ($excludedPath) use ($path) {
+            return $path . $excludedPath;
+        },
+        ['.', '..', 'builds', '.git', 'Packages', '.idea']
+    );
+
+    $filesAndDirectories = scandir($path);
+
+    return array_filter(
+        $filesAndDirectories,
+        function ($fileOrDirectory) use ($path, $excludedPaths) {
+            $fileOrDirectoryPath = $path . $fileOrDirectory;
+            return ! in_array($fileOrDirectoryPath, $excludedPaths);
+        },
+    );
+}
+
+function findOrCreatePackagesBuildDirectory($buildDirectory, $setting)
+{
+    $packagesBuildDirectory = $buildDirectory . $setting['packages-directory'];
+
+    if (! file_exists($packagesBuildDirectory)) {
+        mkdir($packagesBuildDirectory);
+    }
+
+    return $packagesBuildDirectory . '/';
+}
+
+function findOrCreateBuildDirectory($projectRoot, $environment)
+{
+    $buildDirectory = $projectRoot . 'builds/' . $environment . '/';
+
+    if (! file_exists($buildDirectory)) {
+        mkdir($buildDirectory, 0755, true);
+    } else {
+        shell_exec("rm -fR $buildDirectory*");
+    }
+
+    return $buildDirectory;
+}
+
+function fileNeedsModification($file, $setting)
+{
+    return array_reduce(
+            array: $setting['entry-points'] ?? [],
+            callback: fn ($carry, $entryPoint) => str_ends_with($file, $entryPoint) || $carry,
+            initial: false
+        )
+        || str_ends_with($file, '.php');
+}
+
+function allFilesAndDirectories($origin)
+{
+    $filesAndDirectories = scandir($origin);
+
+    return array_filter($filesAndDirectories, fn ($fileOrDirectory) => ! in_array($fileOrDirectory, ['.', '..']));
 }
 
 function readLines(string $source): Generator

@@ -6,7 +6,7 @@ test(
     title: 'it should add a complex project',
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --path=git@github.com:saeghe/complex-package.git");
-var_dump($output);
+
         assertPacakgesAddedToPackagesDirectory('Packages does not added to the packages directory!' . $output);
         assertBuildFileHasDesiredData('Build file for adding complex package does not have desired data!' . $output);
         assertLockFileHasDesiredData('Build lock for adding complex package does not have desired data!' . $output);
@@ -14,7 +14,6 @@ var_dump($output);
     before: function () {
         deleteBuildJson();
         deleteBuildLock();
-        deleteBuildDirectory();
         deletePackagesDirectory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
     },
@@ -22,7 +21,6 @@ var_dump($output);
         deleteBuildJson();
         deleteBuildLock();
         deletePackagesDirectory();
-        deleteBuildDirectory();
     }
 );
 
@@ -34,11 +32,6 @@ function deleteBuildJson()
 function deleteBuildLock()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.lock');
-}
-
-function deleteBuildDirectory()
-{
-    shell_exec('rm -Rf ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
 }
 
 function deletePackagesDirectory()
@@ -84,13 +77,13 @@ function assertLockFileHasDesiredData($message)
         &&'development' === $lock['Saeghe\SimplePackage']['version']
         &&'saeghe' === $lock['Saeghe\SimplePackage']['owner']
         &&'simple-package' === $lock['Saeghe\SimplePackage']['repo']
-        && 'bb176a6c76fb1248aa4d4844a78fd484a9c5b318' === $lock['Saeghe\SimplePackage']['hash']
+        && '3db611bcd9fe6732e011f61bd36ca60ff42f4946' === $lock['Saeghe\SimplePackage']['hash']
 
         && 'git@github.com:saeghe/complex-package.git' === $lock['Saeghe\ComplexPackage']['path']
         &&'development' === $lock['Saeghe\ComplexPackage']['version']
         && 'saeghe' === $lock['Saeghe\ComplexPackage']['owner']
         && 'complex-package' === $lock['Saeghe\ComplexPackage']['repo']
-        && 'b220ddd2e3a2dcd4476b15a00c2558f5874dc6aa' === $lock['Saeghe\ComplexPackage']['hash'],
+        && '17c0fa9ab333ef7280726f99bb878d17940e0ab5' === $lock['Saeghe\ComplexPackage']['hash'],
         $message
     );
 }
