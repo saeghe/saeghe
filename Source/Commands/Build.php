@@ -62,6 +62,12 @@ function compilePackages($packagesDirectory, $packagesBuildDirectory, $packages,
         foreach ($filesAndDirectories as $fileOrDirectory) {
             compile($fileOrDirectory, $packageDirectory, $packageBuildDirectory, $replaceMap, $packageSetting);
         }
+
+//        if (isset($packageSetting['executables'])) {
+//            foreach ($packageSetting['executables'] as $symlink => $path) {
+//                compile($path, $packageDirectory, $packageBuildDirectory, $replaceMap, $packageSetting);
+//            }
+//        }
     }
 }
 
@@ -262,8 +268,11 @@ function findOrCreateBuildDirectory($projectRoot, $environment)
 
 function fileNeedsModification($file, $setting)
 {
+    $executables = isset($setting['executables']) ?  array_values($setting['executables']) : [];
+    $entryPoints = $setting['entry-points'] ?? [];
+
     return array_reduce(
-            array: $setting['entry-points'] ?? [],
+            array: array_merge($executables, $entryPoints),
             callback: fn ($carry, $entryPoint) => str_ends_with($file, $entryPoint) || $carry,
             initial: false
         )

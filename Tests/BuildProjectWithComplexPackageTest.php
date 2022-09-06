@@ -7,6 +7,7 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=build --project=TestRequirements/Fixtures/ProjectWithTests");
         assertBuildForPackages('Packages file does not built properly!' . $output);
+        assertExecutableFileAdded('Complex executable file has not been created!' . $output);
     },
     before: function () {
         deleteBuildJson();
@@ -57,6 +58,7 @@ function assertBuildForPackages($message)
        && buildExistsAndSameAsStub('tests/TestHelper.php')
        && buildExistsAndSameAsStub('build.json')
        && buildExistsAndSameAsStub('build.lock')
+       && buildExistsAndSameAsStub('cli-command')
        ,
        $message
    );
@@ -70,4 +72,15 @@ function buildExistsAndSameAsStub($file)
     return
         file_exists($environmentBuildPath . '/Packages/saeghe/complex-package/' . $file)
         && file_get_contents($environmentBuildPath . '/Packages/saeghe/complex-package/' . $file) === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/' . $file . '.stub'));
+}
+
+function assertExecutableFileAdded($message)
+{
+    assert(
+        is_link($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/complex')
+        && readlink($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/complex')
+             === $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/complex-package/cli-command'
+        ,
+        $message
+    );
 }

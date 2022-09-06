@@ -9,5 +9,8 @@
             "path": "git@github.com:saeghe\/simple-package.git",
             "version": "development"
         }
+    },
+    "executables": {
+        "complex": "cli-command"
     }
 }

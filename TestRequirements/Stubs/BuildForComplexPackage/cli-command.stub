@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+
+require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Models/User.php';
+require_once '$environmentBuildPath/Packages/saeghe/simple-package/Source/SimpleClass.php';
+require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Helpers.php';
+
+use Saeghe\ComplexPackage\Models\User;
+use Saeghe\SimplePackage\SimpleClass;
+use Saeghe\ComplexPackage\Helpers;

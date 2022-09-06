@@ -83,7 +83,7 @@ function assertLockFileHasDesiredData($message)
         &&'development' === $lock['Saeghe\ComplexPackage']['version']
         && 'saeghe' === $lock['Saeghe\ComplexPackage']['owner']
         && 'complex-package' === $lock['Saeghe\ComplexPackage']['repo']
-        && '17c0fa9ab333ef7280726f99bb878d17940e0ab5' === $lock['Saeghe\ComplexPackage']['hash'],
+        && 'cbbe25a4748e7e3332293963586e2316e8a93def' === $lock['Saeghe\ComplexPackage']['hash'],
         $message
     );
 }
