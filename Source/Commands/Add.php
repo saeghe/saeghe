@@ -2,24 +2,27 @@
 
 namespace Saeghe\Saeghe\Commands\Add;
 
-use Exception;
+use function Saeghe\Cli\IO\Read\argument;
 
 function run()
 {
-    $package['path'] = getopt('', ['path::'])['path'] ?? throw new Exception('Package is required to add a path!');
+    $package['path'] = argument('path');
 
     $packagesDirectory = findOrCreatePackagesDirectory();
 
     add($package, $packagesDirectory);
 }
 
-function add($package, $packagesDirectory)
+function add($package, $packagesDirectory, $submodule = false)
 {
     global $projectRoot;
 
     $package = clonePackage($packagesDirectory, $package);
     $package['namespace'] = namespaceFromName($package['name']);
-    findOrCreateBuildJsonFile($projectRoot, $package);
+    if (! $submodule) {
+        findOrCreateBuildJsonFile($projectRoot, $package);
+    }
+
     findOrCreateBuildLockFile($projectRoot, $package);
 
     $packagePath = $packagesDirectory . '/' . $package['owner'] . '/' . $package['repo'] . '/';
@@ -27,7 +30,7 @@ function add($package, $packagesDirectory)
     if (file_exists($packageConfig)) {
         $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
         foreach ($packageSetting['packages'] as $namespace => $subPackage) {
-            add($subPackage, $packagesDirectory);
+            add($subPackage, $packagesDirectory, true);
         }
     }
 }

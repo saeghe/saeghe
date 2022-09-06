@@ -57,9 +57,7 @@ function assertBuildFileHasDesiredData($message)
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
-        assert(isset($config['packages']['Saeghe\SimplePackage']))
-        && assert('git@github.com:saeghe/simple-package.git' === $config['packages']['Saeghe\SimplePackage']['path'])
-        && assert('development' === $config['packages']['Saeghe\SimplePackage']['version'])
+        assert(! isset($config['packages']['Saeghe\SimplePackage']))
 
         && assert(isset($config['packages']['Saeghe\ComplexPackage']))
         && assert('git@github.com:saeghe/complex-package.git' === $config['packages']['Saeghe\ComplexPackage']['path'])
