@@ -2,12 +2,14 @@
 
 namespace Saeghe\Saeghe\Commands\Initialize;
 
+use function Saeghe\Cli\IO\Read\argument;
+
 function run()
 {
     global $projectRoot;
 
-    $filename = getopt('', ['config::'])['config'] ?? 'build.json';
-    $packagesDirectory = getopt('', ['packages-directory::'])['packages-directory'] ?? null;
+    $filename = argument('config', 'build.json');
+    $packagesDirectory = argument('packages-directory');
 
     $config = ['packages' => []];
 
