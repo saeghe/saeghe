@@ -27,6 +27,25 @@ test(
     }
 );
 
+test(
+    title: 'it should add package to the project without trailing .git',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package");
+
+        assertSimplePackageCloned('Simple package does not cloned!' . $output);
+    },
+    before: function () {
+        deleteEmptyProjectBuildJson();
+        deleteEmptyProjectBuildLock();
+        deleteEmptyProjectPackagesDirectory();
+    },
+    after: function () {
+        deleteEmptyProjectPackagesDirectory();
+        deleteEmptyProjectBuildJson();
+        deleteEmptyProjectBuildLock();
+    }
+);
+
 function deleteEmptyProjectBuildJson()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json');

@@ -84,7 +84,9 @@ function findOrCreatePackagesDirectory()
 function clonePackage($packageDirectory, $package, $version)
 {
     $ownerAndRepo = str_replace('git@github.com:', '', $package);
-    $ownerAndRepo = substr_replace($ownerAndRepo, '', -4);
+    if (str_ends_with($ownerAndRepo, '.git')) {
+        $ownerAndRepo = substr_replace($ownerAndRepo, '', -4);
+    }
 
     [$meta['owner'], $meta['repo']] = explode('/', $ownerAndRepo);
 
