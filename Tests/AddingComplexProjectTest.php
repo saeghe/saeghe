@@ -5,7 +5,7 @@ namespace Tests\AddingComplexProjectTest;
 test(
     title: 'it should add a complex project',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --path=git@github.com:saeghe/complex-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/complex-package.git");
 
         assertPacakgesAddedToPackagesDirectory('Packages does not added to the packages directory!' . $output);
         assertBuildFileHasDesiredData('Build file for adding complex package does not have desired data!' . $output);
@@ -31,7 +31,7 @@ function deleteBuildJson()
 
 function deleteBuildLock()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.lock');
+    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
 }
 
 function deletePackagesDirectory()
@@ -47,7 +47,7 @@ function assertPacakgesAddedToPackagesDirectory($message)
         && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/README.md')
         && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package')
         && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/build.json')
-        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/build.lock'),
+        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/build-lock.json'),
         $message
     );
 }
@@ -57,31 +57,30 @@ function assertBuildFileHasDesiredData($message)
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
-        assert(! isset($config['packages']['Saeghe\SimplePackage']))
+        assert(! isset($config['packages']['git@github.com:saeghe/simple-package.git']))
 
-        && assert(isset($config['packages']['Saeghe\ComplexPackage']))
-        && assert('git@github.com:saeghe/complex-package.git' === $config['packages']['Saeghe\ComplexPackage']['path'])
-        && assert('development' === $config['packages']['Saeghe\ComplexPackage']['version']),
+        && assert(isset($config['packages']['git@github.com:saeghe/complex-package.git']))
+        && assert('development' === $config['packages']['git@github.com:saeghe/complex-package.git']),
         $message
     );
 }
 
 function assertLockFileHasDesiredData($message)
 {
-    $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.lock'), true, JSON_THROW_ON_ERROR);
+    $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
-        'git@github.com:saeghe/simple-package.git' === $lock['Saeghe\SimplePackage']['path']
-        &&'development' === $lock['Saeghe\SimplePackage']['version']
-        &&'saeghe' === $lock['Saeghe\SimplePackage']['owner']
-        &&'simple-package' === $lock['Saeghe\SimplePackage']['repo']
-        && '3db611bcd9fe6732e011f61bd36ca60ff42f4946' === $lock['Saeghe\SimplePackage']['hash']
+        isset($lock['packages']['git@github.com:saeghe/simple-package.git'])
+        &&'development' === $lock['packages']['git@github.com:saeghe/simple-package.git']['version']
+        &&'saeghe' === $lock['packages']['git@github.com:saeghe/simple-package.git']['owner']
+        &&'simple-package' === $lock['packages']['git@github.com:saeghe/simple-package.git']['repo']
+        && '3db611bcd9fe6732e011f61bd36ca60ff42f4946' === $lock['packages']['git@github.com:saeghe/simple-package.git']['hash']
 
-        && 'git@github.com:saeghe/complex-package.git' === $lock['Saeghe\ComplexPackage']['path']
-        &&'development' === $lock['Saeghe\ComplexPackage']['version']
-        && 'saeghe' === $lock['Saeghe\ComplexPackage']['owner']
-        && 'complex-package' === $lock['Saeghe\ComplexPackage']['repo']
-        && 'cbbe25a4748e7e3332293963586e2316e8a93def' === $lock['Saeghe\ComplexPackage']['hash'],
+        && isset($lock['packages']['git@github.com:saeghe/complex-package.git'])
+        &&'development' === $lock['packages']['git@github.com:saeghe/complex-package.git']['version']
+        && 'saeghe' === $lock['packages']['git@github.com:saeghe/complex-package.git']['owner']
+        && 'complex-package' === $lock['packages']['git@github.com:saeghe/complex-package.git']['repo']
+        && '5e60733132ddf50df675b2491e35b7bb01674c3e' === $lock['packages']['git@github.com:saeghe/complex-package.git']['hash'],
         $message
     );
 }

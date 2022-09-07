@@ -6,54 +6,39 @@ use function Saeghe\Cli\IO\Read\argument;
 
 function run()
 {
-    $package['path'] = argument('path');
+    $package = argument('package');
+    $version = null;
 
     $packagesDirectory = findOrCreatePackagesDirectory();
 
-    add($package, $packagesDirectory);
+    add($packagesDirectory, $package, $version);
 }
 
-function add($package, $packagesDirectory, $submodule = false)
+function add($packagesDirectory, $package, $version = null, $submodule = false)
 {
     global $projectRoot;
 
-    $package = clonePackage($packagesDirectory, $package);
-    $package['namespace'] = namespaceFromName($package['name']);
+    $meta = clonePackage($packagesDirectory, $package, $version);
+
     if (! $submodule) {
-        findOrCreateBuildJsonFile($projectRoot, $package);
+        findOrCreateBuildJsonFile($projectRoot, $package, $meta);
     }
 
-    findOrCreateBuildLockFile($projectRoot, $package);
+    findOrCreateBuildLockFile($projectRoot, $package, $meta);
 
-    $packagePath = $packagesDirectory . '/' . $package['owner'] . '/' . $package['repo'] . '/';
+    $packagePath = $packagesDirectory . '/' . $meta['owner'] . '/' . $meta['repo'] . '/';
     $packageConfig = $packagePath . 'build.json';
     if (file_exists($packageConfig)) {
         $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
-        foreach ($packageSetting['packages'] as $namespace => $subPackage) {
-            add($subPackage, $packagesDirectory, true);
+        foreach ($packageSetting['packages'] as $subPackage => $version) {
+            add($packagesDirectory, $subPackage, $version, true);
         }
     }
 }
 
-function namespaceFromName($packageName)
+function findOrCreateBuildJsonFile($projectDirectory, $package, $meta)
 {
-    [$owner, $repo] = explode('/', $packageName);
-
-    $repo = str_replace('-', '', ucwords($repo, '-'));
-
-    return ucfirst($owner) . '\\' . ucfirst($repo);
-}
-
-function detectName($package)
-{
-    $name = str_replace('git@github.com:', '', $package);
-
-    return substr_replace($name, '', -4);
-}
-
-function findOrCreateBuildJsonFile($projectDirectory, $package)
-{
-    $configFile = $projectDirectory . '/build.json';
+    $configFile = $projectDirectory . 'build.json';
 
     if (! file_exists($configFile)) {
         file_put_contents($configFile, json_encode([], JSON_PRETTY_PRINT));
@@ -61,17 +46,14 @@ function findOrCreateBuildJsonFile($projectDirectory, $package)
 
     $config = json_decode(file_get_contents($configFile), true, JSON_THROW_ON_ERROR);
 
-    $config['packages'][$package['namespace']] = [
-        'path' => $package['path'],
-        'version' => $package['version'],
-    ];
+    $config['packages'][$package] = $meta['version'];
 
-    file_put_contents($projectDirectory . '/build.json', json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($projectDirectory . 'build.json', json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
-function findOrCreateBuildLockFile($projectDirectory, $package)
+function findOrCreateBuildLockFile($projectDirectory, $package, $meta)
 {
-    $configFile = $projectDirectory . '/build.lock';
+    $configFile = $projectDirectory . 'build-lock.json';
 
     if (! file_exists($configFile)) {
         file_put_contents($configFile, json_encode([], JSON_PRETTY_PRINT));
@@ -79,14 +61,13 @@ function findOrCreateBuildLockFile($projectDirectory, $package)
 
     $lockContent = json_decode(file_get_contents($configFile), true, JSON_THROW_ON_ERROR);
 
-    $lockContent[$package['namespace']] = [
-        'path' => $package['path'],
-        'version' => $package['version'],
-        'hash' => trim($package['hash']),
-        'owner' => trim($package['owner']),
-        'repo' => trim($package['repo']),
+    $lockContent['packages'][$package] = [
+        'version' => $meta['version'],
+        'hash' => trim($meta['hash']),
+        'owner' => trim($meta['owner']),
+        'repo' => trim($meta['repo']),
     ];
-    file_put_contents($projectDirectory . '/build.lock', json_encode($lockContent, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($projectDirectory . 'build-lock.json', json_encode($lockContent, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
 function findOrCreatePackagesDirectory()
@@ -97,17 +78,22 @@ function findOrCreatePackagesDirectory()
         mkdir($packagesDirectory);
     }
 
-    return $packagesDirectory;
+    return $packagesDirectory . '/';
 }
 
-function clonePackage($packageDirectory, $package)
+function clonePackage($packageDirectory, $package, $version)
 {
-    $package['name'] = detectName($package['path']);
-    [$package['owner'], $package['repo']] = explode('/', $package['name']);
-    $package['destination'] = "$packageDirectory/{$package['owner']}/{$package['repo']}";
-    shell_exec("git clone {$package['path']} {$package['destination']}");
-    $package['hash'] = shell_exec("git --git-dir={$package['destination']}/.git rev-parse HEAD");
-    $package['version'] = 'development';
+    $ownerAndRepo = str_replace('git@github.com:', '', $package);
+    $ownerAndRepo = substr_replace($ownerAndRepo, '', -4);
 
-    return $package;
+    [$meta['owner'], $meta['repo']] = explode('/', $ownerAndRepo);
+
+    $destination = "$packageDirectory{$meta['owner']}/{$meta['repo']}";
+
+    shell_exec("git clone $package $destination");
+
+    $meta['hash'] = shell_exec("git --git-dir=$destination/.git rev-parse HEAD");
+    $meta['version'] = 'development';
+
+    return $meta;
 }

@@ -1,0 +1,10 @@
+{
+    "packages": {
+        "git@github.com:saeghe\/simple-package.git": {
+            "version": "development",
+            "hash": "bb176a6c76fb1248aa4d4844a78fd484a9c5b318",
+            "owner": "saeghe",
+            "repo": "simple-package"
+        }
+    }
+}

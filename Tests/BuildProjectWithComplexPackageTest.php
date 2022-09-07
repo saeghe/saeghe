@@ -16,7 +16,7 @@ test(
         deletePackagesDirectory();
 
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
-        shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --path=git@github.com:saeghe/complex-package.git");
+        shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/complex-package.git");
     },
     after: function () {
         deleteBuildJson();
@@ -33,7 +33,7 @@ function deleteBuildJson()
 
 function deleteBuildLock()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.lock');
+    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
 }
 
 function deleteBuildDirectory()
@@ -57,7 +57,7 @@ function assertBuildForPackages($message)
        && buildExistsAndSameAsStub('tests/Features/FirstFeature.php')
        && buildExistsAndSameAsStub('tests/TestHelper.php')
        && buildExistsAndSameAsStub('build.json')
-       && buildExistsAndSameAsStub('build.lock')
+       && buildExistsAndSameAsStub('build-lock.json')
        && buildExistsAndSameAsStub('cli-command')
        ,
        $message

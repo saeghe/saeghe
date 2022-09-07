@@ -24,12 +24,13 @@ $setting = [
     'executables' => $setting['executables'] ?? [],
 ];
 
-$lockPath = str_replace('.json', '.lock', $configPath);
+$lockPath = str_replace('.json', '-lock.json', $configPath);
 $lockSetting = file_exists($lockPath) ? json_decode(json: file_get_contents($lockPath), associative: true, flags: JSON_THROW_ON_ERROR) : [];
+$lockSetting['packages'] = $lockSetting['packages'] ?? [];
 
 $packagesDirectory = $projectRoot . $setting['packages-directory'] . '/';
 
-$command = getopt('', ['command::'])['command'] ?? 'help';
+$command = Read\argument('command', 'help');
 
 switch ($command) {
     case 'initialize':

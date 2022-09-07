@@ -5,10 +5,7 @@
         "Tests": "tests"
     },
     "packages": {
-        "Saeghe\\SimplePackage": {
-            "path": "git@github.com:saeghe\/simple-package.git",
-            "version": "development"
-        }
+        "git@github.com:saeghe\/simple-package.git": "development"
     },
     "executables": {
         "complex": "cli-command"

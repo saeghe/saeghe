@@ -26,7 +26,7 @@ function run()
 
 function addExecutables($buildDirectory, $packagesBuildDirectory, $packages)
 {
-    foreach ($packages as $package => $meta) {
+    foreach ($packages['packages'] as $package => $meta) {
         $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
         $packageConfig = $packageBuildDirectory . '/build.json';
         if (file_exists($packageConfig)) {
@@ -45,7 +45,7 @@ function addExecutables($buildDirectory, $packagesBuildDirectory, $packages)
 
 function compilePackages($packagesDirectory, $packagesBuildDirectory, $packages, $replaceMap)
 {
-    foreach ($packages as $package => $meta) {
+    foreach ($packages['packages'] as $package => $meta) {
         $packageDirectory = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
         $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
         if (! file_exists($packageBuildDirectory)) {
@@ -62,12 +62,6 @@ function compilePackages($packagesDirectory, $packagesBuildDirectory, $packages,
         foreach ($filesAndDirectories as $fileOrDirectory) {
             compile($fileOrDirectory, $packageDirectory, $packageBuildDirectory, $replaceMap, $packageSetting);
         }
-
-//        if (isset($packageSetting['executables'])) {
-//            foreach ($packageSetting['executables'] as $symlink => $path) {
-//                compile($path, $packageDirectory, $packageBuildDirectory, $replaceMap, $packageSetting);
-//            }
-//        }
     }
 }
 
@@ -197,17 +191,19 @@ function makeReplaceMap($setting, $lockSetting, $buildDirectory, $packagesDirect
 {
     $replaceMap = [];
 
-    foreach ($lockSetting as $namespace => $meta) {
+    foreach ($lockSetting['packages'] as $package => $meta) {
         $packageSource = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
         $packageBuild = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
         $packageConfig =  $packageSource . 'build.json';
-        $packageLockFile =  $packageSource . 'build.lock';
+        $packageLockFile =  $packageSource . 'build-lock.json';
         $subSetting = file_exists($packageConfig)
             ? json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR)
             : ['map' => [], 'packages' => []];
         $subLockSetting = file_exists($packageLockFile)
             ? json_decode(json: file_get_contents($packageLockFile), associative: true, flags: JSON_THROW_ON_ERROR)
             : [];
+
+        $subLockSetting['packages'] = $subLockSetting['packages'] ?? [];
 
         $replaceMap = array_merge(
             $replaceMap,

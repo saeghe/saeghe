@@ -7,7 +7,7 @@ use Saeghe\TestRunner\Assertions\File;
 test(
     title: 'it should add package to the project',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --path=git@github.com:saeghe/simple-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
 
         assertBuildCreatedForSimpleProject('Config file is not created!' . $output);
         assertSimplePackageAddedToBuildConfig('Simple Package does not added to config file properly! ' . $output);
@@ -34,7 +34,7 @@ function deleteEmptyProjectBuildJson()
 
 function deleteEmptyProjectBuildLock()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.lock');
+    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json');
 }
 
 function deleteEmptyProjectPackagesDirectory()
@@ -67,23 +67,22 @@ function assertSimplePackageAddedToBuildConfig($message)
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
-        assert(isset($config['packages']['Saeghe\SimplePackage']))
-        && assert('git@github.com:saeghe/simple-package.git' === $config['packages']['Saeghe\SimplePackage']['path'])
-        && assert('development' === $config['packages']['Saeghe\SimplePackage']['version']),
+        assert(isset($config['packages']['git@github.com:saeghe/simple-package.git']))
+        && assert('development' === $config['packages']['git@github.com:saeghe/simple-package.git']),
         $message
     );
 }
 
 function assertBuildLockHasDesiredData($message)
 {
-    $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.lock'), true, JSON_THROW_ON_ERROR);
+    $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
-        'git@github.com:saeghe/simple-package.git' === $lock['Saeghe\SimplePackage']['path']
-        && 'development' === $lock['Saeghe\SimplePackage']['version']
-        && 'saeghe' === $lock['Saeghe\SimplePackage']['owner']
-        && 'simple-package' === $lock['Saeghe\SimplePackage']['repo']
-        && '3db611bcd9fe6732e011f61bd36ca60ff42f4946' === $lock['Saeghe\SimplePackage']['hash'],
+        isset($lock['packages']['git@github.com:saeghe/simple-package.git'])
+        && 'development' === $lock['packages']['git@github.com:saeghe/simple-package.git']['version']
+        && 'saeghe' === $lock['packages']['git@github.com:saeghe/simple-package.git']['owner']
+        && 'simple-package' === $lock['packages']['git@github.com:saeghe/simple-package.git']['repo']
+        && '3db611bcd9fe6732e011f61bd36ca60ff42f4946' === $lock['packages']['git@github.com:saeghe/simple-package.git']['hash'],
         $message
     );
 }
