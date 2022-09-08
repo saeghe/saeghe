@@ -168,7 +168,12 @@ function downloadPackage($packageDirectory, $package, $version, $meta)
 
 function getMetaFromPackage($package)
 {
-    $ownerAndRepo = str_replace('git@github.com:', '', $package);
+    if (str_starts_with($package, 'https:')) {
+        $ownerAndRepo = str_replace('https://github.com/', '', $package);
+    } else {
+        $ownerAndRepo = str_replace('git@github.com:', '', $package);
+    }
+
     if (str_ends_with($ownerAndRepo, '.git')) {
         $ownerAndRepo = substr_replace($ownerAndRepo, '', -4);
     }
