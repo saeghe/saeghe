@@ -220,11 +220,12 @@ function makeReplaceMap($setting, $lockSetting, $buildDirectory, $packagesDirect
 
 function shouldCompileFilesAndDirectories($path, $setting)
 {
+    $settingExcludes = $setting['excludes'] ?? [];
     $excludedPaths = array_map(
         function ($excludedPath) use ($path) {
             return $path . $excludedPath;
         },
-        ['.', '..', 'builds', '.git', 'Packages', '.idea']
+        array_merge(['.', '..', 'builds', '.git', 'Packages', '.idea'], $settingExcludes)
     );
 
     $filesAndDirectories = scandir($path);

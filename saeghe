@@ -7,6 +7,7 @@ require __DIR__ . '/Source/Commands/Add.php';
 require __DIR__ . '/Source/Commands/Build.php';
 require __DIR__ . '/Source/Commands/Initialize.php';
 require __DIR__ . '/Source/Commands/Install.php';
+require __DIR__ . '/Source/Commands/Migrate.php';
 require __DIR__ . '/Source/Commands/Remove.php';
 require __DIR__ . '/Source/Commands/Update.php';
 
@@ -49,6 +50,9 @@ switch ($command) {
         break;
     case 'install':
         \Saeghe\Saeghe\Commands\Install\run();
+        break;
+    case 'migrate':
+        \Saeghe\Saeghe\Commands\Migrate\run();
         break;
     case 'remove':
         \Saeghe\Saeghe\Commands\Remove\run();

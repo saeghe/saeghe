@@ -1,0 +1,16 @@
+{
+    "packages": {
+        "https:\/\/github.com\/Seldaek\/monolog.git": {
+            "version": "3.2.0",
+            "hash": "305444bc6fb6c89e490f4b34fa6e979584d7fa81",
+            "owner": "Seldaek",
+            "repo": "monolog"
+        },
+        "https:\/\/github.com\/php-fig\/log.git": {
+            "version": "3.0.0",
+            "hash": "fe5ea303b0887d5caefd3d431c3e61ad47037001",
+            "owner": "php-fig",
+            "repo": "log"
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "name": "saeghe/composer-package",
+    "description": "A test composer package",
+    "type": "library",
+    "require": {
+        "monolog/monolog": "^3.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Saeghe\\ComposerPackage\\": "src/"
+        }
+    }
+}

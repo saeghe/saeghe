@@ -5,5 +5,8 @@
     },
     "entry-points": [
         "entry-point"
+    ],
+    "excludes": [
+        "excluded-file.php", "excluded-directory"
     ]
 }

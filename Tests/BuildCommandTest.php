@@ -18,6 +18,7 @@ test(
         assertExecutablesAreLinked('Executable files did not linked' . $output);
         assertBuildForProjectEntryPoints('Project entry point does not built properly!' . $output);
         assertBuildForPackagesEntryPoints('Packages entry point does not built properly!' . $output);
+        assertExcludeNotBuilt('Excludes has been built!' . $output);
     },
     before: function () {
         deleteBuildDirectory();
@@ -173,5 +174,14 @@ function assertBuildForPackagesEntryPoints($message)
         file_exists($environmentBuildPath . '/Packages/saeghe/simple-package/entry-point')
         && file_get_contents($environmentBuildPath . '/Packages/saeghe/simple-package/entry-point') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/entry-point.stub')),
         $message
+    );
+}
+
+function assertExcludeNotBuilt($message)
+{
+    assert(
+        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/excluded-file.php')
+        && ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/excluded-directory')
+        , $message
     );
 }
