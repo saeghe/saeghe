@@ -14,6 +14,7 @@ test(
         assertPackagesDirectoryCreatedForEmptyProject('Package directory does not created.' . $output);
         assertReleasedPackageCloned('Released package does not cloned!' . $output);
         assertBuildLockHasDesiredData('Data in the lock files is not what we want.' . $output);
+        assertZipFileDeleted('Zip file has not been deleted.' . $output);
     },
     before: function () {
         deleteEmptyProjectBuildJson();
@@ -85,6 +86,14 @@ function assertBuildLockHasDesiredData($message)
         && 'saeghe' === $lock['packages']['git@github.com:saeghe/released-package.git']['owner']
         && 'released-package' === $lock['packages']['git@github.com:saeghe/released-package.git']['repo']
         && '9554ff78c29bf1d2b75940a22a0726f2fd953b43' === $lock['packages']['git@github.com:saeghe/released-package.git']['hash'],
+        $message
+    );
+}
+
+function assertZipFileDeleted($message)
+{
+    assert(
+        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package.zip'),
         $message
     );
 }

@@ -7,6 +7,7 @@ require __DIR__ . '/Source/Commands/Add.php';
 require __DIR__ . '/Source/Commands/Build.php';
 require __DIR__ . '/Source/Commands/Initialize.php';
 require __DIR__ . '/Source/Commands/Remove.php';
+require __DIR__ . '/Source/Commands/Update.php';
 
 use Saeghe\Cli\IO\Read;
 
@@ -47,6 +48,10 @@ switch ($command) {
         break;
     case 'remove':
         \Saeghe\Saeghe\Commands\Remove\run();
+        break;
+    case 'update':
+        \Saeghe\Saeghe\Commands\Update\run();
+        break;
     default:
         // TODO: Add help
         break;

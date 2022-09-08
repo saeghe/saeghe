@@ -92,6 +92,7 @@ function clonePackage($packageDirectory, $package, $version, $meta)
 {
     $destination = "$packageDirectory{$meta['owner']}/{$meta['repo']}";
 
+    shell_exec("rm -fR $destination");
     shell_exec("git clone $package $destination");
 
     $meta['hash'] = shell_exec("git --git-dir=$destination/.git rev-parse HEAD");
@@ -148,6 +149,8 @@ function downloadPackage($packageDirectory, $package, $version, $meta)
     } else {
         var_dump($res);
     }
+
+    shell_exec('rm -f ' . $zipFile);
 
     $files = scandir($ownerDirectory);
 
