@@ -8,14 +8,14 @@ use function Saeghe\Cli\IO\Read\argument;
 function run()
 {
     $package = argument('package');
-    $version = null;
+    $version = argument('version');
 
     $packagesDirectory = findOrCreatePackagesDirectory();
 
     add($packagesDirectory, $package, $version);
 }
 
-function add($packagesDirectory, $package, $version = null, $submodule = false)
+function add($packagesDirectory, $package, $version, $submodule = false)
 {
     global $projectRoot;
 
@@ -85,7 +85,7 @@ function findOrCreatePackagesDirectory()
         mkdir($packagesDirectory);
     }
 
-    return $packagesDirectory . '/';
+    return $packagesDirectory;
 }
 
 function clonePackage($packageDirectory, $package, $version, $meta)
@@ -113,9 +113,12 @@ function downloadPackage($packageDirectory, $package, $version, $meta)
 {
     global $credentials;
 
-    $output = shell_exec('curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/{$meta['owner']}/{$meta['repo']}/releases/latest | grep 'tag_name'");
-    $tag = str_replace('"tag_name": "', '', $output);
-    $tag = trim(explode('"', $tag)[0]);
+    if (is_null($version)) {
+        $output = shell_exec('curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/{$meta['owner']}/{$meta['repo']}/releases/latest | grep 'tag_name'");
+        $version = str_replace('"tag_name": "', '', $output);
+        $version = trim(explode('"', $version)[0]);
+    }
+
 
     $ownerDirectory = $packageDirectory . $meta['owner'] . '/';
 
@@ -127,7 +130,7 @@ function downloadPackage($packageDirectory, $package, $version, $meta)
 
     $token = $credentials['github.com']['token'];
     $fp = fopen ($zipFile, 'w+');
-    $ch = curl_init("https://github.com/{$meta['owner']}/{$meta['repo']}/zipball/$tag");
+    $ch = curl_init("https://github.com/{$meta['owner']}/{$meta['repo']}/zipball/$version");
     curl_setopt($ch, CURLOPT_TIMEOUT, 600);
     curl_setopt($ch, CURLOPT_FILE, $fp);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -155,7 +158,7 @@ function downloadPackage($packageDirectory, $package, $version, $meta)
     rename($ownerDirectory . $directory, $ownerDirectory . $meta['repo']);
 
     $meta['hash'] = str_replace("{$meta['owner']}-{$meta['repo']}-", '', $directory);
-    $meta['version'] = $tag;
+    $meta['version'] = $version;
 
     return $meta;
 }
