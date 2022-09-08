@@ -10,6 +10,8 @@ require __DIR__ . '/Source/Commands/Remove.php';
 
 use Saeghe\Cli\IO\Read;
 
+$credentials = json_decode(json: file_get_contents(__DIR__ . '/credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
+
 $project = Read\argument('project', '');
 $config = Read\argument('config', 'build.json');
 

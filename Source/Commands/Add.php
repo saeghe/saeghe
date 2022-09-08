@@ -2,6 +2,7 @@
 
 namespace Saeghe\Saeghe\Commands\Add;
 
+use ZipArchive;
 use function Saeghe\Cli\IO\Read\argument;
 
 function run()
@@ -18,7 +19,13 @@ function add($packagesDirectory, $package, $version = null, $submodule = false)
 {
     global $projectRoot;
 
-    $meta = clonePackage($packagesDirectory, $package, $version);
+    $meta = getMetaFromPackage($package);
+
+    if (packageHasRelease($package, $meta)) {
+        $meta = downloadPackage($packagesDirectory, $package, $version, $meta);
+    } else {
+        $meta = clonePackage($packagesDirectory, $package, $version, $meta);
+    }
 
     if (! $submodule) {
         findOrCreateBuildJsonFile($projectRoot, $package, $meta);
@@ -81,7 +88,79 @@ function findOrCreatePackagesDirectory()
     return $packagesDirectory . '/';
 }
 
-function clonePackage($packageDirectory, $package, $version)
+function clonePackage($packageDirectory, $package, $version, $meta)
+{
+    $destination = "$packageDirectory{$meta['owner']}/{$meta['repo']}";
+
+    shell_exec("git clone $package $destination");
+
+    $meta['hash'] = shell_exec("git --git-dir=$destination/.git rev-parse HEAD");
+    $meta['version'] = 'development';
+
+    return $meta;
+}
+
+function packageHasRelease($package, $meta)
+{
+    global $credentials;
+
+    $output = shell_exec('curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/{$meta['owner']}/{$meta['repo']}/releases/latest | grep 'tag_name'");
+
+    return ! is_null($output);
+}
+
+function downloadPackage($packageDirectory, $package, $version, $meta)
+{
+    global $credentials;
+
+    $output = shell_exec('curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/{$meta['owner']}/{$meta['repo']}/releases/latest | grep 'tag_name'");
+    $tag = str_replace('"tag_name": "', '', $output);
+    $tag = trim(explode('"', $tag)[0]);
+
+    $ownerDirectory = $packageDirectory . $meta['owner'] . '/';
+
+    if (! file_exists($ownerDirectory)) {
+        mkdir($ownerDirectory);
+    }
+
+    $zipFile = $ownerDirectory . $meta['repo'] . '.zip';
+
+    $token = $credentials['github.com']['token'];
+    $fp = fopen ($zipFile, 'w+');
+    $ch = curl_init("https://github.com/{$meta['owner']}/{$meta['repo']}/zipball/$tag");
+    curl_setopt($ch, CURLOPT_TIMEOUT, 600);
+    curl_setopt($ch, CURLOPT_FILE, $fp);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer $token"]);
+    curl_exec($ch);
+    curl_close($ch);
+    fclose($fp);
+
+    $zip = new ZipArchive;
+    $res = $zip->open($zipFile);
+
+    if ($res === TRUE) {
+        $zip->extractTo($ownerDirectory);
+        $zip->close();
+    } else {
+        var_dump($res);
+    }
+
+    $files = scandir($ownerDirectory);
+
+    $directory = array_reduce($files, function ($carry, $filename) use ($meta) {
+        return str_starts_with($filename, "{$meta['owner']}-{$meta['repo']}-") ? $filename : $carry;
+    });
+
+    rename($ownerDirectory . $directory, $ownerDirectory . $meta['repo']);
+
+    $meta['hash'] = str_replace("{$meta['owner']}-{$meta['repo']}-", '', $directory);
+    $meta['version'] = $tag;
+
+    return $meta;
+}
+
+function getMetaFromPackage($package)
 {
     $ownerAndRepo = str_replace('git@github.com:', '', $package);
     if (str_ends_with($ownerAndRepo, '.git')) {
@@ -89,13 +168,6 @@ function clonePackage($packageDirectory, $package, $version)
     }
 
     [$meta['owner'], $meta['repo']] = explode('/', $ownerAndRepo);
-
-    $destination = "$packageDirectory{$meta['owner']}/{$meta['repo']}";
-
-    shell_exec("git clone $package $destination");
-
-    $meta['hash'] = shell_exec("git --git-dir=$destination/.git rev-parse HEAD");
-    $meta['version'] = 'development';
 
     return $meta;
 }
