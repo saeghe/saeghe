@@ -1,10 +1,10 @@
 {
-    "excludes": [
-        "vendor"
-    ],
     "map": {
         "Saeghe\\ComposerPackage": "src"
     },
+    "excludes": [
+        "vendor"
+    ],
     "packages": {
         "https:\/\/github.com\/Seldaek\/monolog.git": "3.2.0"
     }

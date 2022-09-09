@@ -10,7 +10,7 @@ function run()
 
     $packagesDirectory = findOrCreatePackagesDirectory();
 
-    $setting = ["excludes" => ["vendor"]];
+    $setting = ['map' => [], 'excludes' => ['vendor']];
     $lockSetting = [];
 
     $composerSetting = json_decode(file_get_contents($projectRoot . '/composer.json'), true);
@@ -69,15 +69,17 @@ function migratePackage($packagesDirectory, $name, $package, $packageMeta)
 
     $packageSetting = json_decode(file_get_contents($packageDirectory . '/composer.json'), true);
 
-    $setting = [];
+    $setting = ['map' => []];
 
     if (isset($packageSetting['autoload']['psr-4'])) {
-        $setting['map'] = [];
         foreach ($packageSetting['autoload']['psr-4'] as $namespace => $path) {
-            $namespace = str_ends_with($namespace, '\\') ? substr_replace($namespace, '', -1) : $namespace;
-            $path = str_ends_with($path, '/') ? substr_replace($path, '', -1) : $path;
+            // TODO:
+            if (! is_array($namespace) && ! is_array($path)) {
+                $namespace = str_ends_with($namespace, '\\') ? substr_replace($namespace, '', -1) : $namespace;
+                $path = str_ends_with($path, '/') ? substr_replace($path, '', -1) : $path;
 
-            $setting['map'][$namespace] = $path;
+                $setting['map'][$namespace] = $path;
+            }
         }
     }
 

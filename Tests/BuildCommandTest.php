@@ -180,8 +180,8 @@ function assertBuildForPackagesEntryPoints($message)
 function assertExcludeNotBuilt($message)
 {
     assert(
-        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/excluded-file.php')
-        && ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/excluded-directory')
+        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development//excluded-file.php')
+        && ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/excluded-directory')
         , $message
     );
 }

@@ -22,13 +22,13 @@ $projectRoot = strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SER
 
 $configPath = $projectRoot . $config;
 $setting = file_exists($configPath) ? json_decode(json: file_get_contents($configPath), associative: true, flags: JSON_THROW_ON_ERROR) : [];
-$setting = [
+$setting = array_merge($setting, [
     'packages-directory' => $setting['packages-directory'] ?? 'Packages',
     'map' => $setting['map'] ?? [],
     'packages' => $setting['packages'] ?? [],
     'entry-points' => $setting['entry-points'] ?? [],
     'executables' => $setting['executables'] ?? [],
-];
+]);
 
 $lockPath = str_replace('.json', '-lock.json', $configPath);
 $lockSetting = file_exists($lockPath) ? json_decode(json: file_get_contents($lockPath), associative: true, flags: JSON_THROW_ON_ERROR) : [];
