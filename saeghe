@@ -60,9 +60,6 @@ switch ($command) {
     case 'update':
         \Saeghe\Saeghe\Commands\Update\run();
         break;
-    case 'test':
-        var_dump(fileperms(__FILE__));
-        break;
     default:
         // TODO: Add help
         break;

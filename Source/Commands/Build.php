@@ -113,44 +113,92 @@ function applyFileModifications($origin, $replaceMap)
     $requireStatements = [];
 
     foreach (readLines($origin) as $line) {
-        $path = findRequirePath($line, $replaceMap);
-        if ($path) {
-            $requireStatements[] = "require_once '$path';";
+        if (str_starts_with($line, 'use ')) {
+            $requireStatements = array_merge($requireStatements, findRequirePaths($line, $replaceMap));
         }
     }
 
     if (count($requireStatements) > 0) {
+        $requireStatements = array_map(fn ($path) => "require_once '$path';", $requireStatements);
+
         return addRequires($requireStatements, $origin);
     }
 
     return file_get_contents($origin);
 }
 
-function findRequirePath($line, $replaceMap)
+function findRequirePaths($line, $replaceMap)
 {
-    $detectedPath = null;
+    $detectedPaths = [];
+
+    $possibleUses = explode('use ', $line);
+
+    if (count($possibleUses) > 1) {
+        foreach ($possibleUses as $separateUse) {
+            $detectedPaths = array_merge($detectedPaths, findRequirePaths($separateUse, $replaceMap));
+        }
+
+        return $detectedPaths;
+    }
+
+    $line = trim('use ' . $possibleUses[0]);
+
+    if (str_contains($line, '\{')) {
+        $parts = string_between($line, '{', '}');
+        $parts = explode(',', $parts);
+        $commonPart = explode('\{', $line)[0];
+        $line = '';
+        foreach ($parts as $part) {
+            $part = trim($part);
+            $line .= "use $commonPart\\$part;";
+        }
+
+        return findRequirePaths($line, $replaceMap);
+    }
+
+    $statements = explode(',', str_replace('use ', '', str_replace(';', '', $line)));
+
+    if (count($statements) > 1) {
+        $line = '';
+        foreach ($statements as $statement) {
+            $statement = trim($statement);
+            $line .= "use $statement;";
+        }
+
+        return findRequirePaths($line, $replaceMap);
+    }
+
+    if (str_contains($line, ' as ')) {
+        $line = explode(' as ', $line)[0] . ';';
+    }
 
     foreach ($replaceMap as $namespace => $path) {
-        if (
-            str_starts_with($line, "use $namespace")
-            || str_starts_with($line, "use function $namespace")
-        ) {
-            $line = trim($line);
-            if (str_starts_with($line, "use function $namespace")) {
-                $line = str_replace("use function $namespace", $path, $line);
-                $function = strrpos($line, '\\');
-                $line = substr($line, 0, strlen($line)  - (strlen($line) - $function));
-                $line .= ".php";
-            } else {
-                $line = str_replace("use $namespace", $path, $line);
-                $line = str_replace(';', '.php', $line);
-            }
+        if (str_starts_with($line, "use function $namespace")) {
+            $line = str_replace("use function $namespace", $path, $line);
+            $function = strrpos($line, '\\');
+            $line = substr($line, 0, strlen($line) - (strlen($line) - $function));
+            $line .= ".php";
 
-            $detectedPath = str_replace('\\', '/', $line);
+            $detectedPaths[] = str_replace('\\', '/', $line);
+            break;
+        } else if (str_starts_with($line, "use const $namespace")) {
+            $line = str_replace("use const $namespace", $path, $line);
+            $function = strrpos($line, '\\');
+            $line = substr($line, 0, strlen($line)  - (strlen($line) - $function));
+            $line .= ".php";
+
+            $detectedPaths[] = str_replace('\\', '/', $line);
+            break;
+        } else if (str_starts_with($line, "use $namespace")) {
+            $line = str_replace("use $namespace", $path, $line);
+            $line = str_replace(';', '.php', $line);
+
+            $detectedPaths[] = str_replace('\\', '/', $line);
+            break;
         }
     }
 
-    return $detectedPath;
+    return $detectedPaths;
 }
 
 function addRequires($requireStatements, $file)
@@ -304,4 +352,15 @@ function intactCopy($origin, $destination)
     copy($origin, $destination);
     chmod($destination, fileperms($origin) & 0x0FFF);
     clearstatcache();
+}
+
+function string_between($string, $start, $end)
+{
+    $startPosition = stripos($string, $start);
+    $first = substr($string, $startPosition);
+    $second = substr($first, strlen($start));
+    $positionEnd = stripos($second, $end);
+    $final = substr($second, 0, $positionEnd);
+
+    return trim($final);
 }

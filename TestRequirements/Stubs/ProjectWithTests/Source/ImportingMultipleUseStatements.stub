@@ -1,0 +1,8 @@
+<?php
+
+namespace ProjectWithTests;
+
+require_once '$environmentBuildPath/Source/SampleFile.php';
+require_once '$environmentBuildPath/Source/SubDirectory/SimpleClass.php';
+
+use ProjectWithTests\SampleFile as AnotherFile, ProjectWithTests\SubDirectory\SimpleClass;
