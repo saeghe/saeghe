@@ -24,6 +24,26 @@ test(
     }
 );
 
+test(
+    title: 'it should add a complex project with http path',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=https://github.com/saeghe/complex-package.git");
+
+        assertPacakgesAddedToPackagesDirectory('Packages does not added to the packages directory!' . $output);
+    },
+    before: function () {
+        deleteBuildJson();
+        deleteBuildLock();
+        deletePackagesDirectory();
+        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
+    },
+    after: function () {
+        deleteBuildJson();
+        deleteBuildLock();
+        deletePackagesDirectory();
+    }
+);
+
 function deleteBuildJson()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');

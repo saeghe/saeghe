@@ -21,10 +21,10 @@ function add($packagesDirectory, $package, $version, $submodule = false)
 
     $meta = getMetaFromPackage($package);
 
-    if (packageHasRelease($package, $meta)) {
-        $meta = downloadPackage($packagesDirectory, $package, $version, $meta);
+    if (packageHasRelease($meta)) {
+        $meta = downloadPackage($packagesDirectory, $version, $meta);
     } else {
-        $meta = clonePackage($packagesDirectory, $package, $version, $meta);
+        $meta = clonePackage($packagesDirectory, $version, $meta);
     }
 
     if (! $submodule) {
@@ -88,12 +88,12 @@ function findOrCreatePackagesDirectory()
     return $packagesDirectory;
 }
 
-function clonePackage($packageDirectory, $package, $version, $meta)
+function clonePackage($packageDirectory, $version, $meta)
 {
     $destination = "$packageDirectory{$meta['owner']}/{$meta['repo']}";
 
     shell_exec("rm -fR $destination");
-    shell_exec("git clone $package $destination");
+    shell_exec("git clone git@github.com:{$meta['owner']}/{$meta['repo']}.git $destination");
 
     $meta['hash'] = shell_exec("git --git-dir=$destination/.git rev-parse HEAD");
     $meta['version'] = 'development';
@@ -101,7 +101,7 @@ function clonePackage($packageDirectory, $package, $version, $meta)
     return $meta;
 }
 
-function packageHasRelease($package, $meta)
+function packageHasRelease($meta)
 {
     global $credentials;
 
@@ -110,7 +110,7 @@ function packageHasRelease($package, $meta)
     return ! is_null($output);
 }
 
-function downloadPackage($packageDirectory, $package, $version, $meta)
+function downloadPackage($packageDirectory, $version, $meta)
 {
     global $credentials;
 
@@ -168,10 +168,10 @@ function downloadPackage($packageDirectory, $package, $version, $meta)
 
 function getMetaFromPackage($package)
 {
-    if (str_starts_with($package, 'https:')) {
-        $ownerAndRepo = str_replace('https://github.com/', '', $package);
-    } else {
+    if (str_starts_with($package, 'git@')) {
         $ownerAndRepo = str_replace('git@github.com:', '', $package);
+    } else {
+        $ownerAndRepo = str_replace('https://github.com/', '', $package);
     }
 
     if (str_ends_with($ownerAndRepo, '.git')) {
