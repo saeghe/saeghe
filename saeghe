@@ -5,6 +5,7 @@ require __DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php';
 require __DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php';
 require __DIR__ . '/Source/Commands/Add.php';
 require __DIR__ . '/Source/Commands/Build.php';
+require __DIR__ . '/Source/Commands/Help.php';
 require __DIR__ . '/Source/Commands/Initialize.php';
 require __DIR__ . '/Source/Commands/Install.php';
 require __DIR__ . '/Source/Commands/Migrate.php';
@@ -38,29 +39,13 @@ $packagesDirectory = $projectRoot . $setting['packages-directory'] . '/';
 
 $command = Read\argument('command', 'help');
 
-switch ($command) {
-    case 'add':
-        \Saeghe\Saeghe\Commands\Add\run();
-        break;
-    case 'build':
-        \Saeghe\Saeghe\Commands\Build\run();
-        break;
-    case 'initialize':
-        \Saeghe\Saeghe\Commands\Initialize\run();
-        break;
-    case 'install':
-        \Saeghe\Saeghe\Commands\Install\run();
-        break;
-    case 'migrate':
-        \Saeghe\Saeghe\Commands\Migrate\run();
-        break;
-    case 'remove':
-        \Saeghe\Saeghe\Commands\Remove\run();
-        break;
-    case 'update':
-        \Saeghe\Saeghe\Commands\Update\run();
-        break;
-    default:
-        // TODO: Add help
-        break;
-}
+match ($command) {
+    'add' => \Saeghe\Saeghe\Commands\Add\run(),
+    'build' => \Saeghe\Saeghe\Commands\Build\run(),
+    'initialize' => \Saeghe\Saeghe\Commands\Initialize\run(),
+    'install' => \Saeghe\Saeghe\Commands\Install\run(),
+    'migrate' => \Saeghe\Saeghe\Commands\Migrate\run(),
+    'remove' => \Saeghe\Saeghe\Commands\Remove\run(),
+    'update' => \Saeghe\Saeghe\Commands\Update\run(),
+    default => \Saeghe\Saeghe\Commands\Help\run(),
+};
