@@ -7,34 +7,34 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . '/saeghe --command=build --project=TestRequirements/Fixtures/ProjectWithTests');
 
-        assertFileWithPackageDependencyHasBeenBuilt('File with package dependency has not been built properly!' . $output);
+        assert_file_with_package_dependency_has_been_built('File with package dependency has not been built properly!' . $output);
     },
     before: function () {
-        deleteBuildDirectory();
-        deletePackagesDirectory();
+        delete_build_directory();
+        delete_packages_directory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build-with-custom-packages-directory.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
         shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/ProjectWithTests --packages-directory=vendor");
         shell_exec($_SERVER['PWD'] . '/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/simple-package.git');
     },
     after: function () {
-        deleteBuildDirectory();
-        deletePackagesDirectory();
+        delete_build_directory();
+        delete_packages_directory();
         shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
         shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
     }
 );
 
-function deleteBuildDirectory()
+function delete_build_directory()
 {
     shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
 }
 
-function deletePackagesDirectory()
+function delete_packages_directory()
 {
     shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/vendor');
 }
 
-function assertFileWithPackageDependencyHasBeenBuilt($message)
+function assert_file_with_package_dependency_has_been_built($message)
 {
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
     $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';

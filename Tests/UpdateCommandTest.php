@@ -7,8 +7,8 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=update --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git");
 
-        assertVersionUpgradedInBuildFile($output);
-        assertBuildLockUpdated($output);
+        assert_version_upgraded_in_build_file($output);
+        assert_build_lock_updated($output);
     },
     before: function () {
         shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.0");
@@ -18,7 +18,7 @@ test(
     }
 );
 
-function assertVersionUpgradedInBuildFile($message)
+function assert_version_upgraded_in_build_file($message)
 {
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json'), true, JSON_THROW_ON_ERROR);
 
@@ -29,7 +29,7 @@ function assertVersionUpgradedInBuildFile($message)
     );
 }
 
-function assertBuildLockUpdated($message)
+function assert_build_lock_updated($message)
 {
     $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
 

@@ -14,17 +14,17 @@ function run()
     global $packagesDirectory;
     $environment = argument('environment', 'development');
 
-    $buildDirectory = findOrCreateBuildDirectory($projectRoot, $environment);
-    $packagesBuildDirectory = findOrCreatePackagesBuildDirectory($buildDirectory, $setting);
-    $replaceMap = makeReplaceMap($setting, $lockSetting, $buildDirectory, $packagesDirectory, $packagesBuildDirectory);
-    compilePackages($packagesDirectory, $packagesBuildDirectory, $lockSetting, $replaceMap);
-    compileProjectFiles($projectRoot, $buildDirectory, $packagesBuildDirectory, $setting, $lockSetting, $replaceMap);
-    addExecutables($buildDirectory, $packagesBuildDirectory, $lockSetting);
+    $buildDirectory = find_or_create_build_directory($projectRoot, $environment);
+    $packagesBuildDirectory = find_or_create_packages_build_directory($buildDirectory, $setting);
+    $replaceMap = make_replace_map($setting, $lockSetting, $buildDirectory, $packagesDirectory, $packagesBuildDirectory);
+    compile_packages($packagesDirectory, $packagesBuildDirectory, $lockSetting, $replaceMap);
+    compile_project_files($projectRoot, $buildDirectory, $packagesBuildDirectory, $setting, $lockSetting, $replaceMap);
+    add_executables($buildDirectory, $packagesBuildDirectory, $lockSetting);
 
     Write\success('Build finished successfully.');
 }
 
-function addExecutables($buildDirectory, $packagesBuildDirectory, $packages)
+function add_executables($buildDirectory, $packagesBuildDirectory, $packages)
 {
     foreach ($packages['packages'] as $package => $meta) {
         $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
@@ -43,7 +43,7 @@ function addExecutables($buildDirectory, $packagesBuildDirectory, $packages)
     }
 }
 
-function compilePackages($packagesDirectory, $packagesBuildDirectory, $packages, $replaceMap)
+function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages, $replaceMap)
 {
     foreach ($packages['packages'] as $package => $meta) {
         $packageDirectory = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
@@ -57,7 +57,7 @@ function compilePackages($packagesDirectory, $packagesBuildDirectory, $packages,
             ? json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR)
             : ['map' => [], 'packages' => []];
 
-        $filesAndDirectories = shouldCompileFilesAndDirectories($packageDirectory, $packageSetting);
+        $filesAndDirectories = should_compile_files_and_directories($packageDirectory, $packageSetting);
 
         foreach ($filesAndDirectories as $fileOrDirectory) {
             compile($fileOrDirectory, $packageDirectory, $packageBuildDirectory, $replaceMap, $packageSetting);
@@ -65,9 +65,9 @@ function compilePackages($packagesDirectory, $packagesBuildDirectory, $packages,
     }
 }
 
-function compileProjectFiles($projectRoot, $buildDirectory, $packagesBuildDirectory, $setting, $lockSetting, $replaceMap)
+function compile_project_files($projectRoot, $buildDirectory, $packagesBuildDirectory, $setting, $lockSetting, $replaceMap)
 {
-    $filesAndDirectories = shouldCompileFilesAndDirectories($projectRoot, $setting);
+    $filesAndDirectories = should_compile_files_and_directories($projectRoot, $setting);
 
     foreach ($filesAndDirectories as $fileOrDirectory) {
         compile($fileOrDirectory, $projectRoot, $buildDirectory, $replaceMap, $setting);
@@ -83,7 +83,7 @@ function compile($fileOrDirectory, $from, $to, $replaceMap, $setting)
         umask(0);
         mkdir($destination, fileperms($origin) & 0x0FFF);
         clearstatcache();
-        $filesAndDirectories = allFilesAndDirectories($origin);
+        $filesAndDirectories = all_files_and_directories($origin);
         foreach ($filesAndDirectories as $fileOrDirectory) {
             compile($fileOrDirectory, $origin, $destination, $replaceMap, $setting);
         }
@@ -91,43 +91,43 @@ function compile($fileOrDirectory, $from, $to, $replaceMap, $setting)
         return;
     }
 
-    if (fileNeedsModification($origin, $setting)) {
-        compileFile($origin, $destination, $replaceMap);
+    if (file_needs_modification($origin, $setting)) {
+        compile_file($origin, $destination, $replaceMap);
 
         return;
     }
 
-    intactCopy($origin, $destination);
+    intact_copy($origin, $destination);
 }
 
-function compileFile($origin, $destination, $replaceMap)
+function compile_file($origin, $destination, $replaceMap)
 {
-    $modifiedFile = applyFileModifications($origin, $replaceMap);
+    $modifiedFile = apply_file_modifications($origin, $replaceMap);
     file_put_contents($destination, $modifiedFile);
     chmod($destination, fileperms($origin) & 0x0FFF);
     clearstatcache();
 }
 
-function applyFileModifications($origin, $replaceMap)
+function apply_file_modifications($origin, $replaceMap)
 {
     $requireStatements = [];
 
-    foreach (readLines($origin) as $line) {
+    foreach (read_lines($origin) as $line) {
         if (str_starts_with($line, 'use ')) {
-            $requireStatements = array_merge($requireStatements, findRequirePaths($line, $replaceMap));
+            $requireStatements = array_merge($requireStatements, find_require_paths($line, $replaceMap));
         }
     }
 
     if (count($requireStatements) > 0) {
         $requireStatements = array_map(fn ($path) => "require_once '$path';", $requireStatements);
 
-        return addRequires($requireStatements, $origin);
+        return add_requires($requireStatements, $origin);
     }
 
     return file_get_contents($origin);
 }
 
-function findRequirePaths($line, $replaceMap)
+function find_require_paths($line, $replaceMap)
 {
     $detectedPaths = [];
 
@@ -135,7 +135,7 @@ function findRequirePaths($line, $replaceMap)
 
     if (count($possibleUses) > 1) {
         foreach ($possibleUses as $separateUse) {
-            $detectedPaths = array_merge($detectedPaths, findRequirePaths($separateUse, $replaceMap));
+            $detectedPaths = array_merge($detectedPaths, find_require_paths($separateUse, $replaceMap));
         }
 
         return $detectedPaths;
@@ -153,7 +153,7 @@ function findRequirePaths($line, $replaceMap)
             $line .= "use $commonPart\\$part;";
         }
 
-        return findRequirePaths($line, $replaceMap);
+        return find_require_paths($line, $replaceMap);
     }
 
     $statements = explode(',', str_replace('use ', '', str_replace(';', '', $line)));
@@ -165,7 +165,7 @@ function findRequirePaths($line, $replaceMap)
             $line .= "use $statement;";
         }
 
-        return findRequirePaths($line, $replaceMap);
+        return find_require_paths($line, $replaceMap);
     }
 
     if (str_contains($line, ' as ')) {
@@ -201,13 +201,13 @@ function findRequirePaths($line, $replaceMap)
     return $detectedPaths;
 }
 
-function addRequires($requireStatements, $file)
+function add_requires($requireStatements, $file)
 {
     $content = '';
 
     $requiresAdded = false;
 
-    foreach (readLines($file) as $line) {
+    foreach (read_lines($file) as $line) {
         $content .= $line;
 
         if (str_starts_with($line, 'namespace')) {
@@ -220,7 +220,7 @@ function addRequires($requireStatements, $file)
 
     if (! $requiresAdded) {
         $content = '';
-        foreach (readLines($file) as $line) {
+        foreach (read_lines($file) as $line) {
             $content .= $line;
 
             if (! $requiresAdded && str_starts_with($line, '<?php')) {
@@ -235,7 +235,7 @@ function addRequires($requireStatements, $file)
     return $content;
 }
 
-function makeReplaceMap($setting, $lockSetting, $buildDirectory, $packagesDirectory, $packagesBuildDirectory)
+function make_replace_map($setting, $lockSetting, $buildDirectory, $packagesDirectory, $packagesBuildDirectory)
 {
     $replaceMap = [];
 
@@ -255,7 +255,7 @@ function makeReplaceMap($setting, $lockSetting, $buildDirectory, $packagesDirect
 
         $replaceMap = array_merge(
             $replaceMap,
-            makeReplaceMap($subSetting, $subLockSetting, $packageBuild, $packagesDirectory, $packagesBuildDirectory)
+            make_replace_map($subSetting, $subLockSetting, $packageBuild, $packagesDirectory, $packagesBuildDirectory)
         );
     }
 
@@ -266,7 +266,7 @@ function makeReplaceMap($setting, $lockSetting, $buildDirectory, $packagesDirect
     return $replaceMap;
 }
 
-function shouldCompileFilesAndDirectories($path, $setting)
+function should_compile_files_and_directories($path, $setting)
 {
     $settingExcludes = $setting['excludes'] ?? [];
     $excludedPaths = array_map(
@@ -287,7 +287,7 @@ function shouldCompileFilesAndDirectories($path, $setting)
     );
 }
 
-function findOrCreatePackagesBuildDirectory($buildDirectory, $setting)
+function find_or_create_packages_build_directory($buildDirectory, $setting)
 {
     $packagesBuildDirectory = $buildDirectory . $setting['packages-directory'];
 
@@ -298,7 +298,7 @@ function findOrCreatePackagesBuildDirectory($buildDirectory, $setting)
     return $packagesBuildDirectory . '/';
 }
 
-function findOrCreateBuildDirectory($projectRoot, $environment)
+function find_or_create_build_directory($projectRoot, $environment)
 {
     $buildDirectory = $projectRoot . 'builds/' . $environment . '/';
 
@@ -311,7 +311,7 @@ function findOrCreateBuildDirectory($projectRoot, $environment)
     return $buildDirectory;
 }
 
-function fileNeedsModification($file, $setting)
+function file_needs_modification($file, $setting)
 {
     $executables = isset($setting['executables']) ?  array_values($setting['executables']) : [];
     $entryPoints = $setting['entry-points'] ?? [];
@@ -324,14 +324,14 @@ function fileNeedsModification($file, $setting)
         || str_ends_with($file, '.php');
 }
 
-function allFilesAndDirectories($origin)
+function all_files_and_directories($origin)
 {
     $filesAndDirectories = scandir($origin);
 
     return array_filter($filesAndDirectories, fn ($fileOrDirectory) => ! in_array($fileOrDirectory, ['.', '..']));
 }
 
-function readLines(string $source): Generator
+function read_lines(string $source): Generator
 {
     $fileHandler = @fopen($source, "r");
 
@@ -346,7 +346,7 @@ function readLines(string $source): Generator
     }
 }
 
-function intactCopy($origin, $destination)
+function intact_copy($origin, $destination)
 {
     umask(0);
     copy($origin, $destination);

@@ -7,10 +7,10 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=install --project=TestRequirements/Fixtures/EmptyProject");
 
-        assertBuildContentNotChanged('Config file has been changed!' . $output);
-        assertLockFileContentNotChanged('Released Package does not added to config file properly! ' . $output);
-        assertPackageExistsInPackagesDirectory('Package does not exist in the packages directory.' . $output);
-        assertZipFileDeleted('Zip file has not been deleted.' . $output);
+        assert_build_content_not_changed('Config file has been changed!' . $output);
+        assert_lock_file_content_not_changed('Released Package does not added to config file properly! ' . $output);
+        assert_package_exists_in_packages_directory('Package does not exist in the packages directory.' . $output);
+        assert_zip_file_deleted('Zip file has not been deleted.' . $output);
     },
     before: function () {
         shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.0");
@@ -21,7 +21,7 @@ test(
     },
 );
 
-function assertBuildContentNotChanged($message)
+function assert_build_content_not_changed($message)
 {
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json'), true, JSON_THROW_ON_ERROR);
 
@@ -32,7 +32,7 @@ function assertBuildContentNotChanged($message)
     );
 }
 
-function assertLockFileContentNotChanged($message)
+function assert_lock_file_content_not_changed($message)
 {
     $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
 
@@ -46,7 +46,7 @@ function assertLockFileContentNotChanged($message)
     );
 }
 
-function assertPackageExistsInPackagesDirectory($message)
+function assert_package_exists_in_packages_directory($message)
 {
     assert(
         file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package')
@@ -57,7 +57,7 @@ function assertPackageExistsInPackagesDirectory($message)
     );
 }
 
-function assertZipFileDeleted($message)
+function assert_zip_file_deleted($message)
 {
     assert(
         ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package.zip'),

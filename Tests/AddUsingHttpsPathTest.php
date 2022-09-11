@@ -9,21 +9,21 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=https://github.com/symfony/thanks.git");
 
-        assertBuildCreatedForHttpProject('Config file is not created!' . $output);
-        assertHttpPackageAddedToBuildConfig('Http Package does not added to config file properly! ' . $output);
-        assertPackagesDirectoryCreatedForEmptyProject('Package directory does not created.' . $output);
-        assertHttpPackageCloned('Http package does not cloned!' . $output);
-        assertBuildLockHasDesiredData('Data in the lock files is not what we want.' . $output);
+        assert_build_created_for_http_project('Config file is not created!' . $output);
+        assert_http_package_added_to_build_config('Http Package does not added to config file properly! ' . $output);
+        assert_packages_directory_created_for_empty_project('Package directory does not created.' . $output);
+        assert_http_package_cloned('Http package does not cloned!' . $output);
+        assert_build_lock_has_desired_data('Data in the lock files is not what we want.' . $output);
     },
     before: function () {
-        deleteEmptyProjectBuildJson();
-        deleteEmptyProjectBuildLock();
-        deleteEmptyProjectPackagesDirectory();
+        delete_empty_project_build_json();
+        delete_empty_project_build_lock();
+        delete_empty_project_packages_directory();
     },
     after: function () {
-        deleteEmptyProjectPackagesDirectory();
-        deleteEmptyProjectBuildJson();
-        deleteEmptyProjectBuildLock();
+        delete_empty_project_packages_directory();
+        delete_empty_project_build_json();
+        delete_empty_project_build_lock();
     }
 );
 
@@ -32,56 +32,56 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=https://github.com/symfony/thanks.git");
 
-        assertHttpPackageCloned('Http package does not cloned!' . $output);
+        assert_http_package_cloned('Http package does not cloned!' . $output);
     },
     before: function () {
-        deleteEmptyProjectBuildJson();
-        deleteEmptyProjectBuildLock();
-        deleteEmptyProjectPackagesDirectory();
+        delete_empty_project_build_json();
+        delete_empty_project_build_lock();
+        delete_empty_project_packages_directory();
     },
     after: function () {
-        deleteEmptyProjectPackagesDirectory();
-        deleteEmptyProjectBuildJson();
-        deleteEmptyProjectBuildLock();
+        delete_empty_project_packages_directory();
+        delete_empty_project_build_json();
+        delete_empty_project_build_lock();
     }
 );
 
-function deleteEmptyProjectBuildJson()
+function delete_empty_project_build_json()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json');
 }
 
-function deleteEmptyProjectBuildLock()
+function delete_empty_project_build_lock()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json');
 }
 
-function deleteEmptyProjectPackagesDirectory()
+function delete_empty_project_packages_directory()
 {
     shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
 }
 
-function assertBuildCreatedForHttpProject($message)
+function assert_build_created_for_http_project($message)
 {
-    File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json', $message);
+    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json', $message);
 }
 
-function assertPackagesDirectoryCreatedForEmptyProject($message)
+function assert_packages_directory_created_for_empty_project($message)
 {
-    File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages', $message);
+    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages', $message);
 }
 
-function assertHttpPackageCloned($message)
+function assert_http_package_cloned($message)
 {
     assert(
-        File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/symfony/thanks')
-        && File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/symfony/thanks/composer.json')
-        && File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/symfony/thanks/README.md'),
+        File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/symfony/thanks')
+        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/symfony/thanks/composer.json')
+        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/symfony/thanks/README.md'),
         $message
     );
 }
 
-function assertHttpPackageAddedToBuildConfig($message)
+function assert_http_package_added_to_build_config($message)
 {
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json'), true, JSON_THROW_ON_ERROR);
 
@@ -92,7 +92,7 @@ function assertHttpPackageAddedToBuildConfig($message)
     );
 }
 
-function assertBuildLockHasDesiredData($message)
+function assert_build_lock_has_desired_data($message)
 {
     $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
 

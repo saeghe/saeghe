@@ -7,9 +7,9 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=migrate --project=TestRequirements/Fixtures/composer-package");
 
-        assertCorrectBuildFile('Build file is not correct!' . $output);
-        assertCorrectBuildLockFile('Build lock file is not correct!' . $output);
-        assertPackageDirectoryContent('Package directory content is not what we want!' . $output);
+        assert_correct_build_file('Build file is not correct!' . $output);
+        assert_correct_build_lock_file('Build lock file is not correct!' . $output);
+        assert_package_directory_content('Package directory content is not what we want!' . $output);
     },
     before: function () {
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/build.json');
@@ -23,7 +23,7 @@ test(
     },
 );
 
-function assertCorrectBuildFile($message)
+function assert_correct_build_file($message)
 {
     $root = $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/';
     $stub = $_SERVER['PWD'] . '/TestRequirements/Stubs/composer-package/';
@@ -35,7 +35,7 @@ function assertCorrectBuildFile($message)
     );
 }
 
-function assertCorrectBuildLockFile($message)
+function assert_correct_build_lock_file($message)
 {
     $root = $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/';
     $stub = $_SERVER['PWD'] . '/TestRequirements/Stubs/composer-package/';
@@ -47,7 +47,7 @@ function assertCorrectBuildLockFile($message)
     );
 }
 
-function assertPackageDirectoryContent($message)
+function assert_package_directory_content($message)
 {
     $root = $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/';
     $stub = $_SERVER['PWD'] . '/TestRequirements/Stubs/composer-package/';

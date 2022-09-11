@@ -7,53 +7,53 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . '/saeghe --command=build --project=TestRequirements/Fixtures/ProjectWithTests --environment=production');
 
-        assertBuildDirectoryExists('Build directory has not been created!' . $output);
-        assertEnvironmentBuildDirectoryExists('Environment build directory has not been created!' . $output);
-        assertSourceHasBeenBuilt('Source files has not been built properly!' . $output);
-        assertFileWithPackageDependencyHasBeenBuilt('File with package dependency has not been built properly!' . $output);
-        assertNonePhpFilesHasNotBeenBuilt('None PHP files has been built properly!' . $output);
-        assertTestsHasBeenBuilt('Test files has not been built properly!' . $output);
-        assertFilePermissionsAreSame('Files permission are not same!' . $output);
-        assertGitDirectoryExcluded('Build copied the git directory!' . $output);
-        assertExecutablesAreLinked('Executable files did not linked' . $output);
-        assertBuildForProjectEntryPoints('Project entry point does not built properly!' . $output);
-        assertBuildForPackagesEntryPoints('Packages entry point does not built properly!' . $output);
+        assert_build_directory_exists('Build directory has not been created!' . $output);
+        assert_environment_build_directory_exists('Environment build directory has not been created!' . $output);
+        assert_source_has_been_built('Source files has not been built properly!' . $output);
+        assert_file_with_package_dependency_has_been_built('File with package dependency has not been built properly!' . $output);
+        assert_none_php_files_has_not_been_built('None PHP files has been built properly!' . $output);
+        assert_tests_has_been_built('Test files has not been built properly!' . $output);
+        assert_file_permissions_are_same('Files permission are not same!' . $output);
+        assert_git_directory_excluded('Build copied the git directory!' . $output);
+        assert_executables_are_linked('Executable files did not linked' . $output);
+        assert_build_for_project_entry_points('Project entry point does not built properly!' . $output);
+        assert_build_for_packages_entry_points('Packages entry point does not built properly!' . $output);
     },
     before: function () {
-        deleteBuildDirectory();
-        deletePackagesDirectory();
+        delete_build_directory();
+        delete_packages_directory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
         shell_exec($_SERVER['PWD'] . '/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/simple-package.git');
     },
     after: function () {
-        deleteBuildDirectory();
-        deletePackagesDirectory();
+        delete_build_directory();
+        delete_packages_directory();
         shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
         shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
     }
 );
 
-function deleteBuildDirectory()
+function delete_build_directory()
 {
     shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
 }
 
-function deletePackagesDirectory()
+function delete_packages_directory()
 {
     shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
 }
 
-function assertBuildDirectoryExists($message)
+function assert_build_directory_exists($message)
 {
     assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds'), $message);
 }
 
-function assertEnvironmentBuildDirectoryExists($message)
+function assert_environment_build_directory_exists($message)
 {
     assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production'), $message);
 }
 
-function assertSourceHasBeenBuilt($message)
+function assert_source_has_been_built($message)
 {
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production';
     $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
@@ -70,7 +70,7 @@ function assertSourceHasBeenBuilt($message)
     );
 }
 
-function assertNonePhpFilesHasNotBeenBuilt($message)
+function assert_none_php_files_has_not_been_built($message)
 {
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production';
 
@@ -81,7 +81,7 @@ function assertNonePhpFilesHasNotBeenBuilt($message)
     );
 }
 
-function assertTestsHasBeenBuilt($message)
+function assert_tests_has_been_built($message)
 {
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production';
     $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
@@ -93,7 +93,7 @@ function assertTestsHasBeenBuilt($message)
     );
 }
 
-function assertFileWithPackageDependencyHasBeenBuilt($message)
+function assert_file_with_package_dependency_has_been_built($message)
 {
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production';
     $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
@@ -105,7 +105,7 @@ function assertFileWithPackageDependencyHasBeenBuilt($message)
     );
 }
 
-function assertFilePermissionsAreSame($message)
+function assert_file_permissions_are_same($message)
 {
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production';
 
@@ -129,7 +129,7 @@ function assertFilePermissionsAreSame($message)
     );
 }
 
-function assertGitDirectoryExcluded($message)
+function assert_git_directory_excluded($message)
 {
     assert(
         ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production/.git')
@@ -139,7 +139,7 @@ function assertGitDirectoryExcluded($message)
     );
 }
 
-function assertExecutablesAreLinked($message)
+function assert_executables_are_linked($message)
 {
     $linkFile = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production/run-executable';
     $linkSource = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production/Packages/saeghe/simple-package/run.php';
@@ -152,7 +152,7 @@ function assertExecutablesAreLinked($message)
     );
 }
 
-function assertBuildForProjectEntryPoints($message)
+function assert_build_for_project_entry_points($message)
 {
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production';
     $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
@@ -164,7 +164,7 @@ function assertBuildForProjectEntryPoints($message)
     );
 }
 
-function assertBuildForPackagesEntryPoints($message)
+function assert_build_for_packages_entry_points($message)
 {
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production';
     $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/SimplePackage';

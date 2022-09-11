@@ -8,7 +8,7 @@ function run()
 {
     global $lockSetting;
 
-    $packagesDirectory = findOrCreatePackagesDirectory();
+    $packagesDirectory = find_or_create_packages_directory();
 
     foreach ($lockSetting['packages'] as $package => $meta) {
         install($package, $meta, $packagesDirectory);
@@ -17,14 +17,14 @@ function run()
 
 function install($package, $meta, $packagesDirectory)
 {
-    if (packageHasRelease($package, $meta)) {
-        downloadPackage($packagesDirectory, $package, $meta['version'], $meta);
+    if (package_has_release($package, $meta)) {
+        download_package($packagesDirectory, $package, $meta['version'], $meta);
     } else {
-        clonePackage($packagesDirectory, $package, $meta['version'], $meta);
+        clone_package($packagesDirectory, $package, $meta['version'], $meta);
     }
 }
 
-function findOrCreatePackagesDirectory()
+function find_or_create_packages_directory()
 {
     global $packagesDirectory;
 
@@ -35,7 +35,7 @@ function findOrCreatePackagesDirectory()
     return $packagesDirectory;
 }
 
-function packageHasRelease($package, $meta)
+function package_has_release($package, $meta)
 {
     global $credentials;
 
@@ -44,7 +44,7 @@ function packageHasRelease($package, $meta)
     return ! is_null($output);
 }
 
-function clonePackage($packageDirectory, $package, $version, $meta)
+function clone_package($packageDirectory, $package, $version, $meta)
 {
     $destination = "$packageDirectory{$meta['owner']}/{$meta['repo']}";
 
@@ -57,7 +57,7 @@ function clonePackage($packageDirectory, $package, $version, $meta)
     return $meta;
 }
 
-function downloadPackage($packageDirectory, $package, $version, $meta)
+function download_package($packageDirectory, $package, $version, $meta)
 {
     global $credentials;
 

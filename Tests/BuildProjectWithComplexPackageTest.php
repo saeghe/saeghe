@@ -6,65 +6,65 @@ test(
     title: 'it should build project with complex package',
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=build --project=TestRequirements/Fixtures/ProjectWithTests");
-        assertBuildForPackages('Packages file does not built properly!' . $output);
-        assertExecutableFileAdded('Complex executable file has not been created!' . $output);
+        assert_build_for_packages('Packages file does not built properly!' . $output);
+        assert_executable_file_added('Complex executable file has not been created!' . $output);
     },
     before: function () {
-        deleteBuildJson();
-        deleteBuildLock();
-        deleteBuildDirectory();
-        deletePackagesDirectory();
+        delete_build_json();
+        delete_build_lock();
+        delete_build_directory();
+        delete_packages_directory();
 
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
         shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/complex-package.git");
     },
     after: function () {
-        deleteBuildJson();
-        deleteBuildLock();
-        deleteBuildDirectory();
-        deletePackagesDirectory();
+        delete_build_json();
+        delete_build_lock();
+        delete_build_directory();
+        delete_packages_directory();
     },
 );
 
-function deleteBuildJson()
+function delete_build_json()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
 }
 
-function deleteBuildLock()
+function delete_build_lock()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
 }
 
-function deleteBuildDirectory()
+function delete_build_directory()
 {
     shell_exec('rm -Rf ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
 }
 
-function deletePackagesDirectory()
+function delete_packages_directory()
 {
     shell_exec('rm -Rf ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
 }
 
-function assertBuildForPackages($message)
+function assert_build_for_packages($message)
 {
    assert(
-       buildExistsAndSameAsStub('src/Controllers/Controller.php')
-       && buildExistsAndSameAsStub('src/Controllers/HomeController.php')
-       && buildExistsAndSameAsStub('src/Models/User.php')
-       && buildExistsAndSameAsStub('src/Views/home.php')
-       && buildExistsAndSameAsStub('src/Helpers.php')
-       && buildExistsAndSameAsStub('tests/Features/FirstFeature.php')
-       && buildExistsAndSameAsStub('tests/TestHelper.php')
-       && buildExistsAndSameAsStub('build.json')
-       && buildExistsAndSameAsStub('build-lock.json')
-       && buildExistsAndSameAsStub('cli-command')
+       build_exists_and_same_as_stub('src/Controllers/Controller.php')
+       && build_exists_and_same_as_stub('src/Controllers/HomeController.php')
+       && build_exists_and_same_as_stub('src/Models/User.php')
+       && build_exists_and_same_as_stub('src/Views/home.php')
+       && build_exists_and_same_as_stub('src/Helpers.php')
+       && build_exists_and_same_as_stub('tests/Features/FirstFeature.php')
+       && build_exists_and_same_as_stub('tests/TestHelper.php')
+       && build_exists_and_same_as_stub('build.json')
+       && build_exists_and_same_as_stub('build-lock.json')
+       && build_exists_and_same_as_stub('cli-command')
        ,
        $message
    );
 }
 
-function buildExistsAndSameAsStub($file)
+function build_exists_and_same_as_stub($file)
 {
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
     $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/BuildForComplexPackage';
@@ -74,7 +74,7 @@ function buildExistsAndSameAsStub($file)
         && file_get_contents($environmentBuildPath . '/Packages/saeghe/complex-package/' . $file) === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/' . $file . '.stub'));
 }
 
-function assertExecutableFileAdded($message)
+function assert_executable_file_added($message)
 {
     assert(
         is_link($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/complex')

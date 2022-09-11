@@ -7,9 +7,9 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=remove --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
 
-        assertDesiredDataInPackagesDirectory('Package has not been deleted from Packages directory!' . $output);
-        assertBuildJsonIsClean('Packages has not been deleted from build json file!' . $output);
-        assertBuildLockIsClean('Packages has not been deleted from build lock file!' . $output);
+        assert_desired_data_in_packages_directory('Package has not been deleted from Packages directory!' . $output);
+        assert_build_json_is_clean('Packages has not been deleted from build json file!' . $output);
+        assert_build_lock_is_clean('Packages has not been deleted from build lock file!' . $output);
     },
     before: function () {
         shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
@@ -21,7 +21,7 @@ test(
     }
 );
 
-function assertDesiredDataInPackagesDirectory($message)
+function assert_desired_data_in_packages_directory($message)
 {
     clearstatcache();
     assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/simple-package')
@@ -31,7 +31,7 @@ function assertDesiredDataInPackagesDirectory($message)
     );
 }
 
-function assertBuildJsonIsClean($message)
+function assert_build_json_is_clean($message)
 {
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json'), true, JSON_THROW_ON_ERROR);
 
@@ -42,7 +42,7 @@ function assertBuildJsonIsClean($message)
     );
 }
 
-function assertBuildLockIsClean($message)
+function assert_build_lock_is_clean($message)
 {
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
 

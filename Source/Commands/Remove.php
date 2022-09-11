@@ -27,11 +27,11 @@ function remove($package, $setting, $lockSetting, $packagesDirectory)
 
     $packageSettings['packages'] = $packageSettings['packages'] ?? [];
 
-    removePackageFromLock($package);
+    remove_package_from_lock($package);
 
-    removePackageFromBuild($package);
+    remove_package_from_build($package);
 
-    deletePackageFromPackages($package);
+    delete_package_from_packages($package);
 
     foreach ($packageSettings['packages'] as $subpackage => $version) {
         if (! isset($setting['packages'][$subpackage])) {
@@ -46,7 +46,7 @@ function remove($package, $setting, $lockSetting, $packagesDirectory)
     }
 }
 
-function removePackageFromLock($package)
+function remove_package_from_lock($package)
 {
     global $lockPath;
 
@@ -56,7 +56,7 @@ function removePackageFromLock($package)
     file_put_contents($lockPath, json_encode($lockSetting, JSON_PRETTY_PRINT));
 }
 
-function removePackageFromBuild($package)
+function remove_package_from_build($package)
 {
     global $configPath;
 
@@ -66,7 +66,7 @@ function removePackageFromBuild($package)
     file_put_contents($configPath, json_encode($setting, JSON_PRETTY_PRINT));
 }
 
-function deletePackageFromPackages($package)
+function delete_package_from_packages($package)
 {
     global $packagesDirectory;
     global $lockSetting;

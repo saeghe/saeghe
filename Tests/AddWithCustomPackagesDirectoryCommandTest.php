@@ -9,42 +9,42 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
 
-        assertPackageDirectoryAddedToConfig('Config does not contains the custom package directory!');
-        assertBuildCreatedForSimpleProject('Config file is not created!' . $output);
-        assertSimplePackageAddedToBuildConfig('Simple Package does not added to config file properly! ' . $output);
-        assertPackagesDirectoryCreatedForEmptyProject('Package directory does not created.' . $output);
-        assertSimplePackageCloned('Simple package does not cloned!' . $output);
-        assertBuildLockHasDesiredData('Data in the lock files is not what we want.' . $output);
+        assert_package_directory_added_to_config('Config does not contains the custom package directory!');
+        assert_build_created_for_simple_project('Config file is not created!' . $output);
+        assert_simple_package_added_to_build_config('Simple Package does not added to config file properly! ' . $output);
+        assert_packages_directory_created_for_empty_project('Package directory does not created.' . $output);
+        assert_simple_package_cloned('Simple package does not cloned!' . $output);
+        assert_build_lock_has_desired_data('Data in the lock files is not what we want.' . $output);
     },
     before: function () {
-        deleteEmptyProjectBuildJson();
-        deleteEmptyProjectBuildLock();
-        deleteEmptyProjectPackagesDirectory();
+        delete_empty_project_build_json();
+        delete_empty_project_build_lock();
+        delete_empty_project_packages_directory();
         shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
     },
     after: function () {
-        deleteEmptyProjectPackagesDirectory();
-        deleteEmptyProjectBuildJson();
-        deleteEmptyProjectBuildLock();
+        delete_empty_project_packages_directory();
+        delete_empty_project_build_json();
+        delete_empty_project_build_lock();
     }
 );
 
-function deleteEmptyProjectBuildJson()
+function delete_empty_project_build_json()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json');
 }
 
-function deleteEmptyProjectBuildLock()
+function delete_empty_project_build_lock()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json');
 }
 
-function deleteEmptyProjectPackagesDirectory()
+function delete_empty_project_packages_directory()
 {
     shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor');
 }
 
-function assertPackageDirectoryAddedToConfig($message)
+function assert_package_directory_added_to_config($message)
 {
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json'), true, JSON_THROW_ON_ERROR);
 
@@ -54,27 +54,27 @@ function assertPackageDirectoryAddedToConfig($message)
     );
 }
 
-function assertBuildCreatedForSimpleProject($message)
+function assert_build_created_for_simple_project($message)
 {
-    File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json', $message);
+    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json', $message);
 }
 
-function assertPackagesDirectoryCreatedForEmptyProject($message)
+function assert_packages_directory_created_for_empty_project($message)
 {
-    File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor', $message);
+    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor', $message);
 }
 
-function assertSimplePackageCloned($message)
+function assert_simple_package_cloned($message)
 {
     assert(
-        File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package')
-        && File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/build.json')
-        && File\assertExists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/README.md'),
+        File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package')
+        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/build.json')
+        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/README.md'),
         $message
     );
 }
 
-function assertSimplePackageAddedToBuildConfig($message)
+function assert_simple_package_added_to_build_config($message)
 {
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json'), true, JSON_THROW_ON_ERROR);
 
@@ -85,7 +85,7 @@ function assertSimplePackageAddedToBuildConfig($message)
     );
 }
 
-function assertBuildLockHasDesiredData($message)
+function assert_build_lock_has_desired_data($message)
 {
     $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
 

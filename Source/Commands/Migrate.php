@@ -8,7 +8,7 @@ function run()
     global $configPath;
     global $lockPath;
 
-    $packagesDirectory = findOrCreatePackagesDirectory();
+    $packagesDirectory = find_or_create_packages_directory();
 
     $setting = ['map' => [], 'excludes' => ['vendor']];
     $lockSetting = [];
@@ -32,7 +32,7 @@ function run()
             $package = $packageMeta['source']['url'];
             $version = $packageMeta['version'];
             $hash = $packageMeta['source']['reference'];
-            $ownerAndRepo = getMetaFromPackage($package);
+            $ownerAndRepo = get_meta_from_package($package);
 
             if (isset($composerSetting['require'][$name])) {
                 $setting['packages'][$package] = $version;
@@ -45,7 +45,7 @@ function run()
                 'repo' => $ownerAndRepo['repo'],
             ];
 
-            migratePackage($packagesDirectory, $name, $package, $lockSetting['packages'][$package]);
+            migrate_package($packagesDirectory, $name, $package, $lockSetting['packages'][$package]);
         }
     }
 
@@ -53,7 +53,7 @@ function run()
     file_put_contents($lockPath, json_encode($lockSetting, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
-function migratePackage($packagesDirectory, $name, $package, $packageMeta)
+function migrate_package($packagesDirectory, $name, $package, $packageMeta)
 {
     global $projectRoot;
 
@@ -65,7 +65,7 @@ function migratePackage($packagesDirectory, $name, $package, $packageMeta)
         mkdir($packageDirectory, 0755, true);
     }
 
-    recursiveCopy($packageVendorDirectory, $packageDirectory);
+    recursive_copy($packageVendorDirectory, $packageDirectory);
 
     $packageSetting = json_decode(file_get_contents($packageDirectory . '/composer.json'), true);
 
@@ -87,7 +87,7 @@ function migratePackage($packagesDirectory, $name, $package, $packageMeta)
     file_put_contents($packageDirectory . '/build-lock.json', json_encode([], JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
-function findOrCreatePackagesDirectory()
+function find_or_create_packages_directory()
 {
     global $packagesDirectory;
 
@@ -98,7 +98,7 @@ function findOrCreatePackagesDirectory()
     return $packagesDirectory;
 }
 
-function getMetaFromPackage($package)
+function get_meta_from_package($package)
 {
     if (str_starts_with($package, 'https:')) {
         $ownerAndRepo = str_replace('https://github.com/', '', $package);
@@ -115,7 +115,7 @@ function getMetaFromPackage($package)
     return $meta;
 }
 
-function recursiveCopy($source, $destination)
+function recursive_copy($source, $destination)
 {
     $dir = opendir($source);
     @mkdir($destination, 0755, true);
@@ -129,7 +129,7 @@ function recursiveCopy($source, $destination)
         $nextDestination = $destination . '/' . $file;
 
         if (is_dir($nextSource)) {
-            recursiveCopy($nextSource, $nextDestination);
+            recursive_copy($nextSource, $nextDestination);
         } else {
             copy($nextSource, $nextDestination);
         }

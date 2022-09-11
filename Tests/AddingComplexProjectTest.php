@@ -7,20 +7,20 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/complex-package.git");
 
-        assertPacakgesAddedToPackagesDirectory('Packages does not added to the packages directory!' . $output);
-        assertBuildFileHasDesiredData('Build file for adding complex package does not have desired data!' . $output);
-        assertLockFileHasDesiredData('Build lock for adding complex package does not have desired data!' . $output);
+        assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
+        assert_build_file_has_desired_data('Build file for adding complex package does not have desired data!' . $output);
+        assert_lock_file_has_desired_data('Build lock for adding complex package does not have desired data!' . $output);
     },
     before: function () {
-        deleteBuildJson();
-        deleteBuildLock();
-        deletePackagesDirectory();
+        delete_build_json();
+        delete_build_lock();
+        delete_packages_directory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
     },
     after: function () {
-        deleteBuildJson();
-        deleteBuildLock();
-        deletePackagesDirectory();
+        delete_build_json();
+        delete_build_lock();
+        delete_packages_directory();
     }
 );
 
@@ -29,37 +29,37 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=https://github.com/saeghe/complex-package.git");
 
-        assertPacakgesAddedToPackagesDirectory('Packages does not added to the packages directory!' . $output);
+        assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
     },
     before: function () {
-        deleteBuildJson();
-        deleteBuildLock();
-        deletePackagesDirectory();
+        delete_build_json();
+        delete_build_lock();
+        delete_packages_directory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
     },
     after: function () {
-        deleteBuildJson();
-        deleteBuildLock();
-        deletePackagesDirectory();
+        delete_build_json();
+        delete_build_lock();
+        delete_packages_directory();
     }
 );
 
-function deleteBuildJson()
+function delete_build_json()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
 }
 
-function deleteBuildLock()
+function delete_build_lock()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
 }
 
-function deletePackagesDirectory()
+function delete_packages_directory()
 {
     shell_exec('rm -Rf ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
 }
 
-function assertPacakgesAddedToPackagesDirectory($message)
+function assert_pacakges_added_to_packages_directory($message)
 {
     assert(
         file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package')
@@ -72,7 +72,7 @@ function assertPacakgesAddedToPackagesDirectory($message)
     );
 }
 
-function assertBuildFileHasDesiredData($message)
+function assert_build_file_has_desired_data($message)
 {
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json'), true, JSON_THROW_ON_ERROR);
 
@@ -85,7 +85,7 @@ function assertBuildFileHasDesiredData($message)
     );
 }
 
-function assertLockFileHasDesiredData($message)
+function assert_lock_file_has_desired_data($message)
 {
     $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json'), true, JSON_THROW_ON_ERROR);
 

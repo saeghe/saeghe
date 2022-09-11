@@ -42,10 +42,10 @@ test(
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject");
 
-        File\assertExists($buildConfig, 'Config file does not exists: ' . $output);
-        File\assertExists($lockPath, 'Lock file does not exists: ' . $output);
-        File\assertContent($buildConfig, $initialContent, 'Config file content is not correct after running initialize!');
-        File\assertContent($lockPath, $lockContent, 'Lock file content is not correct after running initialize!');
+        File\assert_exists($buildConfig, 'Config file does not exists: ' . $output);
+        File\assert_exists($lockPath, 'Lock file does not exists: ' . $output);
+        File\assert_content($buildConfig, $initialContent, 'Config file content is not correct after running initialize!');
+        File\assert_content($lockPath, $lockContent, 'Lock file content is not correct after running initialize!');
 
         return [$buildConfig, $lockPath];
     },
@@ -60,10 +60,10 @@ test(
     case: function ($buildConfig, $configPath, $lockPath) use ($initialContent, $lockContent) {
         $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --config=$buildConfig");
 
-        File\assertExists($configPath, 'Custom config file does not exists: ' . $output);
-        File\assertExists($lockPath, 'Custom lock file does not exists: ' . $output);
-        File\assertContent($configPath, $initialContent, 'Custom config file content is not correct after running initialize!');
-        File\assertContent($lockPath, $lockContent, 'Custom config file content is not correct after running initialize!');
+        File\assert_exists($configPath, 'Custom config file does not exists: ' . $output);
+        File\assert_exists($lockPath, 'Custom lock file does not exists: ' . $output);
+        File\assert_content($configPath, $initialContent, 'Custom config file content is not correct after running initialize!');
+        File\assert_content($lockPath, $lockContent, 'Custom config file content is not correct after running initialize!');
 
         return [$configPath, $lockPath];
     },
@@ -90,8 +90,8 @@ test(
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
 
-        File\assertExists($buildConfig, 'Config file does not exists: ' . $output);
-        File\assertContent($buildConfig, $initialContentWithPackagesDirectory, 'Config file content is not correct after running initialize!');
+        File\assert_exists($buildConfig, 'Config file does not exists: ' . $output);
+        File\assert_content($buildConfig, $initialContentWithPackagesDirectory, 'Config file content is not correct after running initialize!');
 
         return [$buildConfig, $lockPath];
     },
