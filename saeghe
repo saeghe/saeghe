@@ -14,6 +14,16 @@ require __DIR__ . '/Source/Commands/Update.php';
 
 use Saeghe\Cli\IO\Read;
 
+$setting = [
+    'map' => [],
+    'entry-points' => [],
+    'executables' => [],
+    'packages-directory' => 'Packages',
+    'packages' => [],
+];
+
+$lockSetting = ['packages' => []];
+
 $credentials = json_decode(json: file_get_contents(__DIR__ . '/credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
 
 $project = Read\argument('project', '');
@@ -22,18 +32,10 @@ $config = Read\argument('config', 'build.json');
 $projectRoot = strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SERVER['PWD'] . '/';
 
 $configPath = $projectRoot . $config;
-$setting = file_exists($configPath) ? json_decode(json: file_get_contents($configPath), associative: true, flags: JSON_THROW_ON_ERROR) : [];
-$setting = array_merge($setting, [
-    'packages-directory' => $setting['packages-directory'] ?? 'Packages',
-    'map' => $setting['map'] ?? [],
-    'packages' => $setting['packages'] ?? [],
-    'entry-points' => $setting['entry-points'] ?? [],
-    'executables' => $setting['executables'] ?? [],
-]);
+$setting = array_merge($setting, file_exists($configPath) ? json_decode(json: file_get_contents($configPath), associative: true, flags: JSON_THROW_ON_ERROR) : []);
 
 $lockPath = str_replace('.json', '-lock.json', $configPath);
-$lockSetting = file_exists($lockPath) ? json_decode(json: file_get_contents($lockPath), associative: true, flags: JSON_THROW_ON_ERROR) : [];
-$lockSetting['packages'] = $lockSetting['packages'] ?? [];
+$lockSetting = array_merge($lockSetting, file_exists($lockPath) ? json_decode(json: file_get_contents($lockPath), associative: true, flags: JSON_THROW_ON_ERROR) : []);
 
 $packagesDirectory = $projectRoot . $setting['packages-directory'] . '/';
 
