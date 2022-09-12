@@ -45,8 +45,6 @@ function add_executables($buildDirectory, $packagesBuildDirectory, $meta)
 
 function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages, $replaceMap)
 {
-    global $config;
-
     foreach ($packages['packages'] as $package => $meta) {
         $packageDirectory = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
         $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
@@ -59,9 +57,7 @@ function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages
             ? json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR)
             : ['map' => [], 'packages' => []];
 
-        $packageConfig['packages-directory'] = $config['packages-directory'];
-
-        $filesAndDirectories = should_compile_files_and_directories($packageDirectory, $packageConfig);
+        $filesAndDirectories = should_compile_files_and_directories_for_package($packageDirectory, $packageConfig);
 
         foreach ($filesAndDirectories as $fileOrDirectory) {
             compile($fileOrDirectory, $packageDirectory, $packageBuildDirectory, $replaceMap, $packageConfig);
@@ -269,6 +265,27 @@ function make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $
     });
 
     return $replaceMap;
+}
+
+function should_compile_files_and_directories_for_package($path, $config)
+{
+    $excludes = $config['excludes'] ?? [];
+    $excludedPaths = array_map(
+        function ($excludedPath) use ($path) {
+            return $path . $excludedPath;
+        },
+        array_merge(['.', '..', '.git'], $excludes)
+    );
+
+    $filesAndDirectories = scandir($path);
+
+    return array_filter(
+        $filesAndDirectories,
+        function ($fileOrDirectory) use ($path, $excludedPaths) {
+            $fileOrDirectoryPath = $path . $fileOrDirectory;
+            return ! in_array($fileOrDirectoryPath, $excludedPaths);
+        },
+    );
 }
 
 function should_compile_files_and_directories($path, $config)
