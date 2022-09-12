@@ -6,23 +6,23 @@ function run()
 {
     global $projectRoot;
     global $configPath;
-    global $lockPath;
+    global $metaFilePath;
 
     $packagesDirectory = find_or_create_packages_directory();
 
-    $setting = ['map' => [], 'excludes' => ['vendor']];
-    $lockSetting = [];
+    $config = ['map' => [], 'excludes' => ['vendor']];
+    $meta = [];
 
     $composerSetting = json_decode(file_get_contents($projectRoot . '/composer.json'), true);
     $composerLockSetting = json_decode(file_get_contents($projectRoot . '/composer.lock'), true);
 
     if (isset($composerSetting['autoload']['psr-4'])) {
-        $setting['map'] = [];
+        $config['map'] = [];
         foreach ($composerSetting['autoload']['psr-4'] as $namespace => $path) {
             $namespace = str_ends_with($namespace, '\\') ? substr_replace($namespace, '', -1) : $namespace;
             $path = str_ends_with($path, '/') ? substr_replace($path, '', -1) : $path;
 
-            $setting['map'][$namespace] = $path;
+            $config['map'][$namespace] = $path;
         }
     }
 
@@ -35,22 +35,22 @@ function run()
             $ownerAndRepo = get_meta_from_package($package);
 
             if (isset($composerSetting['require'][$name])) {
-                $setting['packages'][$package] = $version;
+                $config['packages'][$package] = $version;
             }
 
-            $lockSetting['packages'][$package] = [
+            $meta['packages'][$package] = [
                 'version' => $version,
                 'hash' => $hash,
                 'owner' => $ownerAndRepo['owner'],
                 'repo' => $ownerAndRepo['repo'],
             ];
 
-            migrate_package($packagesDirectory, $name, $package, $lockSetting['packages'][$package]);
+            migrate_package($packagesDirectory, $name, $package, $meta['packages'][$package]);
         }
     }
 
-    file_put_contents($configPath, json_encode($setting, JSON_PRETTY_PRINT) . PHP_EOL);
-    file_put_contents($lockPath, json_encode($lockSetting, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($configPath, json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($metaFilePath, json_encode($meta, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
 function migrate_package($packagesDirectory, $name, $package, $packageMeta)
@@ -67,23 +67,23 @@ function migrate_package($packagesDirectory, $name, $package, $packageMeta)
 
     recursive_copy($packageVendorDirectory, $packageDirectory);
 
-    $packageSetting = json_decode(file_get_contents($packageDirectory . '/composer.json'), true);
+    $packageComposerSettings = json_decode(file_get_contents($packageDirectory . '/composer.json'), true);
 
-    $setting = ['map' => []];
+    $config = ['map' => []];
 
-    if (isset($packageSetting['autoload']['psr-4'])) {
-        foreach ($packageSetting['autoload']['psr-4'] as $namespace => $path) {
+    if (isset($packageComposerSettings['autoload']['psr-4'])) {
+        foreach ($packageComposerSettings['autoload']['psr-4'] as $namespace => $path) {
             // TODO:
             if (! is_array($namespace) && ! is_array($path)) {
                 $namespace = str_ends_with($namespace, '\\') ? substr_replace($namespace, '', -1) : $namespace;
                 $path = str_ends_with($path, '/') ? substr_replace($path, '', -1) : $path;
 
-                $setting['map'][$namespace] = $path;
+                $config['map'][$namespace] = $path;
             }
         }
     }
 
-    file_put_contents($packageDirectory . '/build.json', json_encode($setting, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($packageDirectory . '/build.json', json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
     file_put_contents($packageDirectory . '/build-lock.json', json_encode([], JSON_PRETTY_PRINT) . PHP_EOL);
 }
 

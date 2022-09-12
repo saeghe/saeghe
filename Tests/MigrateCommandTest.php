@@ -8,7 +8,7 @@ test(
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=migrate --project=TestRequirements/Fixtures/composer-package");
 
         assert_correct_build_file('Build file is not correct!' . $output);
-        assert_correct_build_lock_file('Build lock file is not correct!' . $output);
+        assert_correct_meta_file('Meta file data is not correct!' . $output);
         assert_package_directory_content('Package directory content is not what we want!' . $output);
     },
     before: function () {
@@ -35,7 +35,7 @@ function assert_correct_build_file($message)
     );
 }
 
-function assert_correct_build_lock_file($message)
+function assert_correct_meta_file($message)
 {
     $root = $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/';
     $stub = $_SERVER['PWD'] . '/TestRequirements/Stubs/composer-package/';

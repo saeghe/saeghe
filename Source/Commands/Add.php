@@ -19,25 +19,25 @@ function add($packagesDirectory, $package, $version, $submodule = false)
 {
     global $projectRoot;
 
-    $meta = get_meta_from_package($package);
+    $packageMeta = get_meta_from_package($package);
 
-    if (package_has_release($meta)) {
-        $meta = download_package($packagesDirectory, $version, $meta);
+    if (package_has_release($packageMeta)) {
+        $packageMeta = download_package($packagesDirectory, $version, $packageMeta);
     } else {
-        $meta = clone_package($packagesDirectory, $version, $meta);
+        $packageMeta = clone_package($packagesDirectory, $version, $packageMeta);
     }
 
     if (! $submodule) {
-        find_or_create_build_json_file($projectRoot, $package, $meta);
+        find_or_create_build_json_file($projectRoot, $package, $packageMeta);
     }
 
-    find_or_create_build_lock_file($projectRoot, $package, $meta);
+    find_or_create_meta_file($projectRoot, $package, $packageMeta);
 
-    $packagePath = $packagesDirectory . '/' . $meta['owner'] . '/' . $meta['repo'] . '/';
-    $packageConfig = $packagePath . 'build.json';
-    if (file_exists($packageConfig)) {
-        $packageSetting = json_decode(json: file_get_contents($packageConfig), associative: true, flags: JSON_THROW_ON_ERROR);
-        foreach ($packageSetting['packages'] as $subPackage => $version) {
+    $packagePath = $packagesDirectory . '/' . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
+    $packageConfigPath = $packagePath . 'build.json';
+    if (file_exists($packageConfigPath)) {
+        $packageConfig = json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR);
+        foreach ($packageConfig['packages'] as $subPackage => $version) {
             add($packagesDirectory, $subPackage, $version, true);
         }
     }
@@ -58,7 +58,7 @@ function find_or_create_build_json_file($projectDirectory, $package, $meta)
     file_put_contents($projectDirectory . 'build.json', json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
-function find_or_create_build_lock_file($projectDirectory, $package, $meta)
+function find_or_create_meta_file($projectDirectory, $package, $packageMeta)
 {
     $configFile = $projectDirectory . 'build-lock.json';
 
@@ -66,15 +66,15 @@ function find_or_create_build_lock_file($projectDirectory, $package, $meta)
         file_put_contents($configFile, json_encode([], JSON_PRETTY_PRINT));
     }
 
-    $lockContent = json_decode(file_get_contents($configFile), true, JSON_THROW_ON_ERROR);
+    $meta = json_decode(file_get_contents($configFile), true, JSON_THROW_ON_ERROR);
 
-    $lockContent['packages'][$package] = [
-        'version' => $meta['version'],
-        'hash' => trim($meta['hash']),
-        'owner' => trim($meta['owner']),
-        'repo' => trim($meta['repo']),
+    $meta['packages'][$package] = [
+        'version' => $packageMeta['version'],
+        'hash' => trim($packageMeta['hash']),
+        'owner' => trim($packageMeta['owner']),
+        'repo' => trim($packageMeta['repo']),
     ];
-    file_put_contents($projectDirectory . 'build-lock.json', json_encode($lockContent, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($projectDirectory . 'build-lock.json', json_encode($meta, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
 function find_or_create_packages_directory()

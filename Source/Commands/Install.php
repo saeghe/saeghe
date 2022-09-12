@@ -6,11 +6,11 @@ use ZipArchive;
 
 function run()
 {
-    global $lockSetting;
+    global $meta;
 
     $packagesDirectory = find_or_create_packages_directory();
 
-    foreach ($lockSetting['packages'] as $package => $meta) {
+    foreach ($meta['packages'] as $package => $meta) {
         install($package, $meta, $packagesDirectory);
     }
 }

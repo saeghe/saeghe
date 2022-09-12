@@ -10,10 +10,10 @@ function run()
 {
     $package = argument('package');
 
-    global $setting;
-    global $lockSetting;
+    global $config;
+    global $meta;
     global $packagesDirectory;
 
-    remove($package, $setting, $lockSetting, $packagesDirectory);
+    remove($package, $config, $meta, $packagesDirectory);
     add($packagesDirectory, $package, null);
 }

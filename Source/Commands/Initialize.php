@@ -7,23 +7,23 @@ use function Saeghe\Cli\IO\Read\argument;
 function run()
 {
     global $projectRoot;
-    global $setting;
-    global $lockSetting;
     global $config;
+    global $meta;
+    global $configFile;
 
     $packagesDirectory = argument('packages-directory');
 
     if ($packagesDirectory) {
-        $setting['packages-directory'] = $packagesDirectory;
+        $config['packages-directory'] = $packagesDirectory;
     }
 
     file_put_contents(
-        $projectRoot . $config,
-        json_encode($setting, JSON_PRETTY_PRINT) . PHP_EOL
+        $projectRoot . $configFile,
+        json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL
     );
 
     file_put_contents(
-        $projectRoot . str_replace('.json', '-lock.json', $config),
-        json_encode($lockSetting, JSON_PRETTY_PRINT) . PHP_EOL
+        $projectRoot . str_replace('.json', '-lock.json', $configFile),
+        json_encode($meta, JSON_PRETTY_PRINT) . PHP_EOL
     );
 }

@@ -11,7 +11,7 @@ test(
     },
     before: function () {
         delete_build_json();
-        delete_build_lock();
+        delete_meta_file();
         delete_build_directory();
         delete_packages_directory();
 
@@ -20,7 +20,7 @@ test(
     },
     after: function () {
         delete_build_json();
-        delete_build_lock();
+        delete_meta_file();
         delete_build_directory();
         delete_packages_directory();
     },
@@ -31,7 +31,7 @@ function delete_build_json()
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
 }
 
-function delete_build_lock()
+function delete_meta_file()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
 }

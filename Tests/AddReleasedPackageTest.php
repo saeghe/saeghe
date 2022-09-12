@@ -13,18 +13,18 @@ test(
         assert_released_package_added_to_build_config('Released Package does not added to config file properly! ' . $output);
         assert_packages_directory_created_for_empty_project('Package directory does not created.' . $output);
         assert_released_package_cloned('Released package does not cloned!' . $output);
-        assert_build_lock_has_desired_data('Data in the lock files is not what we want.' . $output);
+        assert_meta_has_desired_data('Meta data is not what we want.' . $output);
         assert_zip_file_deleted('Zip file has not been deleted.' . $output);
     },
     before: function () {
         delete_empty_project_build_json();
-        delete_empty_project_build_lock();
+        delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
     },
     after: function () {
         delete_empty_project_packages_directory();
         delete_empty_project_build_json();
-        delete_empty_project_build_lock();
+        delete_empty_project_meta_file();
     }
 );
 
@@ -33,7 +33,7 @@ function delete_empty_project_build_json()
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json');
 }
 
-function delete_empty_project_build_lock()
+function delete_empty_project_meta_file()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json');
 }
@@ -76,16 +76,16 @@ function assert_released_package_added_to_build_config($message)
     );
 }
 
-function assert_build_lock_has_desired_data($message)
+function assert_meta_has_desired_data($message)
 {
-    $lock = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
+    $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
-        isset($lock['packages']['git@github.com:saeghe/released-package.git'])
-        && 'v1.0.2' === $lock['packages']['git@github.com:saeghe/released-package.git']['version']
-        && 'saeghe' === $lock['packages']['git@github.com:saeghe/released-package.git']['owner']
-        && 'released-package' === $lock['packages']['git@github.com:saeghe/released-package.git']['repo']
-        && '9554ff78c29bf1d2b75940a22a0726f2fd953b43' === $lock['packages']['git@github.com:saeghe/released-package.git']['hash'],
+        isset($meta['packages']['git@github.com:saeghe/released-package.git'])
+        && 'v1.0.2' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
+        && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
+        && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
+        && '9554ff78c29bf1d2b75940a22a0726f2fd953b43' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
         $message
     );
 }

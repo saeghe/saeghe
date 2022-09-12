@@ -9,7 +9,7 @@ test(
 
         assert_desired_data_in_packages_directory('Package has not been deleted from Packages directory!' . $output);
         assert_build_json_is_clean('Packages has not been deleted from build json file!' . $output);
-        assert_build_lock_is_clean('Packages has not been deleted from build lock file!' . $output);
+        assert_meta_is_clean('Packages has not been deleted from meta file!' . $output);
     },
     before: function () {
         shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
@@ -42,7 +42,7 @@ function assert_build_json_is_clean($message)
     );
 }
 
-function assert_build_lock_is_clean($message)
+function assert_meta_is_clean($message)
 {
     $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
 
