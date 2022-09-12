@@ -68,3 +68,130 @@ function dir_find_or_create($path)
 
     return $path;
 }
+
+function json_put($path, array $content)
+{
+    file_put_contents($path, json_encode($content, JSON_PRETTY_PRINT) . PHP_EOL);
+}
+
+function json_merge($path, array $content)
+{
+    $currentContent = json_to_array($path);
+    $content = array_merge_recursive($currentContent, $content);
+
+    json_put($path, $content);
+}
+
+function json_to_array($path)
+{
+    if (file_exists($path)) {
+        return json_decode(json: file_get_contents($path), associative: true, flags: JSON_THROW_ON_ERROR);
+    }
+
+    return [];
+}
+
+function git_clone($packageDirectory, $owner, $repo)
+{
+    $destination = "$packageDirectory$owner/$repo";
+
+    shell_exec("rm -fR $destination");
+    shell_exec("git clone git@github.com:$owner/$repo.git $destination");
+
+    return trim(shell_exec("git --git-dir=$destination/.git rev-parse HEAD"));
+}
+
+function git_has_release($owner, $repo)
+{
+    global $credentials;
+
+    $output = shell_exec('curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/$owner/$repo/releases/latest | grep 'tag_name'");
+
+    return ! is_null($output);
+}
+
+function git_latest_version($owner, $repo)
+{
+    global $credentials;
+
+    $output = shell_exec('curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/$owner/$repo/releases/latest | grep 'tag_name'");
+    $version = str_replace('"tag_name": "', '', $output);
+
+    return trim(explode('"', $version)[0]);
+}
+
+function git_download($packageDirectory, $owner, $repo, $version)
+{
+    global $credentials;
+
+    $ownerDirectory = $packageDirectory . $owner . '/';
+
+    if (! file_exists($ownerDirectory)) {
+        mkdir($ownerDirectory);
+    }
+
+    $zipFile = $ownerDirectory . $repo . '.zip';
+
+    $token = $credentials['github.com']['token'];
+    $fp = fopen ($zipFile, 'w+');
+    $ch = curl_init("https://github.com/$owner/$repo/zipball/$version");
+    curl_setopt($ch, CURLOPT_TIMEOUT, 600);
+    curl_setopt($ch, CURLOPT_FILE, $fp);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer $token"]);
+    curl_exec($ch);
+    curl_close($ch);
+    fclose($fp);
+
+    $zip = new ZipArchive;
+    $res = $zip->open($zipFile);
+
+    if ($res === TRUE) {
+        $zip->extractTo($ownerDirectory);
+        $zip->close();
+    } else {
+        var_dump($res);
+    }
+
+    shell_exec('rm -f ' . $zipFile);
+
+    $files = scandir($ownerDirectory);
+
+    $directory = array_reduce($files, function ($carry, $filename) use ($owner, $repo) {
+        return str_starts_with($filename, "$owner-$repo-") ? $filename : $carry;
+    });
+
+    rename($ownerDirectory . $directory, $ownerDirectory . $repo);
+
+    return trim(str_replace("$owner-$repo-", '', $directory));
+}
+
+function git_repo($package)
+{
+    if (str_starts_with($package, 'git@')) {
+        $ownerAndRepo = str_replace('git@github.com:', '', $package);
+    } else {
+        $ownerAndRepo = str_replace('https://github.com/', '', $package);
+    }
+
+    if (str_ends_with($ownerAndRepo, '.git')) {
+        $ownerAndRepo = substr_replace($ownerAndRepo, '', -4);
+    }
+
+    return explode('/', $ownerAndRepo)[1];
+}
+
+function git_owner($package)
+{
+    if (str_starts_with($package, 'git@')) {
+        $ownerAndRepo = str_replace('git@github.com:', '', $package);
+    } else {
+        $ownerAndRepo = str_replace('https://github.com/', '', $package);
+    }
+
+    if (str_ends_with($ownerAndRepo, '.git')) {
+        $ownerAndRepo = substr_replace($ownerAndRepo, '', -4);
+    }
+
+    return explode('/', $ownerAndRepo)[0];
+}

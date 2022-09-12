@@ -12,13 +12,13 @@ test(
         assert_meta_file_has_desired_data('Meta data for adding complex package does not have desired data!' . $output);
     },
     before: function () {
-        deleete_config_file();
+        delete_config_file();
         delete_meta_file();
         delete_packages_directory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
     },
     after: function () {
-        deleete_config_file();
+        delete_config_file();
         delete_meta_file();
         delete_packages_directory();
     }
@@ -32,19 +32,19 @@ test(
         assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
     },
     before: function () {
-        deleete_config_file();
+        delete_config_file();
         delete_meta_file();
         delete_packages_directory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
     },
     after: function () {
-        deleete_config_file();
+        delete_config_file();
         delete_meta_file();
         delete_packages_directory();
     }
 );
 
-function deleete_config_file()
+function delete_config_file()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
 }
