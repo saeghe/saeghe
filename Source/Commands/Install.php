@@ -7,8 +7,7 @@ use ZipArchive;
 function run()
 {
     global $meta;
-
-    $packagesDirectory = find_or_create_packages_directory();
+    global $packagesDirectory;
 
     foreach ($meta['packages'] as $package => $meta) {
         install($package, $meta, $packagesDirectory);
@@ -22,17 +21,6 @@ function install($package, $meta, $packagesDirectory)
     } else {
         clone_package($packagesDirectory, $package, $meta['version'], $meta);
     }
-}
-
-function find_or_create_packages_directory()
-{
-    global $packagesDirectory;
-
-    if (! file_exists($packagesDirectory)) {
-        mkdir($packagesDirectory);
-    }
-
-    return $packagesDirectory;
 }
 
 function package_has_release($package, $meta)

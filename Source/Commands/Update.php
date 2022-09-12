@@ -8,12 +8,18 @@ use function Saeghe\Saeghe\Commands\Remove\remove;
 
 function run()
 {
-    $package = argument('package');
-
+    global $projectRoot;
     global $config;
     global $meta;
     global $packagesDirectory;
 
+    $package = argument('package');
+
     remove($package, $config, $meta, $packagesDirectory);
-    add($packagesDirectory, $package, null);
+    $packageMeta = add($packagesDirectory, $package, null);
+
+    $config['packages'][$package] = $packageMeta['version'];
+
+    $configFile = $projectRoot . DEFAULT_CONFIG_FILENAME;
+    file_put_contents($configFile, json_encode($config, JSON_PRETTY_PRINT));
 }

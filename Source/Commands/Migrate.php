@@ -7,8 +7,7 @@ function run()
     global $projectRoot;
     global $configPath;
     global $metaFilePath;
-
-    $packagesDirectory = find_or_create_packages_directory();
+    global $packagesDirectory;
 
     $config = ['map' => [], 'excludes' => ['vendor']];
     $meta = [];
@@ -86,17 +85,6 @@ function migrate_package($packagesDirectory, $name, $package, $packageMeta)
     $defaultMetaFilename = str_replace('.json', '-lock.json', DEFAULT_CONFIG_FILENAME);
     file_put_contents($packageDirectory . '/' . DEFAULT_CONFIG_FILENAME, json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
     file_put_contents($packageDirectory . '/' . $defaultMetaFilename, json_encode([], JSON_PRETTY_PRINT) . PHP_EOL);
-}
-
-function find_or_create_packages_directory()
-{
-    global $packagesDirectory;
-
-    if (! file_exists($packagesDirectory)) {
-        mkdir($packagesDirectory);
-    }
-
-    return $packagesDirectory;
 }
 
 function get_meta_from_package($package)

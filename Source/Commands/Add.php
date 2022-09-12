@@ -7,15 +7,17 @@ use function Saeghe\Cli\IO\Read\argument;
 
 function run()
 {
+    global $projectRoot;
+    global $packagesDirectory;
+
     $package = argument('package');
     $version = argument('version');
 
-    $packagesDirectory = find_or_create_packages_directory();
-
-    add($packagesDirectory, $package, $version);
+    $packageMeta = add($packagesDirectory, $package, $version);
+    find_or_create_config_file($projectRoot, $package, $packageMeta);
 }
 
-function add($packagesDirectory, $package, $version, $submodule = false)
+function add($packagesDirectory, $package, $version)
 {
     global $projectRoot;
 
@@ -27,10 +29,6 @@ function add($packagesDirectory, $package, $version, $submodule = false)
         $packageMeta = clone_package($packagesDirectory, $version, $packageMeta);
     }
 
-    if (! $submodule) {
-        find_or_create_config_file($projectRoot, $package, $packageMeta);
-    }
-
     find_or_create_meta_file($projectRoot, $package, $packageMeta);
 
     $packagePath = $packagesDirectory . '/' . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
@@ -38,9 +36,11 @@ function add($packagesDirectory, $package, $version, $submodule = false)
     if (file_exists($packageConfigPath)) {
         $packageConfig = json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR);
         foreach ($packageConfig['packages'] as $subPackage => $version) {
-            add($packagesDirectory, $subPackage, $version, true);
+            add($packagesDirectory, $subPackage, $version);
         }
     }
+
+    return $packageMeta;
 }
 
 function find_or_create_config_file($projectDirectory, $package, $meta)
@@ -75,17 +75,6 @@ function find_or_create_meta_file($projectDirectory, $package, $packageMeta)
         'repo' => trim($packageMeta['repo']),
     ];
     file_put_contents($projectDirectory . 'saeghe.config-lock.json', json_encode($meta, JSON_PRETTY_PRINT) . PHP_EOL);
-}
-
-function find_or_create_packages_directory()
-{
-    global $packagesDirectory;
-
-    if (! file_exists($packagesDirectory)) {
-        mkdir($packagesDirectory);
-    }
-
-    return $packagesDirectory;
 }
 
 function clone_package($packageDirectory, $version, $meta)
