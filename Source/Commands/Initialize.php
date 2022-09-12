@@ -9,13 +9,9 @@ function run()
     global $meta;
     global $configFile;
 
-    file_put_contents(
-        $projectRoot . $configFile,
-        json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL
-    );
-
-    file_put_contents(
+    json_put($projectRoot . $configFile, $config);
+    json_put(
         $projectRoot . str_replace('.json', '-lock.json', $configFile),
-        json_encode($meta, JSON_PRETTY_PRINT) . PHP_EOL
+        $meta
     );
 }
