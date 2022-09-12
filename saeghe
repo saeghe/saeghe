@@ -20,7 +20,7 @@ $config = [
     'map' => [],
     'entry-points' => [],
     'executables' => [],
-    'packages-directory' => 'Packages',
+    'packages-directory' => Read\argument('packages-directory', 'Packages'),
     'packages' => [],
 ];
 
@@ -45,7 +45,7 @@ $meta = array_merge(
     file_exists($metaFilePath) ? json_decode(json: file_get_contents($metaFilePath), associative: true, flags: JSON_THROW_ON_ERROR) : []
 );
 
-$packagesDirectory = $projectRoot . $config['packages-directory'] . '/';
+$packagesDirectory = dir_find_or_create($projectRoot . $config['packages-directory'] . '/');
 
 $command = Read\argument('command', 'help');
 
@@ -59,3 +59,12 @@ match ($command) {
     'update' => \Saeghe\Saeghe\Commands\Update\run(),
     default => \Saeghe\Saeghe\Commands\Help\run(),
 };
+
+function dir_find_or_create($path)
+{
+    if (! file_exists($path)) {
+        mkdir($path);
+    }
+
+    return $path;
+}

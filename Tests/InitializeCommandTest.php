@@ -36,22 +36,30 @@ EOD;
 
 test(
     title: 'it makes a new default config file',
-    case: function () use ($initialContent, $metaContent) {
+    case: function ($packagesDirectory) use ($initialContent, $metaContent) {
         $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
         $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject");
 
         File\assert_exists($configPath, 'Config file does not exists: ' . $output);
-        File\assert_exists($metaFilePath, 'Lock file does not exists: ' . $output);
+        File\assert_exists($configPath, 'Config file does not exists: ' . $output);
+        File\assert_exists($packagesDirectory, 'Packages directory is not created: ' . $output);
         File\assert_content($configPath, $initialContent, 'Config file content is not correct after running initialize!');
         File\assert_content($metaFilePath, $metaContent, 'Lock file content is not correct after running initialize!');
 
-        return [$configPath, $metaFilePath];
+        return [$configPath, $metaFilePath, $packagesDirectory];
     },
-    after: function ($configPath, $metaFilePath) {
+    before: function () {
+        $packagesDirectory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages';
+        shell_exec('rm -fR ' . $packagesDirectory);
+
+        return $packagesDirectory;
+    },
+    after: function ($configPath, $metaFilePath, $packagesDirectory) {
         shell_exec('rm -f ' . $configPath);
         shell_exec('rm -f ' . $metaFilePath);
+        shell_exec('rm -fR ' . $packagesDirectory);
     }
 );
 
@@ -87,16 +95,19 @@ test(
     case: function () use ($initialContentWithPackagesDirectory) {
         $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
         $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
+        $packagesDirectory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor';
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
 
+        File\assert_exists($packagesDirectory, 'packages directory has not been created: ' . $output);
         File\assert_exists($configPath, 'Config file does not exists: ' . $output);
         File\assert_content($configPath, $initialContentWithPackagesDirectory, 'Config file content is not correct after running initialize!');
 
-        return [$configPath, $metaFilePath];
+        return [$configPath, $metaFilePath, $packagesDirectory];
     },
-    after: function ($configPath, $metaFilePath) {
+    after: function ($configPath, $metaFilePath, $packagesDirectory) {
         shell_exec('rm -f ' . $configPath);
         shell_exec('rm -f ' . $metaFilePath);
+        shell_exec('rm -fR ' . $packagesDirectory);
     }
 );

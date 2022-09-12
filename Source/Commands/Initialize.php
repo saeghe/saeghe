@@ -2,20 +2,12 @@
 
 namespace Saeghe\Saeghe\Commands\Initialize;
 
-use function Saeghe\Cli\IO\Read\argument;
-
 function run()
 {
     global $projectRoot;
     global $config;
     global $meta;
     global $configFile;
-
-    $packagesDirectory = argument('packages-directory');
-
-    if ($packagesDirectory) {
-        $config['packages-directory'] = $packagesDirectory;
-    }
 
     file_put_contents(
         $projectRoot . $configFile,
