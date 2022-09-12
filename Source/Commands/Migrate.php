@@ -83,8 +83,9 @@ function migrate_package($packagesDirectory, $name, $package, $packageMeta)
         }
     }
 
-    file_put_contents($packageDirectory . '/build.json', json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
-    file_put_contents($packageDirectory . '/build-lock.json', json_encode([], JSON_PRETTY_PRINT) . PHP_EOL);
+    $defaultMetaFilename = str_replace('.json', '-lock.json', DEFAULT_CONFIG_FILENAME);
+    file_put_contents($packageDirectory . '/' . DEFAULT_CONFIG_FILENAME, json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($packageDirectory . '/' . $defaultMetaFilename, json_encode([], JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
 function find_or_create_packages_directory()

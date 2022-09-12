@@ -23,14 +23,14 @@ test(
     before: function () {
         delete_build_directory();
         delete_packages_directory();
-        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
+        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
         shell_exec($_SERVER['PWD'] . '/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/simple-package.git');
     },
     after: function () {
         delete_build_directory();
         delete_packages_directory();
-        shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
-        shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
+        shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
+        shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
     }
 );
 
@@ -186,7 +186,7 @@ function assert_build_for_packages_entry_points($message)
 function assert_exclude_not_built($message)
 {
     assert(
-        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development//excluded-file.php')
+        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/excluded-file.php')
         && ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/excluded-directory')
         , $message
     );

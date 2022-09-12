@@ -28,7 +28,7 @@ function add_executables($buildDirectory, $packagesBuildDirectory, $packages)
 {
     foreach ($packages['packages'] as $package => $meta) {
         $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
-        $packageConfigPath = $packageBuildDirectory . '/build.json';
+        $packageConfigPath = $packageBuildDirectory . '/' . DEFAULT_CONFIG_FILENAME;
         if (file_exists($packageConfigPath)) {
             $packageConfig = json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR);
 
@@ -51,7 +51,7 @@ function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages
         if (! file_exists($packageBuildDirectory)) {
             mkdir($packageBuildDirectory, 0755, true);
         }
-        $packageConfigPath = $packageDirectory . '/build.json';
+        $packageConfigPath = $packageDirectory . '/' . DEFAULT_CONFIG_FILENAME;
 
         $packageConfig = file_exists($packageConfigPath)
             ? json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR)
@@ -242,8 +242,9 @@ function make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $
     foreach ($meta['packages'] as $package => $packageMeta) {
         $packageSource = $packagesDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
         $packageBuild = $packagesBuildDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
-        $packageConfigPath =  $packageSource . 'build.json';
-        $metaPath =  $packageSource . 'build-lock.json';
+        $packageConfigPath =  $packageSource . DEFAULT_CONFIG_FILENAME;
+        $packageMetaFilename = str_replace('.json', '-lock.json', DEFAULT_CONFIG_FILENAME);
+        $metaPath =  $packageSource . $packageMetaFilename;
         $packageConfig = file_exists($packageConfigPath)
             ? json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR)
             : ['map' => [], 'packages' => []];

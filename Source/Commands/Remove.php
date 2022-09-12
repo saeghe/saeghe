@@ -21,7 +21,7 @@ function remove($package, $config, $meta, $packagesDirectory)
 
     $packageMeta = $meta['packages'][$package];
 
-    $packageConfigPath = $packagesDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/build.json';
+    $packageConfigPath = $packagesDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/' . DEFAULT_CONFIG_FILENAME;
 
     $packageConfig = file_exists($packageConfigPath) ? json_decode(file_get_contents($packageConfigPath), true) : [];
 
@@ -29,7 +29,7 @@ function remove($package, $config, $meta, $packagesDirectory)
 
     remove_package_from_meta($package);
 
-    remove_package_from_build($package);
+    remove_package_from_config($package);
 
     delete_package_from_packages($package);
 
@@ -56,7 +56,7 @@ function remove_package_from_meta($package)
     file_put_contents($metaFilePath, json_encode($meta, JSON_PRETTY_PRINT));
 }
 
-function remove_package_from_build($package)
+function remove_package_from_config($package)
 {
     global $configPath;
 

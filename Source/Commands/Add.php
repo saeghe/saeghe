@@ -28,13 +28,13 @@ function add($packagesDirectory, $package, $version, $submodule = false)
     }
 
     if (! $submodule) {
-        find_or_create_build_json_file($projectRoot, $package, $packageMeta);
+        find_or_create_config_file($projectRoot, $package, $packageMeta);
     }
 
     find_or_create_meta_file($projectRoot, $package, $packageMeta);
 
     $packagePath = $packagesDirectory . '/' . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
-    $packageConfigPath = $packagePath . 'build.json';
+    $packageConfigPath = $packagePath . DEFAULT_CONFIG_FILENAME;
     if (file_exists($packageConfigPath)) {
         $packageConfig = json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR);
         foreach ($packageConfig['packages'] as $subPackage => $version) {
@@ -43,9 +43,9 @@ function add($packagesDirectory, $package, $version, $submodule = false)
     }
 }
 
-function find_or_create_build_json_file($projectDirectory, $package, $meta)
+function find_or_create_config_file($projectDirectory, $package, $meta)
 {
-    $configFile = $projectDirectory . 'build.json';
+    $configFile = $projectDirectory . DEFAULT_CONFIG_FILENAME;
 
     if (! file_exists($configFile)) {
         file_put_contents($configFile, json_encode([], JSON_PRETTY_PRINT));
@@ -55,12 +55,12 @@ function find_or_create_build_json_file($projectDirectory, $package, $meta)
 
     $config['packages'][$package] = $meta['version'];
 
-    file_put_contents($projectDirectory . 'build.json', json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($projectDirectory . DEFAULT_CONFIG_FILENAME, json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
 function find_or_create_meta_file($projectDirectory, $package, $packageMeta)
 {
-    $configFile = $projectDirectory . 'build-lock.json';
+    $configFile = $projectDirectory . 'saeghe.config-lock.json';
 
     if (! file_exists($configFile)) {
         file_put_contents($configFile, json_encode([], JSON_PRETTY_PRINT));
@@ -74,7 +74,7 @@ function find_or_create_meta_file($projectDirectory, $package, $packageMeta)
         'owner' => trim($packageMeta['owner']),
         'repo' => trim($packageMeta['repo']),
     ];
-    file_put_contents($projectDirectory . 'build-lock.json', json_encode($meta, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($projectDirectory . 'saeghe.config-lock.json', json_encode($meta, JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
 function find_or_create_packages_directory()

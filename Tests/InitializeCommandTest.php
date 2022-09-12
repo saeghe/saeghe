@@ -37,28 +37,28 @@ EOD;
 test(
     title: 'it makes a new default config file',
     case: function () use ($initialContent, $metaContent) {
-        $buildConfig = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json';
-        $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json';
+        $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
+        $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject");
 
-        File\assert_exists($buildConfig, 'Config file does not exists: ' . $output);
+        File\assert_exists($configPath, 'Config file does not exists: ' . $output);
         File\assert_exists($metaFilePath, 'Lock file does not exists: ' . $output);
-        File\assert_content($buildConfig, $initialContent, 'Config file content is not correct after running initialize!');
+        File\assert_content($configPath, $initialContent, 'Config file content is not correct after running initialize!');
         File\assert_content($metaFilePath, $metaContent, 'Lock file content is not correct after running initialize!');
 
-        return [$buildConfig, $metaFilePath];
+        return [$configPath, $metaFilePath];
     },
-    after: function ($buildConfig, $metaFilePath) {
-        shell_exec('rm -f ' . $buildConfig);
+    after: function ($configPath, $metaFilePath) {
+        shell_exec('rm -f ' . $configPath);
         shell_exec('rm -f ' . $metaFilePath);
     }
 );
 
 test(
     title: 'it makes a new config file with given filename',
-    case: function ($buildConfig, $configPath, $metaFile) use ($initialContent, $metaContent) {
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --config-file=$buildConfig");
+    case: function ($configFile, $configPath, $metaFile) use ($initialContent, $metaContent) {
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --config-file=$configFile");
 
         File\assert_exists($configPath, 'Custom config file does not exists: ' . $output);
         File\assert_exists($metaFile, 'Custom lock file does not exists: ' . $output);
@@ -68,13 +68,13 @@ test(
         return [$configPath, $metaFile];
     },
     before: function () {
-        $buildConfig = 'build-config.json';
+        $configFile = 'build-config.json';
         $metaFile = 'build-config-lock.json';
-        $configPath = $_SERVER['PWD'] . '/' . $buildConfig;
+        $configPath = $_SERVER['PWD'] . '/' . $configFile;
         // Make sure file does not exist
         shell_exec('rm -f ' . $configPath);
 
-        return compact('buildConfig', 'configPath', 'metaFile');
+        return compact('configFile', 'configPath', 'metaFile');
     },
     after: function ($configPath, $metaFile) {
         shell_exec('rm -f ' . $configPath);
@@ -85,18 +85,18 @@ test(
 test(
     title: 'it makes a new config file with given packages directory',
     case: function () use ($initialContentWithPackagesDirectory) {
-        $buildConfig = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json';
-        $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json';
+        $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
+        $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
 
-        File\assert_exists($buildConfig, 'Config file does not exists: ' . $output);
-        File\assert_content($buildConfig, $initialContentWithPackagesDirectory, 'Config file content is not correct after running initialize!');
+        File\assert_exists($configPath, 'Config file does not exists: ' . $output);
+        File\assert_content($configPath, $initialContentWithPackagesDirectory, 'Config file content is not correct after running initialize!');
 
-        return [$buildConfig, $metaFilePath];
+        return [$configPath, $metaFilePath];
     },
-    after: function ($buildConfig, $metaFilePath) {
-        shell_exec('rm -f ' . $buildConfig);
+    after: function ($configPath, $metaFilePath) {
+        shell_exec('rm -f ' . $configPath);
         shell_exec('rm -f ' . $metaFilePath);
     }
 );

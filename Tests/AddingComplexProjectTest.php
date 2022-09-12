@@ -8,17 +8,17 @@ test(
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/complex-package.git");
 
         assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
-        assert_build_file_has_desired_data('Build file for adding complex package does not have desired data!' . $output);
+        assert_config_file_has_desired_data('Config file for adding complex package does not have desired data!' . $output);
         assert_meta_file_has_desired_data('Meta data for adding complex package does not have desired data!' . $output);
     },
     before: function () {
-        delete_build_json();
+        deleete_config_file();
         delete_meta_file();
         delete_packages_directory();
-        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
+        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
     },
     after: function () {
-        delete_build_json();
+        deleete_config_file();
         delete_meta_file();
         delete_packages_directory();
     }
@@ -32,26 +32,26 @@ test(
         assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
     },
     before: function () {
-        delete_build_json();
+        deleete_config_file();
         delete_meta_file();
         delete_packages_directory();
-        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
+        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
     },
     after: function () {
-        delete_build_json();
+        deleete_config_file();
         delete_meta_file();
         delete_packages_directory();
     }
 );
 
-function delete_build_json()
+function deleete_config_file()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
+    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
 }
 
 function delete_meta_file()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
+    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
 }
 
 function delete_packages_directory()
@@ -63,18 +63,18 @@ function assert_pacakges_added_to_packages_directory($message)
 {
     assert(
         file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package')
-        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/build.json')
+        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/saeghe.config.json')
         && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/README.md')
         && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package')
-        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/build.json')
-        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/build-lock.json'),
+        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/saeghe.config.json')
+        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/saeghe.config-lock.json'),
         $message
     );
 }
 
-function assert_build_file_has_desired_data($message)
+function assert_config_file_has_desired_data($message)
 {
-    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json'), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
         assert(! isset($config['packages']['git@github.com:saeghe/simple-package.git']))
@@ -87,20 +87,20 @@ function assert_build_file_has_desired_data($message)
 
 function assert_meta_file_has_desired_data($message)
 {
-    $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json'), true, JSON_THROW_ON_ERROR);
+    $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/simple-package.git'])
         &&'development' === $meta['packages']['git@github.com:saeghe/simple-package.git']['version']
         &&'saeghe' === $meta['packages']['git@github.com:saeghe/simple-package.git']['owner']
         &&'simple-package' === $meta['packages']['git@github.com:saeghe/simple-package.git']['repo']
-        && '3db611bcd9fe6732e011f61bd36ca60ff42f4946' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash']
+        && 'f0a34daeb2d9af8df05f471cc7a314b0717fe02e' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash']
 
         && isset($meta['packages']['git@github.com:saeghe/complex-package.git'])
         &&'development' === $meta['packages']['git@github.com:saeghe/complex-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/complex-package.git']['owner']
         && 'complex-package' === $meta['packages']['git@github.com:saeghe/complex-package.git']['repo']
-        && '5e60733132ddf50df675b2491e35b7bb01674c3e' === $meta['packages']['git@github.com:saeghe/complex-package.git']['hash'],
+        && '080478442a9ef1d19f5966edc9bf3c1eccca4848' === $meta['packages']['git@github.com:saeghe/complex-package.git']['hash'],
         $message
     );
 }

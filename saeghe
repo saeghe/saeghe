@@ -14,6 +14,8 @@ require __DIR__ . '/Source/Commands/Update.php';
 
 use Saeghe\Cli\IO\Read;
 
+const DEFAULT_CONFIG_FILENAME = 'saeghe.config.json';
+
 $config = [
     'map' => [],
     'entry-points' => [],
@@ -27,7 +29,7 @@ $meta = ['packages' => []];
 $credentials = json_decode(json: file_get_contents(__DIR__ . '/credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
 
 $project = Read\argument('project', '');
-$configFile = Read\argument('config-file', 'build.json');
+$configFile = Read\argument('config-file', DEFAULT_CONFIG_FILENAME);
 
 $projectRoot = strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SERVER['PWD'] . '/';
 

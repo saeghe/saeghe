@@ -7,7 +7,7 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=install --project=TestRequirements/Fixtures/EmptyProject");
 
-        assert_build_content_not_changed('Config file has been changed!' . $output);
+        assert_config_file_content_not_changed('Config file has been changed!' . $output);
         assert_meta_file_content_not_changed('Released Package meta data does not added to meta file properly! ' . $output);
         assert_package_exists_in_packages_directory('Package does not exist in the packages directory.' . $output);
         assert_zip_file_deleted('Zip file has not been deleted.' . $output);
@@ -21,9 +21,9 @@ test(
     },
 );
 
-function assert_build_content_not_changed($message)
+function assert_config_file_content_not_changed($message)
 {
-    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build.json'), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($config['packages']['git@github.com:saeghe/released-package.git'])
@@ -34,7 +34,7 @@ function assert_build_content_not_changed($message)
 
 function assert_meta_file_content_not_changed($message)
 {
-    $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/build-lock.json'), true, JSON_THROW_ON_ERROR);
+    $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/released-package.git'])

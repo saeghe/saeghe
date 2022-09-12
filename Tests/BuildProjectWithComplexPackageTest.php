@@ -10,30 +10,30 @@ test(
         assert_executable_file_added('Complex executable file has not been created!' . $output);
     },
     before: function () {
-        delete_build_json();
+        delete_config_file();
         delete_meta_file();
         delete_build_directory();
         delete_packages_directory();
 
-        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
+        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
         shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/complex-package.git");
     },
     after: function () {
-        delete_build_json();
+        delete_config_file();
         delete_meta_file();
         delete_build_directory();
         delete_packages_directory();
     },
 );
 
-function delete_build_json()
+function delete_config_file()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build.json');
+    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
 }
 
 function delete_meta_file()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/build-lock.json');
+    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
 }
 
 function delete_build_directory()
@@ -56,8 +56,8 @@ function assert_build_for_packages($message)
        && build_exists_and_same_as_stub('src/Helpers.php')
        && build_exists_and_same_as_stub('tests/Features/FirstFeature.php')
        && build_exists_and_same_as_stub('tests/TestHelper.php')
-       && build_exists_and_same_as_stub('build.json')
-       && build_exists_and_same_as_stub('build-lock.json')
+       && build_exists_and_same_as_stub('saeghe.config.json')
+       && build_exists_and_same_as_stub('saeghe.config-lock.json')
        && build_exists_and_same_as_stub('cli-command')
        ,
        $message
