@@ -2,7 +2,7 @@
     "packages": {
         "git@github.com:saeghe\/simple-package.git": {
             "version": "development",
-            "hash": "bb176a6c76fb1248aa4d4844a78fd484a9c5b318",
+            "hash": "f0a34daeb2d9af8df05f471cc7a314b0717fe02e",
             "owner": "saeghe",
             "repo": "simple-package"
         }

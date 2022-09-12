@@ -91,16 +91,16 @@ function assert_meta_file_has_desired_data($message)
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/simple-package.git'])
-        &&'development' === $meta['packages']['git@github.com:saeghe/simple-package.git']['version']
-        &&'saeghe' === $meta['packages']['git@github.com:saeghe/simple-package.git']['owner']
-        &&'simple-package' === $meta['packages']['git@github.com:saeghe/simple-package.git']['repo']
+        && 'development' === $meta['packages']['git@github.com:saeghe/simple-package.git']['version']
+        && 'saeghe' === $meta['packages']['git@github.com:saeghe/simple-package.git']['owner']
+        && 'simple-package' === $meta['packages']['git@github.com:saeghe/simple-package.git']['repo']
         && 'f0a34daeb2d9af8df05f471cc7a314b0717fe02e' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash']
 
         && isset($meta['packages']['git@github.com:saeghe/complex-package.git'])
-        &&'development' === $meta['packages']['git@github.com:saeghe/complex-package.git']['version']
+        && 'development' === $meta['packages']['git@github.com:saeghe/complex-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/complex-package.git']['owner']
         && 'complex-package' === $meta['packages']['git@github.com:saeghe/complex-package.git']['repo']
-        && '080478442a9ef1d19f5966edc9bf3c1eccca4848' === $meta['packages']['git@github.com:saeghe/complex-package.git']['hash'],
+        && '1400280130f4c35f67e4e0128317d4543fb71221' === $meta['packages']['git@github.com:saeghe/complex-package.git']['hash'],
         $message
     );
 }

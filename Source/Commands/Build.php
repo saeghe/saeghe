@@ -24,10 +24,10 @@ function run()
     Write\success('Build finished successfully.');
 }
 
-function add_executables($buildDirectory, $packagesBuildDirectory, $packages)
+function add_executables($buildDirectory, $packagesBuildDirectory, $meta)
 {
-    foreach ($packages['packages'] as $package => $meta) {
-        $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
+    foreach ($meta['packages'] ?? [] as $package => $packageMeta) {
+        $packageBuildDirectory = $packagesBuildDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
         $packageConfigPath = $packageBuildDirectory . '/' . DEFAULT_CONFIG_FILENAME;
         if (file_exists($packageConfigPath)) {
             $packageConfig = json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR);
@@ -45,6 +45,8 @@ function add_executables($buildDirectory, $packagesBuildDirectory, $packages)
 
 function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages, $replaceMap)
 {
+    global $config;
+
     foreach ($packages['packages'] as $package => $meta) {
         $packageDirectory = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
         $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
@@ -56,6 +58,8 @@ function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages
         $packageConfig = file_exists($packageConfigPath)
             ? json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR)
             : ['map' => [], 'packages' => []];
+
+        $packageConfig['packages-directory'] = $config['packages-directory'];
 
         $filesAndDirectories = should_compile_files_and_directories($packageDirectory, $packageConfig);
 
@@ -274,7 +278,7 @@ function should_compile_files_and_directories($path, $config)
         function ($excludedPath) use ($path) {
             return $path . $excludedPath;
         },
-        array_merge(['.', '..', 'builds', '.git', 'Packages', '.idea'], $excludes)
+        array_merge(['.', '..', 'builds', '.git', '.idea', $config['packages-directory']], $excludes)
     );
 
     $filesAndDirectories = scandir($path);
