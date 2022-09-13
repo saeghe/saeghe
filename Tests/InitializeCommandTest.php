@@ -8,6 +8,7 @@ $initialContent = <<<EOD
 {
     "map": [],
     "entry-points": [],
+    "excludes": [],
     "executables": [],
     "packages-directory": "Packages",
     "packages": []
@@ -19,6 +20,7 @@ $initialContentWithPackagesDirectory = <<<EOD
 {
     "map": [],
     "entry-points": [],
+    "excludes": [],
     "executables": [],
     "packages-directory": "vendor",
     "packages": []
@@ -42,7 +44,6 @@ test(
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject");
 
-        File\assert_exists($configPath, 'Config file does not exists: ' . $output);
         File\assert_exists($configPath, 'Config file does not exists: ' . $output);
         File\assert_exists($packagesDirectory, 'Packages directory is not created: ' . $output);
         File\assert_content($configPath, $initialContent, 'Config file content is not correct after running initialize!');

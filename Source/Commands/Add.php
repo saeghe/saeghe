@@ -35,7 +35,9 @@ function add($packagesDirectory, $package, $version)
         $hash = git_clone($packagesDirectory, $owner, $repo);
     }
 
-    json_merge($metaFilePath, ['packages' => [$package => compact('owner', 'repo', 'version', 'hash')]]);
+    $meta = json_to_array($metaFilePath);
+    $meta['packages'][$package] = compact('owner', 'repo', 'version', 'hash');
+    json_put($metaFilePath, $meta);
 
     $packagePath = $packagesDirectory . "/$owner/$repo/";
     $packageConfigPath = $packagePath . DEFAULT_CONFIG_FILENAME;

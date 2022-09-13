@@ -19,6 +19,7 @@ const DEFAULT_CONFIG_FILENAME = 'saeghe.config.json';
 $config = [
     'map' => [],
     'entry-points' => [],
+    'excludes' => [],
     'executables' => [],
     'packages-directory' => Read\argument('packages-directory', 'Packages'),
     'packages' => [],
@@ -26,26 +27,15 @@ $config = [
 
 $meta = ['packages' => []];
 
-$credentials = json_decode(json: file_get_contents(__DIR__ . '/credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
-
+$credentials = json_to_array(__DIR__ . '/credentials.json');
 $project = Read\argument('project', '');
-$configFile = Read\argument('config-file', DEFAULT_CONFIG_FILENAME);
-
 $projectRoot = strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SERVER['PWD'] . '/';
-
-$configPath = $projectRoot . $configFile;
-$config = array_merge(
-    $config,
-    file_exists($configPath) ? json_decode(json: file_get_contents($configPath), associative: true, flags: JSON_THROW_ON_ERROR) : []
-);
-
+$configPath = $projectRoot . Read\argument('config-file', DEFAULT_CONFIG_FILENAME);
+$config = array_merge_json($config, $configPath);
 $metaFilePath = str_replace('.json', '-lock.json', $configPath);
-$meta = array_merge(
-    $meta,
-    file_exists($metaFilePath) ? json_decode(json: file_get_contents($metaFilePath), associative: true, flags: JSON_THROW_ON_ERROR) : []
-);
-
-$packagesDirectory = dir_find_or_create($projectRoot . $config['packages-directory'] . '/');
+$meta = array_merge_json($meta, $metaFilePath);
+$packagesDirectory = dir_find_or_create($projectRoot . $config['packages-directory']);
+$buildsPath = $projectRoot . 'builds' . '/';
 
 $command = Read\argument('command', 'help');
 
@@ -66,7 +56,7 @@ function dir_find_or_create($path)
         mkdir($path);
     }
 
-    return $path;
+    return $path . '/';
 }
 
 function dir_preserve_copy($origin, $destination)
@@ -74,14 +64,38 @@ function dir_preserve_copy($origin, $destination)
     return mkdir($destination, fileperms($origin) & 0x0FFF);
 }
 
-function dir_make_recursive($path)
+function dir_make_recursive($path, $permission = 0755)
 {
-    return mkdir($path, 0755, true);
+    return mkdir($path, $permission, true);
 }
 
 function dir_delete_recursive($path)
 {
     shell_exec("rm -fR $path");
+}
+
+function dir_refresh($path)
+{
+    if (file_exists($path)) {
+        dir_delete_recursive($path);
+    }
+
+    dir_make_recursive($path);
+
+    return $path;
+}
+
+function dir_fresh($path)
+{
+    $path = $path . '/';
+
+    if (! file_exists($path)) {
+        dir_make_recursive($path);
+    } else {
+        dir_delete_recursive("$path*");
+    }
+
+    return $path;
 }
 
 function file_preserve_modify($origin, $destination, $content)
@@ -90,17 +104,14 @@ function file_preserve_modify($origin, $destination, $content)
     chmod($destination, fileperms($origin) & 0x0FFF);
 }
 
+function array_merge_json($array, $path)
+{
+    return array_merge($array, json_to_array($path));
+}
+
 function json_put($path, array $content)
 {
     file_put_contents($path, json_encode($content, JSON_PRETTY_PRINT) . PHP_EOL);
-}
-
-function json_merge($path, array $content)
-{
-    $currentContent = json_to_array($path);
-    $content = array_merge_recursive($currentContent, $content);
-
-    json_put($path, $content);
 }
 
 function json_to_array($path, $default = [])

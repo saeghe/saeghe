@@ -11,12 +11,12 @@ function run()
     global $config;
     global $meta;
     global $packagesDirectory;
+    global $buildsPath;
     $environment = argument('environment', 'development');
 
     umask(0);
-
-    $buildDirectory = find_or_create_build_directory($projectRoot, $environment);
-    $packagesBuildDirectory = find_or_create_packages_build_directory($buildDirectory, $config);
+    $buildDirectory = dir_fresh($buildsPath . $environment);
+    $packagesBuildDirectory = dir_find_or_create($buildDirectory . $config['packages-directory']);
     $replaceMap = make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $packagesBuildDirectory);
     compile_packages($packagesDirectory, $packagesBuildDirectory, $meta, $replaceMap);
     compile_project_files($projectRoot, $buildDirectory, $packagesBuildDirectory, $config, $meta, $replaceMap);
@@ -48,13 +48,12 @@ function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages
 {
     foreach ($packages['packages'] as $package => $meta) {
         $packageDirectory = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
-        $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
-        if (! file_exists($packageBuildDirectory)) {
-            dir_make_recursive($packageBuildDirectory);
-        }
-        $packageConfigPath = $packageDirectory . '/' . DEFAULT_CONFIG_FILENAME;
+        $packageBuildDirectory = dir_refresh($packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/');
 
-        $packageConfig = json_to_array($packageConfigPath, ['map' => [], 'packages' => []]);
+        $packageConfig = array_merge_json(
+            ['map' => [], 'packages' => [], 'excludes' => [], 'executables' => [], 'entry-points' => []],
+            $packageDirectory . '/' . DEFAULT_CONFIG_FILENAME,
+        );
 
         $filesAndDirectories = should_compile_files_and_directories_for_package($packageDirectory, $packageConfig);
 
@@ -260,12 +259,11 @@ function make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $
 
 function should_compile_files_and_directories_for_package($path, $config)
 {
-    $excludes = $config['excludes'] ?? [];
     $excludedPaths = array_map(
         function ($excludedPath) use ($path) {
             return $path . $excludedPath;
         },
-        array_merge(['.', '..', '.git'], $excludes)
+        array_merge(['.', '..', '.git'], $config['excludes'])
     );
 
     $filesAndDirectories = scandir($path);
@@ -281,12 +279,11 @@ function should_compile_files_and_directories_for_package($path, $config)
 
 function should_compile_files_and_directories($path, $config)
 {
-    $excludes = $config['excludes'] ?? [];
     $excludedPaths = array_map(
         function ($excludedPath) use ($path) {
             return $path . $excludedPath;
         },
-        array_merge(['.', '..', 'builds', '.git', '.idea', $config['packages-directory']], $excludes)
+        array_merge(['.', '..', 'builds', '.git', '.idea', $config['packages-directory']], $config['excludes'])
     );
 
     $filesAndDirectories = scandir($path);
@@ -300,37 +297,10 @@ function should_compile_files_and_directories($path, $config)
     );
 }
 
-function find_or_create_packages_build_directory($buildDirectory, $config)
-{
-    $packagesBuildDirectory = $buildDirectory . $config['packages-directory'];
-
-    if (! file_exists($packagesBuildDirectory)) {
-        mkdir($packagesBuildDirectory);
-    }
-
-    return $packagesBuildDirectory . '/';
-}
-
-function find_or_create_build_directory($projectRoot, $environment)
-{
-    $buildDirectory = $projectRoot . 'builds/' . $environment . '/';
-
-    if (! file_exists($buildDirectory)) {
-        mkdir($buildDirectory, 0755, true);
-    } else {
-        dir_delete_recursive("$buildDirectory*");
-    }
-
-    return $buildDirectory;
-}
-
 function file_needs_modification($file, $config)
 {
-    $executables = isset($config['executables']) ?  array_values($config['executables']) : [];
-    $entryPoints = $config['entry-points'] ?? [];
-
     return array_reduce(
-            array: array_merge($executables, $entryPoints),
+            array: array_merge(array_values($config['executables']), $config['entry-points']),
             callback: fn ($carry, $entryPoint) => str_ends_with($file, $entryPoint) || $carry,
             initial: false
         )
