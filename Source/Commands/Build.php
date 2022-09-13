@@ -15,7 +15,7 @@ function run()
     $environment = argument('environment', 'development');
 
     umask(0);
-    $buildDirectory = dir_fresh($buildsPath . $environment);
+    $buildDirectory = dir_clean($buildsPath . $environment);
     $packagesBuildDirectory = dir_find_or_create($buildDirectory . $config['packages-directory']);
     $replaceMap = make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $packagesBuildDirectory);
     compile_packages($packagesDirectory, $packagesBuildDirectory, $meta, $replaceMap);
@@ -48,7 +48,7 @@ function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages
 {
     foreach ($packages['packages'] as $package => $meta) {
         $packageDirectory = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
-        $packageBuildDirectory = dir_refresh($packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/');
+        $packageBuildDirectory = dir_renew($packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/');
 
         $packageConfig = array_merge_json(
             ['map' => [], 'packages' => [], 'excludes' => [], 'executables' => [], 'entry-points' => []],

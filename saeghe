@@ -5,6 +5,7 @@ require __DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php';
 require __DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php';
 require __DIR__ . '/Source/Commands/Add.php';
 require __DIR__ . '/Source/Commands/Build.php';
+require __DIR__ . '/Source/Commands/Flush.php';
 require __DIR__ . '/Source/Commands/Help.php';
 require __DIR__ . '/Source/Commands/Initialize.php';
 require __DIR__ . '/Source/Commands/Install.php';
@@ -42,6 +43,7 @@ $command = Read\argument('command', 'help');
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run(),
     'build' => \Saeghe\Saeghe\Commands\Build\run(),
+    'flush' => \Saeghe\Saeghe\Commands\Flush\run(),
     'initialize' => \Saeghe\Saeghe\Commands\Initialize\run(),
     'install' => \Saeghe\Saeghe\Commands\Install\run(),
     'migrate' => \Saeghe\Saeghe\Commands\Migrate\run(),
@@ -74,7 +76,7 @@ function dir_delete_recursive($path)
     shell_exec("rm -fR $path");
 }
 
-function dir_refresh($path)
+function dir_renew($path)
 {
     if (file_exists($path)) {
         dir_delete_recursive($path);
@@ -85,7 +87,7 @@ function dir_refresh($path)
     return $path;
 }
 
-function dir_fresh($path)
+function dir_clean($path)
 {
     $path = $path . '/';
 
