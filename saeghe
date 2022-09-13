@@ -12,6 +12,7 @@ require __DIR__ . '/Source/Commands/Install.php';
 require __DIR__ . '/Source/Commands/Migrate.php';
 require __DIR__ . '/Source/Commands/Remove.php';
 require __DIR__ . '/Source/Commands/Update.php';
+require __DIR__ . '/Source/Commands/Watch.php';
 
 use Saeghe\Cli\IO\Read;
 
@@ -49,6 +50,7 @@ match ($command) {
     'migrate' => \Saeghe\Saeghe\Commands\Migrate\run(),
     'remove' => \Saeghe\Saeghe\Commands\Remove\run(),
     'update' => \Saeghe\Saeghe\Commands\Update\run(),
+    'watch' => \Saeghe\Saeghe\Commands\Watch\run(),
     default => \Saeghe\Saeghe\Commands\Help\run(),
 };
 
