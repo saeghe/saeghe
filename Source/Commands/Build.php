@@ -2,7 +2,6 @@
 
 namespace Saeghe\Saeghe\Commands\Build;
 
-use Generator;
 use Saeghe\Cli\IO\Write;
 use function Saeghe\Cli\IO\Read\argument;
 
@@ -14,12 +13,16 @@ function run()
     global $packagesDirectory;
     $environment = argument('environment', 'development');
 
+    umask(0);
+
     $buildDirectory = find_or_create_build_directory($projectRoot, $environment);
     $packagesBuildDirectory = find_or_create_packages_build_directory($buildDirectory, $config);
     $replaceMap = make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $packagesBuildDirectory);
     compile_packages($packagesDirectory, $packagesBuildDirectory, $meta, $replaceMap);
     compile_project_files($projectRoot, $buildDirectory, $packagesBuildDirectory, $config, $meta, $replaceMap);
     add_executables($buildDirectory, $packagesBuildDirectory, $meta);
+
+    clearstatcache();
 
     Write\success('Build finished successfully.');
 }
@@ -29,15 +32,13 @@ function add_executables($buildDirectory, $packagesBuildDirectory, $meta)
     foreach ($meta['packages'] ?? [] as $package => $packageMeta) {
         $packageBuildDirectory = $packagesBuildDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
         $packageConfigPath = $packageBuildDirectory . '/' . DEFAULT_CONFIG_FILENAME;
-        if (file_exists($packageConfigPath)) {
-            $packageConfig = json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR);
+        $packageConfig = json_to_array($packageConfigPath);
 
-            if (isset($packageConfig['executables'])) {
-                foreach ($packageConfig['executables'] as $linkName => $source) {
-                    $target = $packageBuildDirectory . $source;
-                    $link = $buildDirectory . $linkName;
-                    symlink($target, $link);
-                }
+        if (isset($packageConfig['executables'])) {
+            foreach ($packageConfig['executables'] as $linkName => $source) {
+                $target = $packageBuildDirectory . $source;
+                $link = $buildDirectory . $linkName;
+                symlink($target, $link);
             }
         }
     }
@@ -49,13 +50,11 @@ function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages
         $packageDirectory = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
         $packageBuildDirectory = $packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
         if (! file_exists($packageBuildDirectory)) {
-            mkdir($packageBuildDirectory, 0755, true);
+            dir_make_recursive($packageBuildDirectory);
         }
         $packageConfigPath = $packageDirectory . '/' . DEFAULT_CONFIG_FILENAME;
 
-        $packageConfig = file_exists($packageConfigPath)
-            ? json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR)
-            : ['map' => [], 'packages' => []];
+        $packageConfig = json_to_array($packageConfigPath, ['map' => [], 'packages' => []]);
 
         $filesAndDirectories = should_compile_files_and_directories_for_package($packageDirectory, $packageConfig);
 
@@ -80,9 +79,7 @@ function compile($fileOrDirectory, $from, $to, $replaceMap, $config)
     $destination = $to . (str_ends_with($to, '/') ? '' : '/') . $fileOrDirectory;
 
     if (is_dir($origin)) {
-        umask(0);
-        mkdir($destination, fileperms($origin) & 0x0FFF);
-        clearstatcache();
+        dir_preserve_copy($origin, $destination);
         $filesAndDirectories = all_files_and_directories($origin);
         foreach ($filesAndDirectories as $fileOrDirectory) {
             compile($fileOrDirectory, $origin, $destination, $replaceMap, $config);
@@ -103,9 +100,7 @@ function compile($fileOrDirectory, $from, $to, $replaceMap, $config)
 function compile_file($origin, $destination, $replaceMap)
 {
     $modifiedFile = apply_file_modifications($origin, $replaceMap);
-    file_put_contents($destination, $modifiedFile);
-    chmod($destination, fileperms($origin) & 0x0FFF);
-    clearstatcache();
+    file_preserve_modify($origin, $destination, $modifiedFile);
 }
 
 function apply_file_modifications($origin, $replaceMap)
@@ -245,12 +240,8 @@ function make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $
         $packageConfigPath =  $packageSource . DEFAULT_CONFIG_FILENAME;
         $packageMetaFilename = str_replace('.json', '-lock.json', DEFAULT_CONFIG_FILENAME);
         $metaPath =  $packageSource . $packageMetaFilename;
-        $packageConfig = file_exists($packageConfigPath)
-            ? json_decode(json: file_get_contents($packageConfigPath), associative: true, flags: JSON_THROW_ON_ERROR)
-            : ['map' => [], 'packages' => []];
-        $subPackageMeta = file_exists($metaPath)
-            ? json_decode(json: file_get_contents($metaPath), associative: true, flags: JSON_THROW_ON_ERROR)
-            : [];
+        $packageConfig = json_to_array($packageConfigPath, ['map' => [], 'packages' => []]);
+        $subPackageMeta = json_to_array($metaPath, []);
 
         $subPackageMeta['packages'] = $subPackageMeta['packages'] ?? [];
 
@@ -327,7 +318,7 @@ function find_or_create_build_directory($projectRoot, $environment)
     if (! file_exists($buildDirectory)) {
         mkdir($buildDirectory, 0755, true);
     } else {
-        shell_exec("rm -fR $buildDirectory*");
+        dir_delete_recursive("$buildDirectory*");
     }
 
     return $buildDirectory;
@@ -344,45 +335,4 @@ function file_needs_modification($file, $config)
             initial: false
         )
         || str_ends_with($file, '.php');
-}
-
-function all_files_and_directories($origin)
-{
-    $filesAndDirectories = scandir($origin);
-
-    return array_filter($filesAndDirectories, fn ($fileOrDirectory) => ! in_array($fileOrDirectory, ['.', '..']));
-}
-
-function read_lines(string $source): Generator
-{
-    $fileHandler = @fopen($source, "r");
-
-    if ($fileHandler) {
-        while (($line = fgets($fileHandler)) !== false) {
-            yield $line;
-        }
-        if (!feof($fileHandler)) {
-            var_dump("Error: unexpected fgets() fail");
-        }
-        fclose($fileHandler);
-    }
-}
-
-function intact_copy($origin, $destination)
-{
-    umask(0);
-    copy($origin, $destination);
-    chmod($destination, fileperms($origin) & 0x0FFF);
-    clearstatcache();
-}
-
-function string_between($string, $start, $end)
-{
-    $startPosition = stripos($string, $start);
-    $first = substr($string, $startPosition);
-    $second = substr($first, strlen($start));
-    $positionEnd = stripos($second, $end);
-    $final = substr($second, 0, $positionEnd);
-
-    return trim($final);
 }

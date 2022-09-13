@@ -69,6 +69,27 @@ function dir_find_or_create($path)
     return $path;
 }
 
+function dir_preserve_copy($origin, $destination)
+{
+    return mkdir($destination, fileperms($origin) & 0x0FFF);
+}
+
+function dir_make_recursive($path)
+{
+    return mkdir($path, 0755, true);
+}
+
+function dir_delete_recursive($path)
+{
+    shell_exec("rm -fR $path");
+}
+
+function file_preserve_modify($origin, $destination, $content)
+{
+    file_put_contents($destination, $content);
+    chmod($destination, fileperms($origin) & 0x0FFF);
+}
+
 function json_put($path, array $content)
 {
     file_put_contents($path, json_encode($content, JSON_PRETTY_PRINT) . PHP_EOL);
@@ -82,13 +103,13 @@ function json_merge($path, array $content)
     json_put($path, $content);
 }
 
-function json_to_array($path)
+function json_to_array($path, $default = [])
 {
     if (file_exists($path)) {
         return json_decode(json: file_get_contents($path), associative: true, flags: JSON_THROW_ON_ERROR);
     }
 
-    return [];
+    return $default;
 }
 
 function git_clone($packageDirectory, $owner, $repo)
@@ -194,4 +215,43 @@ function git_owner($package)
     }
 
     return explode('/', $ownerAndRepo)[0];
+}
+
+function all_files_and_directories($origin)
+{
+    $filesAndDirectories = scandir($origin);
+
+    return array_filter($filesAndDirectories, fn ($fileOrDirectory) => ! in_array($fileOrDirectory, ['.', '..']));
+}
+
+function read_lines(string $source): Generator
+{
+    $fileHandler = @fopen($source, "r");
+
+    if ($fileHandler) {
+        while (($line = fgets($fileHandler)) !== false) {
+            yield $line;
+        }
+        if (!feof($fileHandler)) {
+            var_dump("Error: unexpected fgets() fail");
+        }
+        fclose($fileHandler);
+    }
+}
+
+function intact_copy($origin, $destination)
+{
+    copy($origin, $destination);
+    chmod($destination, fileperms($origin) & 0x0FFF);
+}
+
+function string_between($string, $start, $end)
+{
+    $startPosition = stripos($string, $start);
+    $first = substr($string, $startPosition);
+    $second = substr($first, strlen($start));
+    $positionEnd = stripos($second, $end);
+    $final = substr($second, 0, $positionEnd);
+
+    return trim($final);
 }
