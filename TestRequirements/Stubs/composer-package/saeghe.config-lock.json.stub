@@ -11,6 +11,12 @@
             "hash": "fe5ea303b0887d5caefd3d431c3e61ad47037001",
             "owner": "php-fig",
             "repo": "log"
+        },
+        "https:\/\/github.com\/symfony\/thanks.git": {
+            "version": "v1.2.10",
+            "hash": "e9c4709560296acbd4fe9e12b8d57a925aa7eae8",
+            "owner": "symfony",
+            "repo": "thanks"
         }
     }
 }

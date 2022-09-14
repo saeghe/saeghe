@@ -10,5 +10,8 @@
         "psr-4": {
             "Saeghe\\ComposerPackage\\": "src/"
         }
+    },
+    "require-dev": {
+        "symfony/thanks": "^1.2"
     }
 }

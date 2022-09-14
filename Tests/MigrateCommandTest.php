@@ -64,10 +64,17 @@ function assert_package_directory_content($message)
         && file_exists($root . 'Packages/php-fig/log/composer.json')
         && file_exists($root . 'Packages/php-fig/log/saeghe.config.json')
         && file_exists($root . 'Packages/php-fig/log/saeghe.config-lock.json')
+        && file_exists($root . 'Packages/symfony')
+        && file_exists($root . 'Packages/symfony/thanks')
+        && file_exists($root . 'Packages/symfony/thanks/composer.json')
+        && file_exists($root . 'Packages/symfony/thanks/saeghe.config.json')
+        && file_exists($root . 'Packages/symfony/thanks/saeghe.config-lock.json')
         && file_get_contents($root . 'Packages/Seldaek/monolog/saeghe.config.json') === file_get_contents($stub . 'monolog-saeghe.config.json.stub')
         && file_get_contents($root . 'Packages/Seldaek/monolog/saeghe.config-lock.json') === file_get_contents($stub . 'monolog-saeghe.config-lock.json.stub')
         && file_get_contents($root . 'Packages/php-fig/log/saeghe.config.json') === file_get_contents($stub . 'log-saeghe.config.json.stub')
         && file_get_contents($root . 'Packages/php-fig/log/saeghe.config-lock.json') === file_get_contents($stub . 'log-saeghe.config-lock.json.stub')
+        && file_get_contents($root . 'Packages/symfony/thanks/saeghe.config.json') === file_get_contents($stub . 'symfony-thanks-saeghe.config.json.stub')
+        && file_get_contents($root . 'Packages/symfony/thanks/saeghe.config-lock.json') === file_get_contents($stub . 'symfony-thanks-saeghe.config-lock.json.stub')
         ,
         $message
     );

@@ -25,27 +25,35 @@ function run()
         }
     }
 
-    if (isset($composerLockSetting['packages'])) {
-        foreach ($composerLockSetting['packages'] as $packageMeta) {
-            $name = $packageMeta['name'];
-            $package = $packageMeta['source']['url'];
-            $version = $packageMeta['version'];
-            $hash = $packageMeta['source']['reference'];
-            $ownerAndRepo = get_meta_from_package($package);
+    $requires = array_merge(
+        $composerSetting['require'] ?? [],
+        $composerSetting['require-dev'] ?? [],
+    );
 
-            if (isset($composerSetting['require'][$name])) {
-                $config['packages'][$package] = $version;
-            }
+    $installedPackages = array_merge(
+        $composerLockSetting['packages'] ?? [],
+        $composerLockSetting['packages-dev'] ?? [],
+    );
 
-            $meta['packages'][$package] = [
-                'version' => $version,
-                'hash' => $hash,
-                'owner' => $ownerAndRepo['owner'],
-                'repo' => $ownerAndRepo['repo'],
-            ];
+    foreach ($installedPackages as $packageMeta) {
+        $name = $packageMeta['name'];
+        $package = $packageMeta['source']['url'];
+        $version = $packageMeta['version'];
+        $hash = $packageMeta['source']['reference'];
+        $ownerAndRepo = get_meta_from_package($package);
 
-            migrate_package($packagesDirectory, $name, $package, $meta['packages'][$package]);
+        if (isset($requires[$name])) {
+            $config['packages'][$package] = $version;
         }
+
+        $meta['packages'][$package] = [
+            'version' => $version,
+            'hash' => $hash,
+            'owner' => $ownerAndRepo['owner'],
+            'repo' => $ownerAndRepo['repo'],
+        ];
+
+        migrate_package($packagesDirectory, $name, $package, $meta['packages'][$package]);
     }
 
     file_put_contents($configPath, json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);

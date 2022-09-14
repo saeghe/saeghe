@@ -6,6 +6,7 @@
         "vendor"
     ],
     "packages": {
-        "https:\/\/github.com\/Seldaek\/monolog.git": "3.2.0"
+        "https:\/\/github.com\/Seldaek\/monolog.git": "3.2.0",
+        "https:\/\/github.com\/symfony\/thanks.git": "v1.2.10"
     }
 }
