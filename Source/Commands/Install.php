@@ -2,8 +2,6 @@
 
 namespace Saeghe\Saeghe\Commands\Install;
 
-use ZipArchive;
-
 function run()
 {
     global $meta;
