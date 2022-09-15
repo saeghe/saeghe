@@ -14,9 +14,10 @@ function run()
     global $packagesDirectory;
 
     $package = argument('package');
+    $version = argument('version');
 
     remove($package, $config, $meta, $packagesDirectory);
-    $packageMeta = add($packagesDirectory, $package, null);
+    $packageMeta = add($packagesDirectory, $package, $version);
 
     $config['packages'][$package] = $packageMeta['version'];
 
