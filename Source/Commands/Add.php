@@ -27,7 +27,7 @@ function add($packagesDirectory, $package, $version)
     $owner = git_owner($package);
     $repo = git_repo($package);
 
-    if (git_has_release($owner, $repo)) {
+    if ($version !== 'development' && git_has_release($owner, $repo)) {
         $version = $version ?: git_latest_version($owner, $repo);
         $hash = git_download($packagesDirectory, $owner, $repo, $version);
     } else {

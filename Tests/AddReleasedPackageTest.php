@@ -28,6 +28,39 @@ test(
     }
 );
 
+test(
+    title: 'it should add development version of released package to the project if version passed as development',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=development");
+
+        assert_development_branch_added('We expected to see development branch for the package! ' . $output);
+    },
+    before: function () {
+        delete_empty_project_config_file();
+        delete_empty_project_meta_file();
+        delete_empty_project_packages_directory();
+    },
+    after: function () {
+        delete_empty_project_packages_directory();
+        delete_empty_project_config_file();
+        delete_empty_project_meta_file();
+    }
+);
+
+function assert_development_branch_added($message)
+{
+    $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'), true, JSON_THROW_ON_ERROR);
+
+    assert(
+        isset($meta['packages']['git@github.com:saeghe/released-package.git'])
+        && 'development' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
+        && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
+        && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
+        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/Tests'),
+        $message
+    );
+}
+
 function delete_empty_project_config_file()
 {
     shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json');
