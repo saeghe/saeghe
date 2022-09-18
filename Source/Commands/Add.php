@@ -43,7 +43,7 @@ function add($packagesDirectory, $package, $version)
     $packageConfigPath = $packagePath . DEFAULT_CONFIG_FILENAME;
 
     if (file_exists($packageConfigPath)) {
-        $packageConfig = json_to_array($packageConfigPath);
+        $packageConfig = json_to_array($packageConfigPath, ['packages' => []]);
         foreach ($packageConfig['packages'] as $subPackage => $subPackageVersion) {
             add($packagesDirectory, $subPackage, $subPackageVersion);
         }

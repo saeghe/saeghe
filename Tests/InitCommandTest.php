@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\InitializeCommandTest;
+namespace Tests\InitCommandTest;
 
 use Saeghe\TestRunner\Assertions\File;
 
@@ -42,12 +42,12 @@ test(
         $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
         $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
 
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject");
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=init --project=TestRequirements/Fixtures/EmptyProject");
 
         File\assert_exists($configPath, 'Config file does not exists: ' . $output);
         File\assert_exists($packagesDirectory, 'Packages directory is not created: ' . $output);
-        File\assert_content($configPath, $initialContent, 'Config file content is not correct after running initialize!');
-        File\assert_content($metaFilePath, $metaContent, 'Lock file content is not correct after running initialize!');
+        File\assert_content($configPath, $initialContent, 'Config file content is not correct after running init!');
+        File\assert_content($metaFilePath, $metaContent, 'Lock file content is not correct after running init!');
 
         return [$configPath, $metaFilePath, $packagesDirectory];
     },
@@ -67,12 +67,12 @@ test(
 test(
     title: 'it makes a new config file with given filename',
     case: function ($configFile, $configPath, $metaFile) use ($initialContent, $metaContent) {
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --config-file=$configFile");
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=init --config-file=$configFile");
 
         File\assert_exists($configPath, 'Custom config file does not exists: ' . $output);
         File\assert_exists($metaFile, 'Custom lock file does not exists: ' . $output);
-        File\assert_content($configPath, $initialContent, 'Custom config file content is not correct after running initialize!');
-        File\assert_content($metaFile, $metaContent, 'Custom config file content is not correct after running initialize!');
+        File\assert_content($configPath, $initialContent, 'Custom config file content is not correct after running init!');
+        File\assert_content($metaFile, $metaContent, 'Custom config file content is not correct after running init!');
 
         return [$configPath, $metaFile];
     },
@@ -98,11 +98,11 @@ test(
         $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
         $packagesDirectory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor';
 
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
 
         File\assert_exists($packagesDirectory, 'packages directory has not been created: ' . $output);
         File\assert_exists($configPath, 'Config file does not exists: ' . $output);
-        File\assert_content($configPath, $initialContentWithPackagesDirectory, 'Config file content is not correct after running initialize!');
+        File\assert_content($configPath, $initialContentWithPackagesDirectory, 'Config file content is not correct after running init!');
 
         return [$configPath, $metaFilePath, $packagesDirectory];
     },

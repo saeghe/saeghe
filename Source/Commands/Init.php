@@ -1,6 +1,6 @@
 <?php
 
-namespace Saeghe\Saeghe\Commands\Initialize;
+namespace Saeghe\Saeghe\Commands\Init;
 
 function run()
 {

@@ -13,7 +13,7 @@ test(
         delete_build_directory();
         delete_packages_directory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/build-with-custom-packages-directory.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
-        shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/ProjectWithTests --packages-directory=vendor");
+        shell_exec("{$_SERVER['PWD']}/saeghe --command=init --project=TestRequirements/Fixtures/ProjectWithTests --packages-directory=vendor");
         shell_exec($_SERVER['PWD'] . '/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/simple-package.git');
     },
     after: function () {

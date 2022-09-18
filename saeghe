@@ -7,7 +7,7 @@ require __DIR__ . '/Source/Commands/Add.php';
 require __DIR__ . '/Source/Commands/Build.php';
 require __DIR__ . '/Source/Commands/Flush.php';
 require __DIR__ . '/Source/Commands/Help.php';
-require __DIR__ . '/Source/Commands/Initialize.php';
+require __DIR__ . '/Source/Commands/Init.php';
 require __DIR__ . '/Source/Commands/Install.php';
 require __DIR__ . '/Source/Commands/Migrate.php';
 require __DIR__ . '/Source/Commands/Remove.php';
@@ -45,7 +45,7 @@ match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run(),
     'build' => \Saeghe\Saeghe\Commands\Build\run(),
     'flush' => \Saeghe\Saeghe\Commands\Flush\run(),
-    'initialize' => \Saeghe\Saeghe\Commands\Initialize\run(),
+    'init' => \Saeghe\Saeghe\Commands\Init\run(),
     'install' => \Saeghe\Saeghe\Commands\Install\run(),
     'migrate' => \Saeghe\Saeghe\Commands\Migrate\run(),
     'remove' => \Saeghe\Saeghe\Commands\Remove\run(),

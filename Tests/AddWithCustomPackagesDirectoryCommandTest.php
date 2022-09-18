@@ -20,7 +20,7 @@ test(
         delete_empty_project_config_file();
         delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
-        shell_exec("{$_SERVER['PWD']}/saeghe --command=initialize --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
+        shell_exec("{$_SERVER['PWD']}/saeghe --command=init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
     },
     after: function () {
         delete_empty_project_packages_directory();
