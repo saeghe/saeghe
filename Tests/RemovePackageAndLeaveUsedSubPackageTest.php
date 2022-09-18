@@ -5,18 +5,18 @@ namespace Tests\RemovePackageAndLeaveUsedSubPackageTest;
 test(
     title: 'it should remove the package but leave used subpackage',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=remove --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe remove --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
 
         assert_desired_data_in_packages_directory('Package has not been deleted from Packages directory!' . $output);
         assert_config_file_is_clean('Packages has not been deleted from config file!' . $output);
         assert_meta_is_clean('Packages has not been deleted from meta file!' . $output);
     },
     before: function () {
-        shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
-        shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
+        shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
+        shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
     },
     after: function () {
-        shell_exec($_SERVER['PWD'] . "/saeghe --command=remove --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
+        shell_exec($_SERVER['PWD'] . "/saeghe remove --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
     }
 );

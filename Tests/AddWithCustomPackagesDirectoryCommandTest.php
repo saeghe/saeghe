@@ -7,7 +7,7 @@ use Saeghe\TestRunner\Assertions\File;
 test(
     title: 'it should add package to the given directory',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
 
         assert_package_directory_added_to_config('Config does not contains the custom package directory!');
         assert_config_file_created_for_simple_project('Config file is not created!' . $output);
@@ -20,7 +20,7 @@ test(
         delete_empty_project_config_file();
         delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
-        shell_exec("{$_SERVER['PWD']}/saeghe --command=init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
+        shell_exec("{$_SERVER['PWD']}/saeghe init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
     },
     after: function () {
         delete_empty_project_packages_directory();

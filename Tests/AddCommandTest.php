@@ -7,7 +7,7 @@ use Saeghe\TestRunner\Assertions\File;
 test(
     title: 'it should add package to the project',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
 
         assert_config_file_created_for_simple_project('Config file is not created!' . $output);
         assert_simple_package_added_to_config('Simple Package does not added to config file properly! ' . $output);
@@ -30,7 +30,7 @@ test(
 test(
     title: 'it should add package to the project without trailing .git',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package");
 
         assert_simple_package_cloned('Simple package does not cloned!' . $output);
     },

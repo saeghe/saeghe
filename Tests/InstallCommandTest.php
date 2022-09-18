@@ -5,7 +5,7 @@ namespace Tests\InstallCommand;
 test(
     title: 'it should install packages from lock file',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=install --project=TestRequirements/Fixtures/EmptyProject");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe install --project=TestRequirements/Fixtures/EmptyProject");
 
         assert_config_file_content_not_changed('Config file has been changed!' . $output);
         assert_meta_file_content_not_changed('Released Package meta data does not added to meta file properly! ' . $output);
@@ -13,7 +13,7 @@ test(
         assert_zip_file_deleted('Zip file has not been deleted.' . $output);
     },
     before: function () {
-        shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.3");
+        shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.3");
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
     },
     after: function () {

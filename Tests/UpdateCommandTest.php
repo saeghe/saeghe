@@ -5,13 +5,13 @@ namespace Tests\UpdateCommandTest;
 test(
     title: 'it should update to the latest version',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=update --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe update --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git");
 
         assert_version_upgraded_in_config_file($output);
         assert_meta_updated($output);
     },
     before: function () {
-        shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.3");
+        shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.3");
     },
     after: function () {
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
@@ -21,12 +21,12 @@ test(
 test(
     title: 'it should update to the given version',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=update --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.3");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe update --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.3");
 
         assert_given_version_added('Package did not updated to given package version. ' . $output);
     },
     before: function () {
-        shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.2");
+        shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.2");
     },
     after: function () {
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');

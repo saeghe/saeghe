@@ -61,7 +61,16 @@ EOD;
 test(
     'it should return desired help output',
     case: function () use ($helpContent) {
-        $output = shell_exec($_SERVER['PWD'] . '/saeghe --command=help');
+        $output = shell_exec($_SERVER['PWD'] . '/saeghe --help');
+
+        assert(str_contains($output, $helpContent), 'Help output is not what we want!' . $output);
+    }
+);
+
+test(
+    'it should return help for help command',
+    case: function () use ($helpContent) {
+        $output = shell_exec($_SERVER['PWD'] . '/saeghe help');
 
         assert(str_contains($output, $helpContent), 'Help output is not what we want!' . $output);
     }

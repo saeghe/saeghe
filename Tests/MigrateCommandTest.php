@@ -5,7 +5,7 @@ namespace Tests\MigrateCommandTest;
 test(
     title: 'it should migrate symfony package',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=migrate --project=TestRequirements/Fixtures/composer-package");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe migrate --project=TestRequirements/Fixtures/composer-package");
 
         assert_correct_config_file('Config file is not correct!' . $output);
         assert_correct_meta_file('Meta file data is not correct!' . $output);

@@ -42,7 +42,7 @@ test(
         $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
         $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
 
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=init --project=TestRequirements/Fixtures/EmptyProject");
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
 
         File\assert_exists($configPath, 'Config file does not exists: ' . $output);
         File\assert_exists($packagesDirectory, 'Packages directory is not created: ' . $output);
@@ -67,7 +67,7 @@ test(
 test(
     title: 'it makes a new config file with given filename',
     case: function ($configFile, $configPath, $metaFile) use ($initialContent, $metaContent) {
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=init --config-file=$configFile");
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe init --config-file=$configFile");
 
         File\assert_exists($configPath, 'Custom config file does not exists: ' . $output);
         File\assert_exists($metaFile, 'Custom lock file does not exists: ' . $output);
@@ -98,7 +98,7 @@ test(
         $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
         $packagesDirectory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor';
 
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe --command=init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
+        $output = shell_exec("{$_SERVER['PWD']}/saeghe init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
 
         File\assert_exists($packagesDirectory, 'packages directory has not been created: ' . $output);
         File\assert_exists($configPath, 'Config file does not exists: ' . $output);

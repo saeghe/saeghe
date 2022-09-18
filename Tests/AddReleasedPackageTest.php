@@ -7,7 +7,7 @@ use Saeghe\TestRunner\Assertions\File;
 test(
     title: 'it should add released package to the project',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git");
 
         assert_config_file_created_for_released_project('Config file is not created!' . $output);
         assert_released_package_added_to_config('Released Package does not added to config file properly! ' . $output);
@@ -31,7 +31,7 @@ test(
 test(
     title: 'it should add development version of released package to the project if version passed as development',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=development");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=development");
 
         assert_development_branch_added('We expected to see development branch for the package! ' . $output);
     },

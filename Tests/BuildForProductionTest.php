@@ -5,7 +5,7 @@ namespace Tests\BuildForProductionTest;
 test(
     title: 'it should build the project',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . '/saeghe --command=build --project=TestRequirements/Fixtures/ProjectWithTests --environment=production');
+        $output = shell_exec($_SERVER['PWD'] . '/saeghe build --project=TestRequirements/Fixtures/ProjectWithTests --environment=production');
 
         assert_build_directory_exists('Build directory has not been created!' . $output);
         assert_environment_build_directory_exists('Environment build directory has not been created!' . $output);
@@ -23,7 +23,7 @@ test(
         delete_build_directory();
         delete_packages_directory();
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
-        shell_exec($_SERVER['PWD'] . '/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/simple-package.git');
+        shell_exec($_SERVER['PWD'] . '/saeghe add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/simple-package.git');
     },
     after: function () {
         delete_build_directory();

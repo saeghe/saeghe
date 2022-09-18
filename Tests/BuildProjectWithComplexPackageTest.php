@@ -5,7 +5,7 @@ namespace Tests\BuildProjectWithComplexPackageTest;
 test(
     title: 'it should build project with complex package',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=build --project=TestRequirements/Fixtures/ProjectWithTests");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe build --project=TestRequirements/Fixtures/ProjectWithTests");
         assert_build_for_packages('Packages file does not built properly!' . $output);
         assert_executable_file_added('Complex executable file has not been created!' . $output);
     },
@@ -16,7 +16,7 @@ test(
         delete_packages_directory();
 
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
-        shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/complex-package.git");
+        shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/complex-package.git");
     },
     after: function () {
         delete_config_file();

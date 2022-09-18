@@ -39,7 +39,7 @@ $meta = array_merge_json($meta, $metaFilePath);
 $packagesDirectory = dir_find_or_create($projectRoot . $config['packages-directory']);
 $buildsPath = $projectRoot . 'builds' . '/';
 
-$command = Read\argument('command', 'help');
+$command = Read\command() ?? Read\argument('command', 'help');
 
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run(),

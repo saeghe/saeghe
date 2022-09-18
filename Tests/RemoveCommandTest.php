@@ -5,14 +5,14 @@ namespace Tests\RemoveCommandTest;
 test(
     title: 'it should remove a package',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe --command=remove --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe remove --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
 
         assert_desired_data_in_packages_directory('Package has not been deleted from Packages directory!' . $output);
         assert_config_file_is_clean('Packages has not been deleted from config file!' . $output);
         assert_meta_is_clean('Packages has not been deleted from meta!' . $output);
     },
     before: function () {
-        shell_exec($_SERVER['PWD'] . "/saeghe --command=add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
+        shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
     }
 );
 
