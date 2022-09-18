@@ -1,12 +1,8 @@
 <?php
 
-namespace Saeghe\Saeghe\Commands\Help;
+namespace Tests\HelpCommandTest;
 
-use Saeghe\Cli\IO\Write;
-
-function run()
-{
-    $content = <<<EOD
+$helpContent = <<<EOD
 usage: saeghe [command] [options...]
 
 These are common Saeghe commands used in various situations:
@@ -58,9 +54,15 @@ Update installed packages:
                     If you need to get the latest version of an added package, you can run update command. This command
                     needs a required `package` option. You can also path a optional `version` option, if passed, then
                     Saeghe will download exact version number, if not passed, it downloads latest available version.
-                    
-  
+
 EOD;
 
-    Write\line($content);
-}
+
+test(
+    'it should return desired help output',
+    case: function () use ($helpContent) {
+        $output = shell_exec($_SERVER['PWD'] . '/saeghe --command=help');
+
+        assert(str_contains($output, $helpContent), 'Help output is not what we want!' . $output);
+    }
+);
