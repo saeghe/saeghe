@@ -1,4 +1,4 @@
-### Saeghe package manager
+# Saeghe package manager
 
 ## Introduction
 
