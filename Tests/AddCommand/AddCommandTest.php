@@ -1,15 +1,14 @@
 <?php
 
-namespace Tests\AddWithCustomPackagesDirectoryCommandTest;
+namespace Tests\AddCommand\AddCommandTest;
 
 use Saeghe\TestRunner\Assertions\File;
 
 test(
-    title: 'it should add package to the given directory',
+    title: 'it should add package to the project',
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
 
-        assert_package_directory_added_to_config('Config does not contains the custom package directory!');
         assert_config_file_created_for_simple_project('Config file is not created!' . $output);
         assert_simple_package_added_to_config('Simple Package does not added to config file properly! ' . $output);
         assert_packages_directory_created_for_empty_project('Package directory does not created.' . $output);
@@ -20,7 +19,25 @@ test(
         delete_empty_project_config_file();
         delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
-        shell_exec("{$_SERVER['PWD']}/saeghe init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
+    },
+    after: function () {
+        delete_empty_project_packages_directory();
+        delete_empty_project_config_file();
+        delete_empty_project_meta_file();
+    }
+);
+
+test(
+    title: 'it should add package to the project without trailing .git',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package");
+
+        assert_simple_package_cloned('Simple package does not cloned!' . $output);
+    },
+    before: function () {
+        delete_empty_project_config_file();
+        delete_empty_project_meta_file();
+        delete_empty_project_packages_directory();
     },
     after: function () {
         delete_empty_project_packages_directory();
@@ -41,17 +58,7 @@ function delete_empty_project_meta_file()
 
 function delete_empty_project_packages_directory()
 {
-    shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor');
-}
-
-function assert_package_directory_added_to_config($message)
-{
-    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
-
-    assert(
-        $config['packages-directory'] === 'vendor',
-        $message
-    );
+    shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
 }
 
 function assert_config_file_created_for_simple_project($message)
@@ -61,15 +68,15 @@ function assert_config_file_created_for_simple_project($message)
 
 function assert_packages_directory_created_for_empty_project($message)
 {
-    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor', $message);
+    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages', $message);
 }
 
 function assert_simple_package_cloned($message)
 {
     assert(
-        File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package')
-        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/saeghe.config.json')
-        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/README.md'),
+        File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package')
+        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/saeghe.config.json')
+        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/README.md'),
         $message
     );
 }

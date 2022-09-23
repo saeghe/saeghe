@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AddingComplexProjectTest;
+namespace Tests\AddCommand\AddingComplexProjectTest;
 
 test(
     title: 'it should add a complex project',

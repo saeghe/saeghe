@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AddUsingHttpsPath;
+namespace Tests\AddCommand\AddUsingHttpsPath;
 
 use Saeghe\TestRunner\Assertions\File;
 

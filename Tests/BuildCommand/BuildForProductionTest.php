@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\BuildForProductionTest;
+namespace Tests\BuildCommand\BuildForProductionTest;
 
 test(
     title: 'it should build the project',

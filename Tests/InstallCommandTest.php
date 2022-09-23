@@ -41,7 +41,7 @@ function assert_meta_file_content_not_changed($message)
         && 'v1.0.3' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
         && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
-        && '9e9b796915596f7c5e0b91d2f9fa5f916a9b5cc8' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
+        && '9e9b796' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
         $message
     );
 }

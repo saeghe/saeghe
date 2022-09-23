@@ -141,7 +141,7 @@ function git_has_release($owner, $repo)
 {
     global $credentials;
 
-    $output = shell_exec('curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/$owner/$repo/releases/latest | grep 'tag_name'");
+    $output = shell_exec('curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/$owner/$repo/releases/latest | grep 'tag_name'");
 
     return ! is_null($output);
 }
@@ -150,7 +150,7 @@ function git_latest_version($owner, $repo)
 {
     global $credentials;
 
-    $output = shell_exec('curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/$owner/$repo/releases/latest | grep 'tag_name'");
+    $output = shell_exec('curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/$owner/$repo/releases/latest | grep 'tag_name'");
     $version = str_replace('"tag_name": "', '', $output);
 
     return trim(explode('"', $version)[0]);

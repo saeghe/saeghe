@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\BuildWithCustomPackageDirectoryTest;
+namespace Tests\BuildCommand\BuildWithCustomPackageDirectoryTest;
 
 test(
     title: 'it should build the project with custom packages directory',

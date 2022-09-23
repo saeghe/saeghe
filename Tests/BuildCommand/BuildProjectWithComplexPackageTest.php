@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\BuildProjectWithComplexPackageTest;
+namespace Tests\BuildCommand\BuildProjectWithComplexPackageTest;
 
 test(
     title: 'it should build project with complex package',
