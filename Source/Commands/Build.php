@@ -3,6 +3,8 @@
 namespace Saeghe\Saeghe\Commands\Build;
 
 use Saeghe\Cli\IO\Write;
+use Saeghe\Saeghe\PhpFile;
+use Saeghe\Saeghe\Str;
 use function Saeghe\Cli\IO\Read\argument;
 
 function run()
@@ -105,94 +107,53 @@ function compile_file($origin, $destination, $replaceMap)
 function apply_file_modifications($origin, $replaceMap)
 {
     $requireStatements = [];
+    $phpFile = new PhpFile(file_get_contents($origin));
+    $requireStatements = array_merge(
+        $requireStatements,
+        array_map(function ($useConstant) {
+            return Str\before_last_occurrence($useConstant, '\\');
+        }, array_keys($phpFile->usedConstants())),
+    );
+    $requireStatements = array_merge(
+        $requireStatements,
+        array_map(function ($useConstant) {
+            return Str\before_last_occurrence($useConstant, '\\');
+        }, array_keys($phpFile->usedFunctions())),
+    );
+    $usedClasses = array_keys($phpFile->usedClasses());
+    $requireStatements = array_merge($requireStatements, $usedClasses);
 
-    foreach (read_lines($origin) as $line) {
-        if (str_starts_with($line, 'use ')) {
-            $requireStatements = array_merge($requireStatements, find_require_paths($line, $replaceMap));
-        }
+    if (($parentClass = $phpFile->parentClass()) && ($namespace = $phpFile->namespace())) {
+        $requireStatements[] = array_reduce($usedClasses, function ($carry, $usedClass) use ($parentClass) {
+            return $usedClass === $parentClass || str_ends_with($usedClass, "\\$parentClass") ? $usedClass : $carry;
+        }, $namespace . "\\$parentClass");
     }
 
     if (count($requireStatements) > 0) {
+        $requireStatements = array_unique($requireStatements);
+        foreach ($requireStatements as  $index => $requireStatement) {
+            $realPath = null;
+            foreach ($replaceMap as $namespace => $path) {
+                if (str_starts_with($requireStatement, $namespace)) {
+                    $realPath = str_replace($namespace, $path, $requireStatement);
+                    $realPath = str_replace('\\', '/', $realPath) . '.php';
+                    break;
+                }
+            }
+
+            if ($realPath) {
+                $requireStatements[$index] = $realPath;
+            } else {
+                unset($requireStatements[$index]);
+            }
+        }
+
         $requireStatements = array_map(fn ($path) => "require_once '$path';", $requireStatements);
 
         return add_requires($requireStatements, $origin);
     }
 
     return file_get_contents($origin);
-}
-
-function find_require_paths($line, $replaceMap)
-{
-    $detectedPaths = [];
-
-    $possibleUses = explode('use ', $line);
-
-    if (count($possibleUses) > 1) {
-        foreach ($possibleUses as $separateUse) {
-            $detectedPaths = array_merge($detectedPaths, find_require_paths($separateUse, $replaceMap));
-        }
-
-        return $detectedPaths;
-    }
-
-    $line = trim('use ' . $possibleUses[0]);
-
-    if (str_contains($line, '\{')) {
-        $parts = string_between($line, '{', '}');
-        $parts = explode(',', $parts);
-        $commonPart = explode('\{', $line)[0];
-        $line = '';
-        foreach ($parts as $part) {
-            $part = trim($part);
-            $line .= "use $commonPart\\$part;";
-        }
-
-        return find_require_paths($line, $replaceMap);
-    }
-
-    $statements = explode(',', str_replace('use ', '', str_replace(';', '', $line)));
-
-    if (count($statements) > 1) {
-        $line = '';
-        foreach ($statements as $statement) {
-            $statement = trim($statement);
-            $line .= "use $statement;";
-        }
-
-        return find_require_paths($line, $replaceMap);
-    }
-
-    if (str_contains($line, ' as ')) {
-        $line = explode(' as ', $line)[0] . ';';
-    }
-
-    foreach ($replaceMap as $namespace => $path) {
-        if (str_starts_with($line, "use function $namespace")) {
-            $line = str_replace("use function $namespace", $path, $line);
-            $function = strrpos($line, '\\');
-            $line = substr($line, 0, strlen($line) - (strlen($line) - $function));
-            $line .= ".php";
-
-            $detectedPaths[] = str_replace('\\', '/', $line);
-            break;
-        } else if (str_starts_with($line, "use const $namespace")) {
-            $line = str_replace("use const $namespace", $path, $line);
-            $function = strrpos($line, '\\');
-            $line = substr($line, 0, strlen($line)  - (strlen($line) - $function));
-            $line .= ".php";
-
-            $detectedPaths[] = str_replace('\\', '/', $line);
-            break;
-        } else if (str_starts_with($line, "use $namespace")) {
-            $line = str_replace("use $namespace", $path, $line);
-            $line = str_replace(';', '.php', $line);
-
-            $detectedPaths[] = str_replace('\\', '/', $line);
-            break;
-        }
-    }
-
-    return $detectedPaths;
 }
 
 function add_requires($requireStatements, $file)

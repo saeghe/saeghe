@@ -19,6 +19,7 @@ test(
         assert_build_for_project_entry_points('Project entry point does not built properly!' . $output);
         assert_build_for_packages_entry_points('Packages entry point does not built properly!' . $output);
         assert_exclude_not_built('Excludes has been built!' . $output);
+        assert_build_for_extended_classes('Extended classes has not been built properly!' . $output);
     },
     before: function () {
         delete_build_directory();
@@ -189,5 +190,26 @@ function assert_exclude_not_built($message)
         ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/excluded-file.php')
         && ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/excluded-directory')
         , $message
+    );
+}
+
+function assert_build_for_extended_classes($message)
+{
+    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
+
+    assert(
+        file_exists($environmentBuildPath . '/Source/ExtendExamples/ParentAbstractClass.php')
+        && file_exists($environmentBuildPath . '/Source/ExtendExamples/AbstractClass.php')
+        && file_exists($environmentBuildPath . '/Source/ExtendExamples/ParentClass.php')
+        && file_exists($environmentBuildPath . '/Source/ExtendExamples/ChildClass.php')
+        && file_exists($environmentBuildPath . '/Source/ExtendExamples/ChildFromSource.php')
+        && file_get_contents($environmentBuildPath . '/Source/ExtendExamples/ParentAbstractClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ExtendExamples/ParentAbstractClass.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/ExtendExamples/AbstractClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ExtendExamples/AbstractClass.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/ExtendExamples/ParentClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ExtendExamples/ParentClass.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/ExtendExamples/ChildClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ExtendExamples/ChildClass.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/ExtendExamples/ChildFromSource.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ExtendExamples/ChildFromSource.stub'))
+        ,
+        $message
     );
 }

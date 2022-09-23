@@ -1,0 +1,10 @@
+<?php
+
+namespace ProjectWithTests\ExtendExamples;
+
+require_once '$environmentBuildPath/Source/ExtendExamples/AbstractClass.php';
+
+class ParentClass extends AbstractClass
+{
+
+}

@@ -3,6 +3,8 @@
 
 require __DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php';
 require __DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php';
+require __DIR__ . '/Source/Str.php';
+require __DIR__ . '/Source/PhpFile.php';
 require __DIR__ . '/Source/Commands/Add.php';
 require __DIR__ . '/Source/Commands/Build.php';
 require __DIR__ . '/Source/Commands/Flush.php';
@@ -258,15 +260,4 @@ function intact_copy($origin, $destination)
 {
     copy($origin, $destination);
     chmod($destination, fileperms($origin) & 0x0FFF);
-}
-
-function string_between($string, $start, $end)
-{
-    $startPosition = stripos($string, $start);
-    $first = substr($string, $startPosition);
-    $second = substr($first, strlen($start));
-    $positionEnd = stripos($second, $end);
-    $final = substr($second, 0, $positionEnd);
-
-    return trim($final);
 }

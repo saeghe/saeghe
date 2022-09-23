@@ -1,0 +1,12 @@
+<?php
+
+namespace ProjectWithTests\ExtendExamples;
+
+require_once '$environmentBuildPath/Source/SubDirectory/SimpleClass.php';
+
+use ProjectWithTests\SubDirectory\SimpleClass;
+
+class ChildFromSource extends SimpleClass
+{
+
+}

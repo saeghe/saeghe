@@ -2,11 +2,11 @@
 
 namespace Tests\Features;
 
+require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Helpers.php';
 require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Controllers/HomeController.php';
 require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Models/User.php';
 require_once '$environmentBuildPath/Packages/saeghe/simple-package/Source/SimpleClass.php';
 require_once '$environmentBuildPath/Tests/TestHelper.php';
-require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Helpers.php';
 
 use Saeghe\ComplexPackage\Controllers\HomeController;
 use Saeghe\ComplexPackage\Models\User;
