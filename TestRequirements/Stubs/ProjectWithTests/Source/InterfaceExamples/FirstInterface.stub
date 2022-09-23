@@ -1,0 +1,13 @@
+<?php
+
+namespace ProjectWithTests\InterfaceExamples;
+
+require_once '$environmentBuildPath/Source/InterfaceExamples/InnerInterfaces/InnerInterface.php';
+require_once '$environmentBuildPath/Source/InterfaceExamples/SecondInterface.php';
+
+use ProjectWithTests\InterfaceExamples\InnerInterfaces\InnerInterface;
+
+interface FirstInterface extends SecondInterface, InnerInterface
+{
+
+}

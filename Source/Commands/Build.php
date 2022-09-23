@@ -110,23 +110,39 @@ function apply_file_modifications($origin, $replaceMap)
     $phpFile = new PhpFile(file_get_contents($origin));
     $requireStatements = array_merge(
         $requireStatements,
-        array_map(function ($useConstant) {
-            return Str\before_last_occurrence($useConstant, '\\');
+        array_map(function ($import) {
+            return Str\before_last_occurrence($import, '\\');
         }, array_keys($phpFile->usedConstants())),
     );
     $requireStatements = array_merge(
         $requireStatements,
-        array_map(function ($useConstant) {
-            return Str\before_last_occurrence($useConstant, '\\');
+        array_map(function ($import) {
+            return Str\before_last_occurrence($import, '\\');
         }, array_keys($phpFile->usedFunctions())),
     );
     $usedClasses = array_keys($phpFile->usedClasses());
+
     $requireStatements = array_merge($requireStatements, $usedClasses);
 
-    if (($parentClass = $phpFile->parentClass()) && ($namespace = $phpFile->namespace())) {
-        $requireStatements[] = array_reduce($usedClasses, function ($carry, $usedClass) use ($parentClass) {
-            return $usedClass === $parentClass || str_ends_with($usedClass, "\\$parentClass") ? $usedClass : $carry;
-        }, $namespace . "\\$parentClass");
+    if ($namespace = $phpFile->namespace()) {
+        $additionalClasses = array_merge(
+            $phpFile->implementedInterfaces(),
+            $phpFile->extendedClasses()
+        );
+        $additionalClasses = array_map(function ($additionalClass) use ($usedClasses, $namespace) {
+            $shouldImport = $namespace . "\\$additionalClass";
+
+            foreach ($usedClasses as $usedClass) {
+                if ($usedClass === $additionalClass || str_ends_with($usedClass, "\\$additionalClass")) {
+                    $shouldImport = $usedClass;
+                    break;
+                }
+            }
+
+            return $shouldImport;
+        }, $additionalClasses);
+
+        $requireStatements = array_merge($requireStatements, $additionalClasses);
     }
 
     if (count($requireStatements) > 0) {

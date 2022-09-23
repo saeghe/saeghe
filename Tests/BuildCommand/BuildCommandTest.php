@@ -20,6 +20,7 @@ test(
         assert_build_for_packages_entry_points('Packages entry point does not built properly!' . $output);
         assert_exclude_not_built('Excludes has been built!' . $output);
         assert_build_for_extended_classes('Extended classes has not been built properly!' . $output);
+        assert_build_for_interfaces('Interfaces has not been built properly!' . $output);
     },
     before: function () {
         delete_build_directory();
@@ -209,6 +210,29 @@ function assert_build_for_extended_classes($message)
         && file_get_contents($environmentBuildPath . '/Source/ExtendExamples/ParentClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ExtendExamples/ParentClass.stub'))
         && file_get_contents($environmentBuildPath . '/Source/ExtendExamples/ChildClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ExtendExamples/ChildClass.stub'))
         && file_get_contents($environmentBuildPath . '/Source/ExtendExamples/ChildFromSource.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ExtendExamples/ChildFromSource.stub'))
+        ,
+        $message
+    );
+}
+
+function assert_build_for_interfaces($message)
+{
+    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
+
+    assert(
+        file_exists($environmentBuildPath . '/Source/InterfaceExamples/InnerInterfaces/InnerInterface.php')
+        && file_exists($environmentBuildPath . '/Source/InterfaceExamples/InnerInterfaces/OtherInnerInterface.php')
+        && file_exists($environmentBuildPath . '/Source/InterfaceExamples/FirstInterface.php')
+        && file_exists($environmentBuildPath . '/Source/InterfaceExamples/MyClass.php')
+        && file_exists($environmentBuildPath . '/Source/InterfaceExamples/SecondInterface.php')
+        && file_exists($environmentBuildPath . '/Source/InterfaceExamples/ThirdInterface.php')
+        && file_get_contents($environmentBuildPath . '/Source/InterfaceExamples/InnerInterfaces/InnerInterface.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/InterfaceExamples/InnerInterfaces/InnerInterface.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/InterfaceExamples/InnerInterfaces/OtherInnerInterface.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/InterfaceExamples/InnerInterfaces/OtherInnerInterface.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/InterfaceExamples/FirstInterface.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/InterfaceExamples/FirstInterface.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/InterfaceExamples/MyClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/InterfaceExamples/MyClass.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/InterfaceExamples/SecondInterface.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/InterfaceExamples/SecondInterface.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/InterfaceExamples/ThirdInterface.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/InterfaceExamples/ThirdInterface.stub'))
         ,
         $message
     );

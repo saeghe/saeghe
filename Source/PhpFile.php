@@ -107,9 +107,64 @@ class PhpFile
         return $this->findUsesIn($classes);
     }
 
-    public function parentClass()
+    public function namespace()
     {
-        $parent = null;
+        $namespace = null;
+        foreach ($this->lines as $line) {
+            if (str_starts_with($line, 'namespace ')) {
+                $namespace = str_replace('namespace ', '', str_replace(';', '', $line));
+                break;
+            }
+        }
+
+        return $namespace;
+    }
+
+    public function extendedClasses()
+    {
+        $parents = [];
+        $signature = $this->classSignature();
+
+        if (strlen($signature) > 0 && str_contains($signature, ' extends ')) {
+            $extends = trim(explode(' extends', $signature)[1]);
+            $extends = Str\before_last_occurrence($extends, ' implements ');
+
+            if (str_contains($extends, ',')) {
+                $parents = explode(',', $extends);
+            } else {
+                $parents[] = $extends;
+            }
+        }
+
+        return array_map(function ($parent) {
+            return trim(str_replace('{', '', $parent));
+        }, $parents);
+    }
+
+    public function implementedInterfaces()
+    {
+        $interfaces = [];
+        $signature = $this->classSignature();
+
+
+        if (strlen($signature) > 0 && str_contains($signature, ' implements ')) {
+            $implements = trim(explode(' implements', $signature)[1]);
+            $extends = Str\before_last_occurrence($implements, ' extends ');
+
+            if (str_contains($implements, ',')) {
+                $interfaces = explode(',', $implements);
+            } else {
+                $interfaces[] = $implements;
+            }
+        }
+
+        return array_map(function ($interface) {
+            return trim(str_replace('{', '', $interface));
+        }, $interfaces);
+    }
+
+    public function classSignature()
+    {
         $signature = '';
 
         foreach ($this->lines as $line) {
@@ -135,30 +190,7 @@ class PhpFile
             }
         }
 
-        if (strlen($signature) > 0 && str_contains($signature, ' extends ')) {
-            $parent = trim(explode(' extends', $signature)[1]);
-
-            if (str_contains($parent, ' ')) {
-                $parent = explode(' ', $parent)[0];
-            }
-
-            $parent = str_replace('{', '', $parent);
-        }
-
-        return $parent;
-    }
-
-    public function namespace()
-    {
-        $namespace = null;
-        foreach ($this->lines as $line) {
-            if (str_starts_with($line, 'namespace ')) {
-                $namespace = str_replace('namespace ', '', str_replace(';', '', $line));
-                break;
-            }
-        }
-
-        return $namespace;
+        return $signature;
     }
 
     private function findUsesIn($useStatements)

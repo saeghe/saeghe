@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\PhpFileTest\ParentClassTest;
+namespace Tests\PhpFileTest\Extends;
 
 require_once __DIR__ . '/../../Source/Str.php';
 require_once __DIR__ . '/../../Source/PhpFile.php';
@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../Source/PhpFile.php';
 use Saeghe\Saeghe\PhpFile;
 
 test(
-    title: 'it should return null when there is no parent class',
+    title: 'it should return null when there is no extend class',
     case: function () {
         $content = <<<EOD
 <?php
@@ -24,12 +24,12 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(null === $phpFile->parentClass());
+        assert([] === $phpFile->extendedClasses());
     }
 );
 
 test(
-    title: 'it should detect parent class for class',
+    title: 'it should detect extend class for class',
     case: function () {
         $content = <<<EOD
 <?php
@@ -45,12 +45,12 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert('ParentClass' === $phpFile->parentClass());
+        assert(['ParentClass'] === $phpFile->extendedClasses());
     }
 );
 
 test(
-    title: 'it should detect parent class for nested parent class',
+    title: 'it should detect extend class for nested extend class',
     case: function () {
         $content = <<<EOD
 <?php
@@ -67,12 +67,12 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert('ParentClass' === $phpFile->parentClass());
+        assert(['ParentClass'] === $phpFile->extendedClasses());
     }
 );
 
 test(
-    title: 'it should detect parent with mixed interfaces and ugly code',
+    title: 'it should detect extend with mixed interfaces and ugly code',
     case: function () {
         $content = <<<EOD
 <?php
@@ -87,12 +87,12 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert('ParentClass' === $phpFile->parentClass());
+        assert(['ParentClass'] === $phpFile->extendedClasses());
     }
 );
 
 test(
-    title: 'it should detect parent class for abstract class',
+    title: 'it should detect extend class for abstract class',
     case: function () {
         $content = <<<EOD
 <?php
@@ -105,12 +105,12 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert('ParentAbstractClass' === $phpFile->parentClass());
+        assert(['ParentAbstractClass'] === $phpFile->extendedClasses());
     }
 );
 
 test(
-    title: 'it should detect parent class for interface class',
+    title: 'it should detect extend class for interface class',
     case: function () {
         $content = <<<EOD
 <?php
@@ -125,12 +125,12 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert('OtherInterface' === $phpFile->parentClass());
+        assert(['OtherInterface'] === $phpFile->extendedClasses());
     }
 );
 
 test(
-    title: 'it should detect parent class for trait',
+    title: 'it should detect extend class for trait',
     case: function () {
         $content = <<<EOD
 <?php
@@ -145,6 +145,27 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert('OtherTrait' === $phpFile->parentClass());
+        assert(['OtherTrait'] === $phpFile->extendedClasses());
+    }
+);
+
+test(
+    title: 'it should detect extend interfaces for interface',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace MyApp;
+
+interface FirstInterface extends SecondInterface,ThirdInterface, ForthInterface 
+{
+
+}
+
+EOD;
+
+        $phpFile = new PhpFile($content);
+
+        assert(['SecondInterface', 'ThirdInterface', 'ForthInterface'] === $phpFile->extendedClasses());
     }
 );
