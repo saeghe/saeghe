@@ -149,7 +149,7 @@ class PhpFile
 
         if (strlen($signature) > 0 && str_contains($signature, ' implements ')) {
             $implements = trim(explode(' implements', $signature)[1]);
-            $extends = Str\before_last_occurrence($implements, ' extends ');
+            $implements = Str\before_last_occurrence($implements, ' extends ');
 
             if (str_contains($implements, ',')) {
                 $interfaces = explode(',', $implements);

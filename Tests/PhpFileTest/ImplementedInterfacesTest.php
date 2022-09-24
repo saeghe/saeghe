@@ -55,7 +55,7 @@ test(
 
 namespace MyApp;
 
-class MyClass implements FirstInterface, SecondInterface, ThirdInterface
+class MyClass extends ParentClass implements FirstInterface, SecondInterface, ThirdInterface extends JustForTest
 {
 
 }
