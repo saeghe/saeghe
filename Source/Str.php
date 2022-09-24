@@ -22,10 +22,25 @@ function after_last_occurrence($subject, $needle)
     $pos = mb_strrpos($subject, $needle);
 
     if ($pos === false) {
-        return $subject;
+        return '';
     }
 
     return mb_substr(string: $subject, start: $pos + 1,  encoding: 'UTF-8');
+}
+
+function before_first_occurrence($subject, $needle)
+{
+    if ($needle === '') {
+        return '';
+    }
+
+    $pos = mb_strpos($subject, $needle);
+
+    if ($pos === false) {
+        return '';
+    }
+
+    return mb_substr(string: $subject, start: 0, length: $pos,  encoding: 'UTF-8');
 }
 
 function before_last_occurrence($subject, $needle)

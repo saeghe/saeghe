@@ -127,7 +127,8 @@ function apply_file_modifications($origin, $replaceMap)
     if ($namespace = $phpFile->namespace()) {
         $additionalClasses = array_merge(
             $phpFile->implementedInterfaces(),
-            $phpFile->extendedClasses()
+            $phpFile->extendedClasses(),
+            $phpFile->usedTraits(),
         );
         $additionalClasses = array_map(function ($additionalClass) use ($usedClasses, $namespace) {
             $shouldImport = $namespace . "\\$additionalClass";
@@ -143,6 +144,7 @@ function apply_file_modifications($origin, $replaceMap)
         }, $additionalClasses);
 
         $requireStatements = array_merge($requireStatements, $additionalClasses);
+
     }
 
     if (count($requireStatements) > 0) {

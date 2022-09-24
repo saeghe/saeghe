@@ -21,6 +21,7 @@ test(
         assert_exclude_not_built('Excludes has been built!' . $output);
         assert_build_for_extended_classes('Extended classes has not been built properly!' . $output);
         assert_build_for_interfaces('Interfaces has not been built properly!' . $output);
+        assert_build_for_traits('Traits has not been built properly!' . $output);
     },
     before: function () {
         delete_build_directory();
@@ -233,6 +234,25 @@ function assert_build_for_interfaces($message)
         && file_get_contents($environmentBuildPath . '/Source/InterfaceExamples/MyClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/InterfaceExamples/MyClass.stub'))
         && file_get_contents($environmentBuildPath . '/Source/InterfaceExamples/SecondInterface.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/InterfaceExamples/SecondInterface.stub'))
         && file_get_contents($environmentBuildPath . '/Source/InterfaceExamples/ThirdInterface.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/InterfaceExamples/ThirdInterface.stub'))
+        ,
+        $message
+    );
+}
+
+function assert_build_for_traits($message)
+{
+    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
+
+    assert(
+        file_exists($environmentBuildPath . '/Source/UsedTraits/ClassWithTrait.php')
+        && file_exists($environmentBuildPath . '/Source/UsedTraits/FirstTrait.php')
+        && file_exists($environmentBuildPath . '/Source/UsedTraits/SecondTrait.php')
+        && file_exists($environmentBuildPath . '/Source/UsedTraits/ThirdTrait.php')
+        && file_get_contents($environmentBuildPath . '/Source/UsedTraits/ClassWithTrait.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/UsedTraits/ClassWithTrait.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/UsedTraits/FirstTrait.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/UsedTraits/FirstTrait.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/UsedTraits/SecondTrait.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/UsedTraits/SecondTrait.stub'))
+        && file_get_contents($environmentBuildPath . '/Source/UsedTraits/ThirdTrait.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/UsedTraits/ThirdTrait.stub'))
         ,
         $message
     );

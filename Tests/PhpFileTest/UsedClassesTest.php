@@ -26,6 +26,29 @@ EOD;
 );
 
 test(
+    title: 'it should detect simple classes contain traits',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace MyApp;
+
+use MyApp\OtherNamespace\ClassA;
+
+class MyClass extends ParentClass implements MyInterface
+{
+    use MyTrait;
+}
+
+EOD;
+
+        $phpFile = new PhpFile($content);
+
+        assert(['MyApp\OtherNamespace\ClassA' => 'ClassA'] === $phpFile->usedClasses());
+    }
+);
+
+test(
     title: 'it should detect multiple classes',
     case: function () {
         $content = <<<EOD

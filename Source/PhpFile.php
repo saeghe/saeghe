@@ -13,11 +13,37 @@ class PhpFile
         $this->lines = explode(PHP_EOL, $content);
     }
 
+    public function classSignature()
+    {
+        $signature = '';
+
+        foreach ($this->lines as $line) {
+            if ($signature === '' && $this->isClassSignature($line)) {
+                $signature = $line;
+            } else {
+                if (
+                    str_ends_with($signature, '{')
+                    || str_ends_with($signature, '{' . PHP_EOL)
+                ) {
+                    break;
+                } else {
+                    $signature .= $line;
+                }
+            }
+        }
+
+        return $signature;
+    }
+
     public function usedConstants()
     {
         $constants = [];
 
         foreach ($this->lines as $codeLine) {
+            if ($this->isClassSignature($codeLine)) {
+                break;
+            }
+
             $lines = explode(';', $codeLine);
 
             foreach ($lines as $line) {
@@ -48,6 +74,9 @@ class PhpFile
         $functions = [];
 
         foreach ($this->lines as $codeLine) {
+            if ($this->isClassSignature($codeLine)) {
+                break;
+            }
             $lines = explode(';', $codeLine);
 
             foreach ($lines as $line) {
@@ -78,6 +107,10 @@ class PhpFile
         $classes = [];
 
         foreach ($this->lines as $codeLine) {
+            if ($this->isClassSignature($codeLine)) {
+                break;
+            }
+
             $lines = explode(';', $codeLine);
 
             foreach ($lines as $line) {
@@ -163,34 +196,30 @@ class PhpFile
         }, $interfaces);
     }
 
-    public function classSignature()
+    public function usedTraits()
     {
-        $signature = '';
+        $traits = [];
 
         foreach ($this->lines as $line) {
-            if (
-                $signature === ''
-                && (
-                    str_starts_with($line, 'class ')
-                    || str_starts_with($line, 'interface ')
-                    || str_starts_with($line, 'abstract class ')
-                    || str_starts_with($line, 'trait ')
-                )
-            ) {
-                $signature = $line;
-            } else {
-                if (
-                    str_ends_with($signature, '{')
-                    || str_ends_with($signature, '{' . PHP_EOL)
-                ) {
-                    break;
+            if (str_starts_with($line, '    use ')) {
+                $statement = explode('    use', $line)[1];
+                $statement = str_replace(';', '', $statement);
+                if (str_contains($statement, ',')) {
+                    $traits = array_merge($traits, explode(',', $statement));
                 } else {
-                    $signature .= $line;
+                    $traits[] = $statement;
                 }
             }
         }
 
-        return $signature;
+        return array_map(function ($usedTrait) {
+            $usedTrait = trim($usedTrait);
+            if (str_contains($usedTrait, '{')) {
+                $usedTrait = trim(Str\before_first_occurrence($usedTrait, '{'));
+            }
+
+            return $usedTrait;
+        }, $traits);
     }
 
     private function findUsesIn($useStatements)
@@ -213,5 +242,13 @@ class PhpFile
         });
 
         return $uses;
+    }
+
+    private function isClassSignature($line)
+    {
+        return str_starts_with($line, 'class ')
+        || str_starts_with($line, 'interface ')
+        || str_starts_with($line, 'abstract class ')
+        || str_starts_with($line, 'trait ');
     }
 }

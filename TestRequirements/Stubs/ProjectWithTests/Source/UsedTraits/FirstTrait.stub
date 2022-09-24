@@ -1,0 +1,10 @@
+<?php
+
+namespace ProjectWithTests\UsedTraits;
+
+require_once '$environmentBuildPath/Source/UsedTraits/SecondTrait.php';
+
+trait FirstTrait
+{
+    use SecondTrait;
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\StrTests\AfterLastOccurrenceTest;
+namespace Tests\StrTests\BeforeFirstOccurrenceTest;
 
 require_once __DIR__ . '/../../Source/Str.php';
 
@@ -10,18 +10,18 @@ test(
     title: 'it should return empty string when needle is empty',
     case: function () {
         $subject = 'hello world';
-        assert('' === Str\after_last_occurrence($subject, ''));
+        assert('' === Str\before_first_occurrence($subject, ''));
     }
 );
 
 test(
-    title: 'it should return the substring after the last occurrence',
+    title: 'it should return the substring before the first occurrence',
     case: function () {
         $subject = 'My\Class\Name';
-        assert('Name' === Str\after_last_occurrence($subject, '\\'));
+        assert('My' === Str\before_first_occurrence($subject, '\\'));
 
         $subject = 'This is another sentence contains i to test';
-        assert(' to test' === Str\after_last_occurrence($subject, 'i'));
+        assert('This is another senten' === Str\before_first_occurrence($subject, 'c'));
     }
 );
 
@@ -29,6 +29,6 @@ test(
     title: 'it should return empty string when needle is not in the subject',
     case: function () {
         $subject = 'hello world';
-        assert('' === Str\after_last_occurrence($subject, 'my'));
+        assert('' === Str\before_first_occurrence($subject, 'my'));
     }
 );
