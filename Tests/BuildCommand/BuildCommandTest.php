@@ -22,6 +22,7 @@ test(
         assert_build_for_extended_classes('Extended classes has not been built properly!' . $output);
         assert_build_for_interfaces('Interfaces has not been built properly!' . $output);
         assert_build_for_traits('Traits has not been built properly!' . $output);
+        assert_build_for_specified_file('Specified file has not been built properly!' . $output);
     },
     before: function () {
         delete_build_directory();
@@ -253,6 +254,19 @@ function assert_build_for_traits($message)
         && file_get_contents($environmentBuildPath . '/Source/UsedTraits/FirstTrait.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/UsedTraits/FirstTrait.stub'))
         && file_get_contents($environmentBuildPath . '/Source/UsedTraits/SecondTrait.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/UsedTraits/SecondTrait.stub'))
         && file_get_contents($environmentBuildPath . '/Source/UsedTraits/ThirdTrait.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/UsedTraits/ThirdTrait.stub'))
+        ,
+        $message
+    );
+}
+
+function assert_build_for_specified_file($message)
+{
+    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
+
+    assert(
+        file_exists($environmentBuildPath . '/Source/ClassUsesHelper.php')
+        && file_get_contents($environmentBuildPath . '/Source/ClassUsesHelper.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ClassUsesHelper.stub'))
         ,
         $message
     );

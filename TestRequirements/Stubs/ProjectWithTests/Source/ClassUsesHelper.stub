@@ -1,0 +1,14 @@
+<?php
+
+namespace ProjectWithTests\SampleFile;
+
+require_once '$environmentBuildPath/Services/Constants.php';
+require_once '$environmentBuildPath/Services/Functions.php';
+
+use function ProjectWithTests\Service\helper;
+use const ProjectWithTests\Service\HELPER_CONST;
+
+class ClassUsesHelper
+{
+
+}

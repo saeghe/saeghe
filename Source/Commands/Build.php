@@ -106,23 +106,27 @@ function compile_file($origin, $destination, $replaceMap)
 
 function apply_file_modifications($origin, $replaceMap)
 {
-    $requireStatements = [];
     $phpFile = new PhpFile(file_get_contents($origin));
-    $requireStatements = array_merge(
-        $requireStatements,
-        array_map(function ($import) {
-            return Str\before_last_occurrence($import, '\\');
-        }, array_keys($phpFile->usedConstants())),
-    );
-    $requireStatements = array_merge(
-        $requireStatements,
-        array_map(function ($import) {
-            return Str\before_last_occurrence($import, '\\');
-        }, array_keys($phpFile->usedFunctions())),
-    );
-    $usedClasses = array_keys($phpFile->usedClasses());
 
-    $requireStatements = array_merge($requireStatements, $usedClasses);
+    $requiredConstants = array_map(function ($import) use ($replaceMap) {
+        $path = path_finder($replaceMap, $import, true);
+        if (! $path) {
+            $path = path_finder($replaceMap, Str\before_last_occurrence($import, '\\'), false);
+        }
+
+        return $path;
+    }, array_keys($phpFile->usedConstants()));
+
+    $requiredFunctions = array_map(function ($import) use ($replaceMap) {
+        $path = path_finder($replaceMap, $import, true);
+        if (! $path) {
+            $path = path_finder($replaceMap, Str\before_last_occurrence($import, '\\'), false);
+        }
+
+        return $path;
+    }, array_keys($phpFile->usedFunctions()));
+
+    $usedClasses = array_keys($phpFile->usedClasses());
 
     if ($namespace = $phpFile->namespace()) {
         $additionalClasses = array_merge(
@@ -143,28 +147,15 @@ function apply_file_modifications($origin, $replaceMap)
             return $shouldImport;
         }, $additionalClasses);
 
-        $requireStatements = array_merge($requireStatements, $additionalClasses);
-
+        $usedClasses = array_merge($usedClasses, $additionalClasses);
     }
+
+    $requiredClasses = array_map(fn ($import) => path_finder($replaceMap, $import, false), $usedClasses);
+
+    $requireStatements = array_filter(array_merge($requiredConstants, $requiredFunctions, $requiredClasses));
 
     if (count($requireStatements) > 0) {
         $requireStatements = array_unique($requireStatements);
-        foreach ($requireStatements as  $index => $requireStatement) {
-            $realPath = null;
-            foreach ($replaceMap as $namespace => $path) {
-                if (str_starts_with($requireStatement, $namespace)) {
-                    $realPath = str_replace($namespace, $path, $requireStatement);
-                    $realPath = str_replace('\\', '/', $realPath) . '.php';
-                    break;
-                }
-            }
-
-            if ($realPath) {
-                $requireStatements[$index] = $realPath;
-            } else {
-                unset($requireStatements[$index]);
-            }
-        }
 
         $requireStatements = array_map(fn ($path) => "require_once '$path';", $requireStatements);
 
@@ -172,6 +163,26 @@ function apply_file_modifications($origin, $replaceMap)
     }
 
     return file_get_contents($origin);
+}
+
+function path_finder($replaceMap, $import, $absolute)
+{
+    $realPath = null;
+
+    foreach ($replaceMap as $namespace => $path) {
+        if ($absolute) {
+            if ($import === $namespace && str_ends_with($path, '.php')) {
+                return $path;
+            }
+        } else {
+            if (str_starts_with($import, $namespace)) {
+                $realPath = str_replace($namespace, $path, $import);
+                $realPath = str_replace('\\', '/', $realPath) . '.php';
+            }
+        }
+    }
+
+    return $realPath;
 }
 
 function add_requires($requireStatements, $file)

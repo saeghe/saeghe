@@ -1,7 +1,9 @@
 {
     "map": {
         "ProjectWithTests": "Source",
-        "Tests": "Tests"
+        "Tests": "Tests",
+        "ProjectWithTests\\Service\\helper": "Services\/Functions.php",
+        "ProjectWithTests\\Service\\HELPER_CONST": "Services\/Constants.php"
     },
     "entry-points": [
         "entry-point"
