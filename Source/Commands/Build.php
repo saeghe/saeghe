@@ -135,6 +135,10 @@ function apply_file_modifications($origin, $replaceMap)
             $phpFile->usedTraits(),
         );
         $additionalClasses = array_map(function ($additionalClass) use ($usedClasses, $namespace) {
+            if (str_starts_with($additionalClass, '\\')) {
+                return $additionalClass;
+            }
+
             $shouldImport = $namespace . "\\$additionalClass";
 
             foreach ($usedClasses as $usedClass) {

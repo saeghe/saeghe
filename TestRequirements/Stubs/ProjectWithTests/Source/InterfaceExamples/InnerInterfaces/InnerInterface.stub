@@ -2,7 +2,7 @@
 
 namespace ProjectWithTests\InterfaceExamples\InnerInterfaces;
 
-interface InnerInterface
+interface InnerInterface extends \Iterator
 {
 
 }

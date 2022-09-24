@@ -2,7 +2,7 @@
 
 namespace ProjectWithTests\ExtendExamples;
 
-abstract class ParentAbstractClass
+abstract class ParentAbstractClass extends \ArrayObject
 {
 
 }
