@@ -127,3 +127,36 @@ EOD;
         );
     }
 );
+
+test(
+    title: 'it should detect used classes with compounded namespace',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace ProjectWithTests\CompoundNamespace;
+
+use ProjectWithTests\CompoundNamespace\Foo as CompoundFoo;
+
+class UseCompoundNamespace
+{
+    public function run()
+    {
+        (new CompoundFoo\ClassFoo());
+        CompoundFoo\ClassBar::class;
+        CompoundFoo\ClassBaz::boot();
+        CompoundFoo\InnerNamespace\ClassBaz::run();
+    }
+}
+
+EOD;
+        $phpFile = new PhpFile($content);
+
+        assert([
+                'ProjectWithTests\CompoundNamespace\Foo\ClassFoo' => 'ClassFoo',
+                'ProjectWithTests\CompoundNamespace\Foo\ClassBaz' => 'ClassBaz',
+                'ProjectWithTests\CompoundNamespace\Foo\InnerNamespace\ClassBaz' => 'ClassBaz',
+            ] === $phpFile->usedClasses()
+        );
+    }
+);

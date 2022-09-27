@@ -6,10 +6,12 @@ use Saeghe\Saeghe\Str;
 
 class PhpFile
 {
+    public string $content;
     public array $lines;
 
     public function __construct($content)
     {
+        $this->content = $content;
         $this->lines = explode(PHP_EOL, $content);
     }
 
@@ -66,7 +68,24 @@ class PhpFile
             }
         }
 
-        return $this->findUsesIn($constants);
+        $uses = [];
+
+        array_walk($constants, function ($import) use (&$uses) {
+            $unified = explode(',', $import);
+
+            foreach ($unified as $import) {
+                $import = trim($import);
+                if (str_contains($import, ' as ')) {
+                    [$import, $alias] = explode(' as ', $import);
+                } else {
+                    $alias = Str\after_last_occurrence($import, '\\');
+                }
+
+                $uses[$import] = $alias;
+            }
+        });
+
+        return $uses;
     }
 
     public function usedFunctions()
@@ -99,7 +118,24 @@ class PhpFile
             }
         }
 
-        return $this->findUsesIn($functions);
+        $uses = [];
+
+        array_walk($functions, function ($import) use (&$uses) {
+            $unified = explode(',', $import);
+
+            foreach ($unified as $import) {
+                $import = trim($import);
+                if (str_contains($import, ' as ')) {
+                    [$import, $alias] = explode(' as ', $import);
+                } else {
+                    $alias = Str\after_last_occurrence($import, '\\');
+                }
+
+                $uses[$import] = $alias;
+            }
+        });
+
+        return $uses;
     }
 
     public function usedClasses()
@@ -137,7 +173,34 @@ class PhpFile
             }
         }
 
-        return $this->findUsesIn($classes);
+        $uses = [];
+
+        array_walk($classes, function ($import) use (&$uses) {
+            $commaSeparatedImports = explode(',', $import);
+
+            foreach ($commaSeparatedImports as $commaSeparatedImport) {
+                $commaSeparatedImport = trim($commaSeparatedImport);
+                if (str_contains($commaSeparatedImport, ' as ')) {
+                    [$aliasLink, $alias] = explode(' as ', $commaSeparatedImport);
+
+                    $namespaceUsedClasses = $this->namespaceUsedClasses($alias);
+
+                    if (count($namespaceUsedClasses) > 0) {
+                        foreach ($namespaceUsedClasses as $namespaceUsedClass) {
+                            $usedClass = str_replace($alias, $aliasLink, $namespaceUsedClass);
+                            $uses[$usedClass] = Str\after_last_occurrence($namespaceUsedClass, '\\');
+                        }
+                    } else {
+                        $uses[$aliasLink] = $alias;
+                    }
+                } else {
+                    $alias = Str\after_last_occurrence($commaSeparatedImport, '\\');
+                    $uses[$commaSeparatedImport] = $alias;
+                }
+            }
+        });
+
+        return $uses;
     }
 
     public function namespace()
@@ -222,33 +285,34 @@ class PhpFile
         }, $traits);
     }
 
-    private function findUsesIn($useStatements)
-    {
-        $uses = [];
-
-        array_walk($useStatements, function ($import) use (&$uses) {
-            $unified = explode(',', $import);
-
-            foreach ($unified as $separated) {
-                $separated = trim($separated);
-                if (str_contains($separated, ' as ')) {
-                    [$separated, $alias] = explode(' as ', $separated);
-                } else {
-                    $alias = Str\after_last_occurrence($separated, '\\');
-                }
-
-                $uses[$separated] = $alias;
-            }
-        });
-
-        return $uses;
-    }
-
     private function isClassSignature($line)
     {
         return str_starts_with($line, 'class ')
-        || str_starts_with($line, 'interface ')
-        || str_starts_with($line, 'abstract class ')
-        || str_starts_with($line, 'trait ');
+            || str_starts_with($line, 'interface ')
+            || str_starts_with($line, 'abstract class ')
+            || str_starts_with($line, 'trait ');
+    }
+
+    private function namespaceUsedClasses($namespace)
+    {
+        $regex = "/$namespace+(\\\\\w+)+(\(|::\w+)/";
+
+        preg_match_all($regex, $this->content, $matches, PREG_OFFSET_CAPTURE);
+
+        $matches = array_filter($matches[0], fn ($usage) => ! str_ends_with($usage[0], '::class'));
+
+        return array_map(function ($match) {
+            $class = $match[0];
+
+            if (str_contains($class, '(')) {
+                return Str\before_first_occurrence($class, '(');
+            }
+
+            if (str_contains($class, '::')) {
+                return Str\before_first_occurrence($class, '::');
+            }
+
+            return $class;
+        }, $matches);
     }
 }
