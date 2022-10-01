@@ -2,7 +2,10 @@
 
 namespace ProjectWithTests\InterfaceExamples;
 
-interface SecondInterface
+use ArrayAccess;
+use ProjectWithTests\InterfaceExamples\InnerInterfaces\ExtendableInterface as ExtendInterface;
+
+interface SecondInterface extends ExtendInterface, ArrayAccess
 {
 
 }

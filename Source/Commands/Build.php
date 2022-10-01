@@ -126,7 +126,8 @@ function apply_file_modifications($origin, $replaceMap)
         return $path;
     }, array_keys($phpFile->usedFunctions()));
 
-    $usedClasses = array_keys($phpFile->usedClasses());
+    $usedClasses = $phpFile->usedClasses();
+    $shouldImportClasses = array_keys($usedClasses);
 
     if ($namespace = $phpFile->namespace()) {
         $additionalClasses = array_merge(
@@ -134,27 +135,28 @@ function apply_file_modifications($origin, $replaceMap)
             $phpFile->extendedClasses(),
             $phpFile->usedTraits(),
         );
-        $additionalClasses = array_map(function ($additionalClass) use ($usedClasses, $namespace) {
+
+        array_walk($additionalClasses, function ($additionalClass) use ($usedClasses, $namespace, &$shouldImportClasses) {
             if (str_starts_with($additionalClass, '\\')) {
-                return $additionalClass;
-            }
-
-            $shouldImport = $namespace . "\\$additionalClass";
-
-            foreach ($usedClasses as $usedClass) {
-                if ($usedClass === $additionalClass || str_ends_with($usedClass, "\\$additionalClass")) {
-                    $shouldImport = $usedClass;
-                    break;
+                $shouldImportClasses[] = $additionalClass;
+            } else {
+                foreach ($usedClasses as $usedClass => $alias) {
+                    if ($usedClass === $additionalClass && ! str_contains($usedClass, '\\')) {
+                        $shouldImportClasses[] = $usedClass;
+                        return;
+                    }
+                    if ($alias === $additionalClass) {
+                        $shouldImportClasses[] = $usedClass;
+                        return;
+                    }
                 }
+
+                $shouldImportClasses[] = $namespace . "\\$additionalClass";
             }
-
-            return $shouldImport;
-        }, $additionalClasses);
-
-        $usedClasses = array_merge($usedClasses, $additionalClasses);
+        });
     }
 
-    $requiredClasses = array_map(fn ($import) => path_finder($replaceMap, $import, false), $usedClasses);
+    $requiredClasses = array_map(fn ($import) => path_finder($replaceMap, $import, false), $shouldImportClasses);
 
     $requireStatements = array_filter(array_merge($requiredConstants, $requiredFunctions, $requiredClasses));
 

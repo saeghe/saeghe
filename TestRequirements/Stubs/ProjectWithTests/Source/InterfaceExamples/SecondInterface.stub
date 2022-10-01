@@ -2,7 +2,12 @@
 
 namespace ProjectWithTests\InterfaceExamples;
 
-interface SecondInterface
+require_once '$environmentBuildPath/Source/InterfaceExamples/InnerInterfaces/ExtendableInterface.php';
+
+use ArrayAccess;
+use ProjectWithTests\InterfaceExamples\InnerInterfaces\ExtendableInterface as ExtendInterface;
+
+interface SecondInterface extends ExtendInterface, ArrayAccess
 {
 
 }
