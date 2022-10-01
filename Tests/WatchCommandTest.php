@@ -22,7 +22,6 @@ test(
     },
     before: function () {
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
-        shell_exec($_SERVER['PWD'] . '/saeghe init --project=TestRequirements/Fixtures/ProjectWithTests');
         mkdir($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Source');
     },
     after: function () {
