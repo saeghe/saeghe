@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\PhpFileTest\Extends;
+namespace Tests\PhpFileTest\ExtendsTest;
 
 require_once __DIR__ . '/../../Source/Str.php';
 require_once __DIR__ . '/../../Source/PhpFile.php';
