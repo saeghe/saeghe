@@ -57,3 +57,8 @@ function before_last_occurrence($subject, $needle)
 
     return mb_substr(string: $subject, start: 0, length: $pos,  encoding: 'UTF-8');
 }
+
+function remove_last_character($subject)
+{
+    return substr_replace($subject ,"",-1);
+}

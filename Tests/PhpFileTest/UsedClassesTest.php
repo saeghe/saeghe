@@ -82,6 +82,14 @@ use MyApp\OtherNamespace\ClassA;
 use MyApp\OtherNamespace\{ClassB, ClassC as C, ClassD};
 use MyApp\OtherNamespace\ClassE as ClassF;
 
+class MyClass
+{
+    public function __invoke()
+    {
+        new ClassB;
+        new C(ClassF::call('something'))
+    }
+}
 EOD;
 
         $phpFile = new PhpFile($content);
@@ -110,6 +118,14 @@ use MyApp\OtherNamespace\{ClassB, ClassC as C, ClassD};use function MyApp\\funct
 use MyApp\OtherNamespace\ClassE as ClassF;use MyApp\OtherNamespace\ClassG;
 use MyApp\FirstClass, MyApp\AnotherNamespace\SecondClass;
 
+class MyClass
+{
+    public function __construct()
+    {
+        new C;
+        ClassF::call();
+    }
+}
 EOD;
 
         $phpFile = new PhpFile($content);
@@ -156,6 +172,75 @@ EOD;
                 'ProjectWithTests\CompoundNamespace\Foo\ClassFoo' => 'ClassFoo',
                 'ProjectWithTests\CompoundNamespace\Foo\ClassBaz' => 'ClassBaz',
                 'ProjectWithTests\CompoundNamespace\Foo\InnerNamespace\ClassBaz' => 'ClassBaz',
+            ] === $phpFile->usedClasses()
+        );
+    }
+);
+
+test(
+    title: 'it should not return namespace aliases as used classes when there is no usages',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace ProjectWithTests\CompoundNamespace;
+
+use ProjectWithTests\CompoundNamespace as Compound;
+use ProjectWithTests\UsedStaticallyCompoundNamespace as UsedStaticallyCompound;
+use ProjectWithTests\UsedNewCompoundNamespace as UsedNewCompound;
+use ProjectWithTests\UnusedClass;
+
+class UseCompoundNamespace
+{
+    public function run()
+    {
+        Compound\ClassBar::class;
+        UsedStaticallyCompound\ClassFoo::call();
+        new UsedNewCompound\ClassFoo();
+    }
+}
+
+EOD;
+        $phpFile = new PhpFile($content);
+
+        assert([
+                'ProjectWithTests\UsedStaticallyCompoundNamespace\ClassFoo' => 'ClassFoo',
+                'ProjectWithTests\UsedNewCompoundNamespace\ClassFoo' => 'ClassFoo',
+                'ProjectWithTests\UnusedClass' => 'UnusedClass',
+            ] === $phpFile->usedClasses()
+        );
+    }
+);
+
+test(
+    title: 'it should detect functions',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace ProjectWithTests\CompoundNamespace;
+
+use ProjectWithTests\Functions as Helper;
+use ProjectWithTests\Classes as HelperClass;
+use ProjectWithTests\StaticClass as StaticHelper;
+
+class UseCompoundNamespace
+{
+    public function run()
+    {
+        Helper\aFunction();
+        new HelperClass();
+        StaticHelper::call();
+    }
+}
+
+EOD;
+        $phpFile = new PhpFile($content);
+
+        assert([
+                'ProjectWithTests\Functions' => '',
+                'ProjectWithTests\Classes' => 'HelperClass',
+                'ProjectWithTests\StaticClass' => 'StaticHelper',
             ] === $phpFile->usedClasses()
         );
     }

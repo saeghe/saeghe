@@ -183,13 +183,21 @@ class PhpFile
                 if (str_contains($commaSeparatedImport, ' as ')) {
                     [$aliasLink, $alias] = explode(' as ', $commaSeparatedImport);
 
-                    $namespaceUsedClasses = $this->namespaceUsedClasses($alias);
+                    if ($this->aliasIsNamespace($alias)) {
+                        $namespaceUsedClasses = $this->namespaceClasses($alias);
 
-                    if (count($namespaceUsedClasses) > 0) {
-                        foreach ($namespaceUsedClasses as $namespaceUsedClass) {
-                            $usedClass = str_replace($alias, $aliasLink, $namespaceUsedClass);
-                            $uses[$usedClass] = Str\after_last_occurrence($namespaceUsedClass, '\\');
+                        if (count($namespaceUsedClasses) > 0) {
+                            foreach ($namespaceUsedClasses as $namespaceUsedClass) {
+                                if (str_contains($namespaceUsedClass, '\\')) {
+                                    $usedClass = str_replace($alias, $aliasLink, $namespaceUsedClass);
+                                    $uses[$usedClass] = Str\after_last_occurrence($namespaceUsedClass, '\\');
+                                } else {
+                                    $uses[$aliasLink] = $alias;
+                                }
+                            }
                         }
+                    } else if ($this->aliasFunctionHasBeenUsed($alias)) {
+                        $uses[$aliasLink] = '';
                     } else {
                         $uses[$aliasLink] = $alias;
                     }
@@ -293,26 +301,47 @@ class PhpFile
             || str_starts_with($line, 'trait ');
     }
 
-    private function namespaceUsedClasses($namespace)
+    private function namespaceClasses($alias)
     {
-        $regex = "/$namespace+(\\\\\w+)+(\(|::\w+)/";
+        preg_match_all("/new $alias\\\\\w+(\\\\\w+)*[^\w]/", $this->content, $newInstances, PREG_OFFSET_CAPTURE);
 
-        preg_match_all($regex, $this->content, $matches, PREG_OFFSET_CAPTURE);
+        preg_match_all("/[^\w]+$alias\\\\\w+(\\\\\w+)*::\w+/", $this->content, $staticCalls, PREG_OFFSET_CAPTURE);
 
-        $matches = array_filter($matches[0], fn ($usage) => ! str_ends_with($usage[0], '::class'));
+        $staticCalls = array_filter($staticCalls[0], fn ($usage) => ! str_ends_with($usage[0], '::class'));
 
-        return array_map(function ($match) {
-            $class = $match[0];
+        return array_merge(
+            array_map(function ($match) {
+                $class = str_replace('new ', '', $match[0]);
 
-            if (str_contains($class, '(')) {
-                return Str\before_first_occurrence($class, '(');
-            }
+                return Str\remove_last_character($class);
+            }, $newInstances[0]),
+            array_map(function ($match) use ($alias) {
+                $class = $match[0];
+                $nonAcceptableCharacters = Str\before_first_occurrence($class, $alias);
+                $class = str_replace($nonAcceptableCharacters, '', $class);
 
-            if (str_contains($class, '::')) {
-                return Str\before_first_occurrence($class, '::');
-            }
+                if (str_contains($class, '::')) {
+                    return Str\before_first_occurrence($class, '::');
+                }
 
-            return $class;
-        }, $matches);
+                return $class;
+            }, $staticCalls)
+        );
+    }
+
+    private function aliasIsNamespace($alias)
+    {
+        preg_match_all("/new $alias\\\\\w+(\\\\\w+)*[^\w]/", $this->content, $newInstances, PREG_OFFSET_CAPTURE);
+
+        preg_match_all("/[^\w]+$alias\\\\\w+(\\\\\w+)*::\w+/", $this->content, $staticCalls, PREG_OFFSET_CAPTURE);
+
+        return count(array_merge($newInstances[0], $staticCalls[0])) > 0;
+    }
+
+    private function aliasFunctionHasBeenUsed($alias)
+    {
+        preg_match_all("/[^\w]$alias\\\\\w+\(/", $this->content, $functions, PREG_OFFSET_CAPTURE);
+
+        return isset($functions[0][0]) && count($functions[0][0]) > 0;
     }
 }
