@@ -298,6 +298,7 @@ class PhpFile
         return str_starts_with($line, 'class ')
             || str_starts_with($line, 'interface ')
             || str_starts_with($line, 'abstract class ')
+            || str_starts_with($line, 'final class ')
             || str_starts_with($line, 'trait ');
     }
 
