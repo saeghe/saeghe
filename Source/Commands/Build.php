@@ -141,10 +141,6 @@ function apply_file_modifications($origin, $replaceMap)
                 $shouldImportClasses[] = $additionalClass;
             } else {
                 foreach ($usedClasses as $usedClass => $alias) {
-                    if ($usedClass === $additionalClass && ! str_contains($usedClass, '\\')) {
-                        $shouldImportClasses[] = $usedClass;
-                        return;
-                    }
                     if ($alias === $additionalClass) {
                         $shouldImportClasses[] = $usedClass;
                         return;
