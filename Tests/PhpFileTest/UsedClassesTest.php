@@ -2,7 +2,6 @@
 
 namespace Tests\PhpFileTest\UsedClassesTest;
 
-require_once __DIR__ . '/../../Source/Str.php';
 require_once __DIR__ . '/../../Source/PhpFile.php';
 
 use Saeghe\Saeghe\PhpFile;

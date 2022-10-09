@@ -2,6 +2,8 @@
 
 namespace Saeghe\Saeghe;
 
+require_once __DIR__ . '/Str.php';
+
 use Saeghe\Saeghe\Str;
 
 class PhpFile
@@ -37,7 +39,7 @@ class PhpFile
         return $signature;
     }
 
-    public function usedConstants()
+    public function importedConstants()
     {
         $constants = [];
 
@@ -88,7 +90,55 @@ class PhpFile
         return $uses;
     }
 
-    public function usedFunctions()
+    public function usedConstants(): array
+    {
+        $importedConstants = $this->importedConstants();
+        $importedClasses = $this->importedClasses();
+
+        preg_match_all("/(\w+\\\\)*\w+::\w+\W/", $this->content, $usedConstants, PREG_OFFSET_CAPTURE);
+
+        $usedConstants = array_filter($usedConstants[0], function ($usedConstant) {
+            $usedConstant = $usedConstant[0];
+
+            return ! str_ends_with($usedConstant, '(')
+                && ! str_ends_with($usedConstant, '::class' . Str\last_character($usedConstant));
+        });
+
+        $inClassUsedConstants = array_map(function ($usedConstant) use ($importedClasses) {
+            $usedConstant = Str\remove_last_character($usedConstant[0]);
+
+            if (str_starts_with($usedConstant, 'self::') || str_starts_with($usedConstant, 'static::')) {
+                return str_replace('::', '\\', $usedConstant);
+            }
+
+            [$class, $const] = explode('::', $usedConstant);
+
+            foreach ($importedClasses as $use => $alias) {
+                if ($use === $class || $class === $alias) {
+                    return $use . '\\' . $const;
+                }
+
+                if (str_starts_with($class, $alias . '\\')) {
+                    $class = Str\replace_first_occurrance($class, $alias, $use);
+                    return $class . '\\' . $const;
+                }
+            }
+
+            return $this->namespace() . '\\' . str_replace('::', '\\', $usedConstant);
+        }, $usedConstants);
+
+        $constantsFromImport = [];
+
+        foreach ($importedConstants as $use => $alias) {
+            if (preg_match_all("/\W$alias\W/", $this->content, $usedConstants, PREG_OFFSET_CAPTURE) > 1) {
+                $constantsFromImport[] = $use;
+            }
+        }
+
+        return array_unique(array_merge($inClassUsedConstants, $constantsFromImport));
+    }
+
+    public function importedFunctions()
     {
         $functions = [];
 
@@ -121,6 +171,60 @@ class PhpFile
         $uses = [];
 
         array_walk($functions, function ($import) use (&$uses) {
+            $unified = explode(',', $import);
+
+            foreach ($unified as $import) {
+                $import = trim($import);
+                if (str_contains($import, ' as ')) {
+                    [$import, $alias] = explode(' as ', $import);
+                } else {
+                    $alias = Str\after_last_occurrence($import, '\\');
+                }
+
+                $uses[$import] = $alias;
+            }
+        });
+
+        return $uses;
+    }
+
+    public function importedClasses()
+    {
+        $classes = [];
+
+        foreach ($this->lines as $codeLine) {
+            if ($this->isClassSignature($codeLine)) {
+                break;
+            }
+            $lines = explode(';', $codeLine);
+
+            foreach ($lines as $line) {
+                $line = trim($line);
+
+                if (str_starts_with($line, 'use const ') || str_starts_with($line, 'use function ')) {
+                    continue;
+                }
+
+                if (str_starts_with($line, 'use ')) {
+                    if (str_contains($line, '\{')) {
+                        $parts = Str\between($line, '{', '}');
+                        $parts = explode(',', $parts);
+                        $commonPart = str_replace('use ', '', explode('\{', $line)[0]);
+
+                        foreach ($parts as $part) {
+                            $part = trim($part);
+                            $classes[] = "$commonPart\\$part";
+                        }
+                    } else {
+                        $classes[] = str_replace('use ', '', $line);
+                    }
+                }
+            }
+        }
+
+        $uses = [];
+
+        array_walk($classes, function ($import) use (&$uses) {
             $unified = explode(',', $import);
 
             foreach ($unified as $import) {

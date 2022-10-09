@@ -58,7 +58,17 @@ function before_last_occurrence($subject, $needle)
     return mb_substr(string: $subject, start: 0, length: $pos,  encoding: 'UTF-8');
 }
 
+function last_character($subject)
+{
+    return mb_substr($subject, -1);
+}
+
 function remove_last_character($subject)
 {
     return substr_replace($subject ,"",-1);
+}
+
+function replace_first_occurrance($subject, $search, $replace)
+{
+    return preg_replace('/' . $search . '/', $replace, $subject, 1);
 }

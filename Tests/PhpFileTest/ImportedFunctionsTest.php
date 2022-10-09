@@ -1,8 +1,7 @@
 <?php
 
-namespace Tests\PhpFileTest\UsedFunctionsTest;
+namespace Tests\PhpFileTest\ImportedFunctionsTest;
 
-require_once __DIR__ . '/../../Source/Str.php';
 require_once __DIR__ . '/../../Source/PhpFile.php';
 
 use Saeghe\Saeghe\PhpFile;
@@ -23,7 +22,7 @@ EOD;
 
         assert([
             'MyApp\OtherNamespace\functionA' => 'functionA'
-        ] === $phpFile->usedFunctions());
+        ] === $phpFile->importedFunctions());
     }
 );
 
@@ -44,7 +43,7 @@ EOD;
         assert([
                 'MyApp\OtherNamespace\functionA' => 'functionA',
                 'MyApp\OtherNamespace\functionB' => 'functionB',
-            ] === $phpFile->usedFunctions()
+            ] === $phpFile->importedFunctions()
         );
     }
 );
@@ -71,7 +70,7 @@ EOD;
                 'MyApp\OtherNamespace\functionC' => 'C',
                 'MyApp\OtherNamespace\functionD' => 'functionD',
                 'MyApp\OtherNamespace\functionE' => 'functionF',
-            ] === $phpFile->usedfunctions()
+            ] === $phpFile->importedFunctions()
         );
     }
 );
@@ -102,7 +101,7 @@ EOD;
                 'MyApp\OtherNamespace\functionG' => 'functionG',
                 'MyApp\\fistFunction' => 'fistFunction',
                 'MyApp\AnotherNamespace\secondFunction' => 'secondFunction',
-            ] === $phpFile->usedFunctions()
+            ] === $phpFile->importedFunctions()
         );
     }
 );
