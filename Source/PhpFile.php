@@ -13,8 +13,38 @@ class PhpFile
 
     public function __construct($content)
     {
-        $this->content = $content;
-        $this->lines = explode(PHP_EOL, $content);
+        $this->content = $this->strip_content($content);
+        $this->lines = explode(PHP_EOL, $this->content);
+    }
+
+    private function strip_content($content)
+    {
+        $newContent = '';
+        $tokens = token_get_all($content);
+
+        foreach ($tokens as $token) {
+            if (is_string($token)) {
+                // simple 1-character token
+                $newContent .= $token;
+            } else {
+                // token array
+                list($id, $text) = $token;
+
+                switch ($id) {
+                    case T_COMMENT:
+                    case T_DOC_COMMENT:
+                        // no action on comments
+                        break;
+
+                    default:
+                        // anything else -> output "as is"
+                        $newContent .= $text;
+                        break;
+                }
+            }
+        }
+
+        return $newContent;
     }
 
     public function classSignature()
@@ -107,7 +137,10 @@ class PhpFile
         $inClassUsedConstants = array_map(function ($usedConstant) use ($importedClasses) {
             $usedConstant = Str\remove_last_character($usedConstant[0]);
 
-            if (str_starts_with($usedConstant, 'self::') || str_starts_with($usedConstant, 'static::')) {
+            if (str_starts_with($usedConstant, 'self::')
+                || str_starts_with($usedConstant, 'static::')
+                || str_starts_with($usedConstant, 'parent::')
+            ) {
                 return str_replace('::', '\\', $usedConstant);
             }
 
@@ -130,7 +163,7 @@ class PhpFile
         $constantsFromImport = [];
 
         foreach ($importedConstants as $use => $alias) {
-            if (preg_match_all("/\W$alias\W/", $this->content, $usedConstants, PREG_OFFSET_CAPTURE) > 1) {
+            if (preg_match_all("/\W$alias\W/", $this->content, $dontCare, PREG_OFFSET_CAPTURE) > 1) {
                 $constantsFromImport[] = $use;
             }
         }
@@ -186,6 +219,61 @@ class PhpFile
         });
 
         return $uses;
+    }
+
+    public function usedFunctions()
+    {
+        $importedFunctions = $this->importedFunctions();
+        $importedClasses = $this->importedClasses();
+
+        $content = preg_replace("/ function \w+\(/", ' ', $this->content);
+        preg_match_all("/\W(\w+\\\\)*\w+\(/", $content, $usedFunctions, PREG_OFFSET_CAPTURE);
+
+        $usedFunctions = array_filter($usedFunctions[0], function ($usedFunction) {
+            return ! str_starts_with($usedFunction[0], ':') && ! str_starts_with($usedFunction[0], '>');
+        });
+
+        $inFileUsedFunctions = array_map(function ($usedFunction) use ($importedClasses, $importedFunctions) {
+            $usedFunction = Str\remove_last_character(Str\remove_first_character($usedFunction[0]));
+
+            $function = str_contains($usedFunction, '\\')
+                ? Str\after_last_occurrence($usedFunction, '\\')
+                : $usedFunction;
+
+            $file = str_contains($usedFunction, '\\')
+                ? Str\before_last_occurrence($usedFunction, '\\')
+                : '';
+
+            foreach ($importedClasses as $class => $alias) {
+                if ($alias === $file) {
+                    return $class . '\\' . $function;
+                }
+
+                if (str_starts_with($file, "$alias\\")) {
+                    return Str\replace_first_occurrance($file, $alias, $class) . '\\' . $function;
+                }
+            }
+
+            if (in_array($function, array_values($importedFunctions))) {
+                return null;
+            }
+
+            if ($file === '') {
+                return $function;
+            }
+
+            return $this->namespace() . '\\' . $usedFunction;
+        }, $usedFunctions);
+
+        $functionsFromImport = [];
+
+        foreach ($importedFunctions as $use => $alias) {
+            if ((int) preg_match_all("/\W$alias\(/", $content, $dontCare, PREG_OFFSET_CAPTURE) > 0) {
+                $functionsFromImport[] = $use;
+            }
+        }
+
+        return array_values(array_filter(array_unique(array_merge($inFileUsedFunctions, $functionsFromImport))));
     }
 
     public function importedClasses()

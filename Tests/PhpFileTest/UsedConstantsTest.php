@@ -28,6 +28,7 @@ class MyClass
     public function __construct() {
         self::CONST_A;
         $var = static::CONST_B;
+        $varParent = parent::CONST_PARENT;
     }
     
     public function method()
@@ -52,6 +53,7 @@ EOD;
             [
                 'self\CONST_A',
                 'static\CONST_B',
+                'parent\CONST_PARENT',
                 'Application\ClassInSameNamespace\CONST_C',
                 'Application\AnyNamespace\UsedClass\CONST_D',
                 'Model\CONST_1',

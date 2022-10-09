@@ -63,6 +63,11 @@ function last_character($subject)
     return mb_substr($subject, -1);
 }
 
+function remove_first_character($subject)
+{
+    return substr_replace($subject ,"",0, 1);
+}
+
 function remove_last_character($subject)
 {
     return substr_replace($subject ,"",-1);
