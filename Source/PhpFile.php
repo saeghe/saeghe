@@ -332,75 +332,52 @@ class PhpFile
 
     public function usedClasses()
     {
-        $classes = [];
+        $importedClasses = $this->importedClasses();
 
-        foreach ($this->lines as $codeLine) {
-            if ($this->isClassSignature($codeLine)) {
-                break;
-            }
+        preg_match_all("/(\w+\\\\)*\w+::\w+/", $this->content, $usedStaticClasses, PREG_OFFSET_CAPTURE);
 
-            $lines = explode(';', $codeLine);
-
-            foreach ($lines as $line) {
-                $line = trim($line);
-
-                if (str_starts_with($line, 'use const ') || str_starts_with($line, 'use function ')) {
-                    continue;
-                }
-
-                if (str_starts_with($line, 'use ')) {
-                    if (str_contains($line, '\{')) {
-                        $parts = Str\between($line, '{', '}');
-                        $parts = explode(',', $parts);
-                        $commonPart = str_replace('use ', '', explode('\{', $line)[0]);
-
-                        foreach ($parts as $part) {
-                            $part = trim($part);
-                            $classes[] = "$commonPart\\$part";
-                        }
-                    } else {
-                        $classes[] = str_replace('use ', '', $line);
-                    }
-                }
-            }
-        }
-
-        $uses = [];
-
-        array_walk($classes, function ($import) use (&$uses) {
-            $commaSeparatedImports = explode(',', $import);
-
-            foreach ($commaSeparatedImports as $commaSeparatedImport) {
-                $commaSeparatedImport = trim($commaSeparatedImport);
-                if (str_contains($commaSeparatedImport, ' as ')) {
-                    [$aliasLink, $alias] = explode(' as ', $commaSeparatedImport);
-
-                    if ($this->aliasIsNamespace($alias)) {
-                        $namespaceUsedClasses = $this->namespaceClasses($alias);
-
-                        if (count($namespaceUsedClasses) > 0) {
-                            foreach ($namespaceUsedClasses as $namespaceUsedClass) {
-                                if (str_contains($namespaceUsedClass, '\\')) {
-                                    $usedClass = str_replace($alias, $aliasLink, $namespaceUsedClass);
-                                    $uses[$usedClass] = Str\after_last_occurrence($namespaceUsedClass, '\\');
-                                } else {
-                                    $uses[$aliasLink] = $alias;
-                                }
-                            }
-                        }
-                    } else if ($this->aliasFunctionHasBeenUsed($alias)) {
-                        $uses[$aliasLink] = '';
-                    } else {
-                        $uses[$aliasLink] = $alias;
-                    }
-                } else {
-                    $alias = Str\after_last_occurrence($commaSeparatedImport, '\\');
-                    $uses[$commaSeparatedImport] = $alias;
-                }
-            }
+        $usedStaticClasses = array_filter($usedStaticClasses[0], function ($usedStaticClass) {
+            return ! str_ends_with($usedStaticClass[0], '::class')
+                && ! str_starts_with($usedStaticClass[0], 'parent')
+                && ! str_starts_with($usedStaticClass[0], 'static')
+                && ! str_starts_with($usedStaticClass[0], 'self');
         });
 
-        return $uses;
+        $usedStaticClassesInFile = array_map(function ($usedStaticClass) use ($importedClasses) {
+            $usedStaticClass = $usedStaticClass[0];
+            [$class, $method] = explode('::', $usedStaticClass);
+
+            foreach ($importedClasses as $path => $alias) {
+                if ($class === $alias) {
+                    return $path;
+                }
+
+                if (str_starts_with($class, $alias . '\\')) {
+                    return Str\replace_first_occurrance($class, $alias, $path);
+                }
+            }
+
+            return $this->namespace() . '\\' . $class;
+        }, $usedStaticClasses);
+
+        preg_match_all("/new (\w+\\\\)*\w+/", $this->content, $usedInstantiatedClasses, PREG_OFFSET_CAPTURE);
+
+        $usedInstantiatedClassesInFile = array_map(function ($usedInstantiatedClass) use ($importedClasses) {
+            $usedInstantiatedClass = Str\replace_first_occurrance($usedInstantiatedClass[0], 'new ', '');
+
+            $class = Str\after_last_occurrence($usedInstantiatedClass, '\\');
+            $path = Str\before_last_occurrence($usedInstantiatedClass, '\\');
+
+            foreach ($importedClasses as $namespace => $alias) {
+                if ($path === $namespace || $path === $alias) {
+                    return $namespace . (strlen($class) > 0 ? '\\' . $class : '');
+                }
+            }
+
+            return $this->namespace() . '\\' . $path;
+        }, $usedInstantiatedClasses[0]);
+
+        return array_unique(array_merge($usedStaticClassesInFile, $usedInstantiatedClassesInFile));
     }
 
     public function namespace()
