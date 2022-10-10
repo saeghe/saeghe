@@ -9,5 +9,7 @@ class ImportingMultipleUseStatements
     public function __construct()
     {
         AnotherFile\anImportantFunction();
+
+        $x = AnotherFile\anImportantFunction() || new SimpleClass();
     }
 }

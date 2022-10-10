@@ -9,5 +9,6 @@ test(
     title: 'this is not going to run',
     case: function () {
         SampleFile\anImportantFunction();
+        Helper\anyFunction();
     },
 );

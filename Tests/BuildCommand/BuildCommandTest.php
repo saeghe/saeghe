@@ -65,12 +65,14 @@ function assert_source_has_been_built($message)
     $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
 
     assert(
-        file_exists($environmentBuildPath . '/Source/SubDirectory/ClassUseAnotherClass.php')
+        file_exists($environmentBuildPath . '/Source/ImportableSample.php')
+        && file_exists($environmentBuildPath . '/Source/SubDirectory/ClassUseAnotherClass.php')
         && file_exists($environmentBuildPath . '/Source/SubDirectory/SimpleClass.php')
         && file_exists($environmentBuildPath . '/Source/SampleFile.php')
         && file_exists($environmentBuildPath . '/Source/ImportingWithTheUseOperator.php')
         && file_exists($environmentBuildPath . '/Source/ImportingMultipleUseStatements.php')
         && file_exists($environmentBuildPath . '/Source/GroupUseStatements.php')
+        && file_get_contents($environmentBuildPath . '/Source/ImportableSample.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/ImportableSample.stub'))
         && file_get_contents($environmentBuildPath . '/Source/SubDirectory/ClassUseAnotherClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/SubDirectory/ClassUseAnotherClass.stub'))
         && file_get_contents($environmentBuildPath . '/Source/SubDirectory/SimpleClass.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/SubDirectory/SimpleClass.stub'))
         && file_get_contents($environmentBuildPath . '/Source/SampleFile.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/SampleFile.stub'))

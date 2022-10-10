@@ -3,8 +3,8 @@
 namespace Tests\Features;
 
 require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Helpers.php';
-require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Controllers/HomeController.php';
 require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Models/User.php';
+require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Controllers/HomeController.php';
 require_once '$environmentBuildPath/Packages/saeghe/simple-package/Source/SimpleClass.php';
 require_once '$environmentBuildPath/Tests/TestHelper.php';
 
@@ -16,5 +16,10 @@ use function Saeghe\ComplexPackage\Helpers\helper1;
 
 class FirstFeature extends TestHelper
 {
-
+    public function test()
+    {
+        new HomeController(new SimpleClass);
+        User::login();
+        helper1();
+    }
 }

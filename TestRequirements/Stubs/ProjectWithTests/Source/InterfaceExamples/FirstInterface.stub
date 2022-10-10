@@ -2,8 +2,8 @@
 
 namespace ProjectWithTests\InterfaceExamples;
 
-require_once '$environmentBuildPath/Source/InterfaceExamples/InnerInterfaces/InnerInterface.php';
 require_once '$environmentBuildPath/Source/InterfaceExamples/SecondInterface.php';
+require_once '$environmentBuildPath/Source/InterfaceExamples/InnerInterfaces/InnerInterface.php';
 
 use ProjectWithTests\InterfaceExamples\InnerInterfaces\InnerInterface;
 

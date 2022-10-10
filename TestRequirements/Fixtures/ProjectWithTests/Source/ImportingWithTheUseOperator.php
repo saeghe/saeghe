@@ -16,4 +16,14 @@ class ImportingWithTheUseOperator
     {
         $another = new Another();
     }
+
+    public function action()
+    {
+        new SimpleClass();
+        if (anImportantFunction() || anotherFunction()) {
+            $var = CONSTANT;
+        } else {
+            $var = AnotherConstant;
+        }
+    }
 }

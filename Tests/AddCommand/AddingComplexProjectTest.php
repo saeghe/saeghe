@@ -94,13 +94,13 @@ function assert_meta_file_has_desired_data($message)
         && 'development' === $meta['packages']['git@github.com:saeghe/simple-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/simple-package.git']['owner']
         && 'simple-package' === $meta['packages']['git@github.com:saeghe/simple-package.git']['repo']
-        && 'f0a34daeb2d9af8df05f471cc7a314b0717fe02e' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash']
+        && '85f94d8c34cb5678a5b37707479517654645c102' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash']
 
         && isset($meta['packages']['git@github.com:saeghe/complex-package.git'])
         && 'development' === $meta['packages']['git@github.com:saeghe/complex-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/complex-package.git']['owner']
         && 'complex-package' === $meta['packages']['git@github.com:saeghe/complex-package.git']['repo']
-        && '1400280130f4c35f67e4e0128317d4543fb71221' === $meta['packages']['git@github.com:saeghe/complex-package.git']['hash'],
+        && '08cccc569cffaf9ca67660d43e1de65b12895867' === $meta['packages']['git@github.com:saeghe/complex-package.git']['hash'],
         $message
     );
 }

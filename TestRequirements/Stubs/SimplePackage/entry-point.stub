@@ -3,3 +3,5 @@
 require_once '$environmentBuildPath/Packages/saeghe/simple-package/Source/ImaginaryClass.php';
 
 use Saeghe\SimplePackage\ImaginaryClass;
+
+new ImaginaryClass();

@@ -62,6 +62,8 @@ class MyClass extends ParentClass implements InterfaceA, interfaceB
         if (G::call()) {
         
         }
+        
+        Application\SubDirectory\ClassUseAnotherStaticClass::call();
     }
     
     public function instantiation()
@@ -76,6 +78,7 @@ class MyClass extends ParentClass implements InterfaceA, interfaceB
         new InstanceG(new SameNamespaceClass());
         new User();
         new \ArrayObject();
+        $newInstanceClassWithoutUse = new Application\SubDirectory\ClassUseAnotherClass();
     }
     
     [#SetUp]
@@ -92,12 +95,14 @@ EOD;
                 'Application\Statics\CompoundNamespace\ClassD',
                 'Application\Statics\ClassE',
                 'Application\Statics\ClassF',
+                'Application\SubDirectory\ClassUseAnotherStaticClass',
                 'Application\Instances\InstanceA',
                 'Application\Instances\CompoundNamespace\InstanceD',
                 'Application\Instances\InstanceE',
                 'Application\Instances\InstanceF',
                 'Application\SameNamespaceClass',
                 'User',
+                'Application\SubDirectory\ClassUseAnotherClass'
             ] === (new PhpFile($content))->usedClasses(),
             'Used classes are not detected!'
         );

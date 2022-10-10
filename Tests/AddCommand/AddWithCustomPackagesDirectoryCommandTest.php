@@ -94,7 +94,7 @@ function assert_meta_has_desired_data($message)
         && 'development' === $meta['packages']['git@github.com:saeghe/simple-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/simple-package.git']['owner']
         && 'simple-package' === $meta['packages']['git@github.com:saeghe/simple-package.git']['repo']
-        && 'f0a34daeb2d9af8df05f471cc7a314b0717fe02e' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash'],
+        && '85f94d8c34cb5678a5b37707479517654645c102' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash'],
         $message
     );
 }

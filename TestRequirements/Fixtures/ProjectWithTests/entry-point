@@ -3,3 +3,5 @@
 
 use ProjectWithTests\SubDirectory\SimpleClass;
 use ProjectWithTests\SubDirectory\ClassUseAnotherClass;
+
+SimpleClass::handle(new ClassUseAnotherClass());

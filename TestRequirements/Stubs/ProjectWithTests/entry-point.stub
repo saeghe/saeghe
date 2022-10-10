@@ -6,3 +6,5 @@ require_once '$environmentBuildPath/Source/SubDirectory/ClassUseAnotherClass.php
 
 use ProjectWithTests\SubDirectory\SimpleClass;
 use ProjectWithTests\SubDirectory\ClassUseAnotherClass;
+
+SimpleClass::handle(new ClassUseAnotherClass());

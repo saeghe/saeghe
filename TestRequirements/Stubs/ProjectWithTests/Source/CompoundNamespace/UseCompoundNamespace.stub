@@ -2,8 +2,8 @@
 
 namespace ProjectWithTests\CompoundNamespace;
 
-require_once '$environmentBuildPath/Source/CompoundNamespace/Foo/ClassFoo.php';
 require_once '$environmentBuildPath/Source/CompoundNamespace/Foo/ClassBaz.php';
+require_once '$environmentBuildPath/Source/CompoundNamespace/Foo/ClassFoo.php';
 
 use ProjectWithTests\CompoundNamespace\Foo as CompoundFoo;
 

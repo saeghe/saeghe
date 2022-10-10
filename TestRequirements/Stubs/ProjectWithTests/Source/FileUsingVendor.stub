@@ -8,5 +8,8 @@ use Saeghe\SimplePackage\AUsefulClass;
 
 class FileWithPackageDependency
 {
-
+    public function __construct()
+    {
+        new AUsefulClass();
+    }
 }

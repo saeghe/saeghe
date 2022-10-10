@@ -227,6 +227,7 @@ class PhpFile
         $importedClasses = $this->importedClasses();
 
         $content = preg_replace("/ function \w+\(/", ' ', $this->content);
+        $content = preg_replace("/new (\w+\\\\)*\w+\(/", ' ', $content);
         preg_match_all("/\W(\w+\\\\)*\w+\(/", $content, $usedFunctions, PREG_OFFSET_CAPTURE);
 
         $usedFunctions = array_filter($usedFunctions[0], function ($usedFunction) {
@@ -273,7 +274,9 @@ class PhpFile
             }
         }
 
-        return array_values(array_filter(array_unique(array_merge($inFileUsedFunctions, $functionsFromImport))));
+        $usedFunctions = array_values(array_filter(array_unique(array_merge($inFileUsedFunctions, $functionsFromImport))));
+
+        return $usedFunctions;
     }
 
     public function importedClasses()
@@ -327,6 +330,8 @@ class PhpFile
             }
         });
 
+        uksort($uses, fn ($first, $second) => strlen($second) - strlen($first));
+
         return $uses;
     }
 
@@ -357,6 +362,10 @@ class PhpFile
                 }
             }
 
+            if (str_contains($class, '\\')) {
+                return $class;
+            }
+
             return $this->namespace() . '\\' . $class;
         }, $usedStaticClasses);
 
@@ -368,10 +377,18 @@ class PhpFile
             $class = Str\after_last_occurrence($usedInstantiatedClass, '\\');
             $path = Str\before_last_occurrence($usedInstantiatedClass, '\\');
 
-            foreach ($importedClasses as $namespace => $alias) {
-                if ($path === $namespace || $path === $alias) {
-                    return $namespace . (strlen($class) > 0 ? '\\' . $class : '');
+            foreach ($importedClasses as $importedClass => $alias) {
+                if ($path === $importedClass || $path === $alias) {
+                    return $importedClass . (strlen($class) > 0 ? '\\' . $class : '');
                 }
+
+                if ($this->aliasIsNamespace($alias) && str_starts_with($class, $alias . '\\')) {
+                    return Str\replace_first_occurrance($class, $alias, $path);
+                }
+            }
+
+            if (str_contains($path, '\\')) {
+                return $path . '\\' . $class;
             }
 
             return $this->namespace() . '\\' . $path;

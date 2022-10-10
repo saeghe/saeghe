@@ -115,7 +115,7 @@ function apply_file_modifications($origin, $replaceMap)
         }
 
         return $path;
-    }, array_keys($phpFile->importedConstants()));
+    }, $phpFile->usedConstants());
 
     $requiredFunctions = array_map(function ($import) use ($replaceMap) {
         $path = path_finder($replaceMap, $import, true);
@@ -124,10 +124,10 @@ function apply_file_modifications($origin, $replaceMap)
         }
 
         return $path;
-    }, array_keys($phpFile->importedFunctions()));
+    }, $phpFile->usedFunctions());
 
-    $usedClasses = $phpFile->usedClasses();
-    $shouldImportClasses = array_keys($usedClasses);
+    $importedClasses = $phpFile->importedClasses();
+    $shouldImportClasses = $phpFile->usedClasses();
     $namespace = $phpFile->namespace();
     $additionalClasses = array_merge(
         $phpFile->implementedInterfaces(),
@@ -135,11 +135,11 @@ function apply_file_modifications($origin, $replaceMap)
         $phpFile->usedTraits(),
     );
 
-    array_walk($additionalClasses, function ($additionalClass) use ($usedClasses, $namespace, &$shouldImportClasses) {
+    array_walk($additionalClasses, function ($additionalClass) use ($importedClasses, $namespace, &$shouldImportClasses) {
         if (str_starts_with($additionalClass, '\\')) {
             $shouldImportClasses[] = $additionalClass;
         } else {
-            foreach ($usedClasses as $usedClass => $alias) {
+            foreach ($importedClasses as $usedClass => $alias) {
                 if ($usedClass === $additionalClass && ! str_contains($usedClass, '\\')) {
                     $shouldImportClasses[] = $usedClass;
                     return;

@@ -17,11 +17,13 @@ namespace Application;
 use function Application\Helpers\function_a;
 use function Application\Helpers\function_b as function_c;
 use function Application\Helpers\{function_d, function_e as g, unused_function};
+use Application\Application;
 use Application\CompoundNamespace as OtherNamespace;
 use Application\OtherHelper as AwesomeHelper;
 use Application\Model\{User, Order as Orders, NotUsed};
 use Application\CallFromNewInstance;
 use Application\Str;
+use Application\CompoundNamespaceClass as Compound;
 
 class MyClass
 {
@@ -56,6 +58,12 @@ class MyClass
         (new CallFromNewInstance)->callMethod($parameters);
         $this->methodNotCountedInFunctions();
         Str\remove_last_character($subject);
+    }
+    
+    function newInstancesShouldNotBeIncluded()
+    {
+        new Application($parameters);
+        new Compound();
     }
 }
 EOD;
