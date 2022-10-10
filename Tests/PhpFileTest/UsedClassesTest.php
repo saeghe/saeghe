@@ -32,6 +32,11 @@ use Application\Instances\{InstanceE, InstanceF as InstanceG, UnusedInstance};
 use User;
 use Application\Attributes\SetUp;
 
+/**
+ * It should Ignore any call in comment
+ * AnyCommentClass::static or new AnyInstanceClass()
+ * Should get ignored 
+ */
 class MyClass extends ParentClass implements InterfaceA, interfaceB
 {
     use MyTrait;
@@ -55,6 +60,8 @@ class MyClass extends ParentClass implements InterfaceA, interfaceB
     
     public static function calls()
     {
+        // Inline comments should get ignore for static ClassInComment::call()
+        $string = "%s::any should not get involve"
         ClassA::static_call();
         ClassC\ClassD::another_call();
         ClassE::call();
@@ -62,12 +69,18 @@ class MyClass extends ParentClass implements InterfaceA, interfaceB
         if (G::call()) {
         
         }
-        
+
         Application\SubDirectory\ClassUseAnotherStaticClass::call();
+        \Locale::setDefault('en');
     }
     
     public function instantiation()
     {
+        // Inline comments should get ignore for new ClassInComment()
+        $string = "new ClassInString() should not get involve";
+        new self();
+        new parent();
+        new static();
         $var = new InstanceA;
 
         if ($var2 = (new InstanceC\InstanceD())) {

@@ -45,6 +45,7 @@ class MyClass
         OtherNamespace\SubClass::CONST_A;
         A::CONST_I;
         ClassB::CONST_J;
+        \ReflectionProperty::IS_PUBLIC
     }
 }
 EOD;
@@ -60,10 +61,12 @@ EOD;
                 'Application\SubNamespace\SubClass\CONST_A',
                 'Application\OtherNamespace\ClassA\CONST_I',
                 'Application\OtherNamespace\ClassB\CONST_J',
+                '\ReflectionProperty\IS_PUBLIC',
                 'Application\Constants\CONST_E',
                 'Application\Constants\CONST_F',
                 'Application\Constants\CONST_G',
                 'Application\Constants\CONST_H',
+
             ] === (new PhpFile($content))->usedConstants(),
             'Class constants are not detected!'
         );

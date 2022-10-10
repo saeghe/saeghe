@@ -36,6 +36,7 @@ class MyClass
     public function method()
     {
         str_replace($search, $replace, $subject);
+        \strlen($var);
         SameNamespace\method_call($parameters);
         $varA = function_a();
         $varC = function_c();
@@ -71,6 +72,7 @@ EOD;
         assert(
             [
                 'str_replace',
+                '\strlen',
                 'Application\SameNamespace\method_call',
                 'Application\CompoundNamespace\HelperFiles\methodCall',
                 'Application\OtherHelper\function_a',

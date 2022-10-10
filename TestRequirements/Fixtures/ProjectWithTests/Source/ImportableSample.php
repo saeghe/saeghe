@@ -67,6 +67,9 @@ class ImportableSample extends ParentClass implements ClassInterface
 
     public function new_instance_examples()
     {
+        new self();
+        new parent();
+        new static();
         $newInstance = new NewInstanceClassA();
         $newFromPackage = new PackageClass();
         $newInstanceWithParameter = new NewInstanceClassB(new NewInstanceClassC);
@@ -81,6 +84,13 @@ class ImportableSample extends ParentClass implements ClassInterface
         $staticCall = StaticClassA::call();
         $callInInnerClass = StaticClassB::run(StaticClassC::output($staticCall));
         $staticCallToCompoundNamespaceClass = CompoundNamespace\StaticClass::handle();
+        \Locale::setDefault('en');
+    }
+
+    public function call_functions()
+    {
+        str_replace('', '', '');
+        \strlen($var);
     }
 
     public function constants_examples()
@@ -91,6 +101,7 @@ class ImportableSample extends ParentClass implements ClassInterface
         ClassWithConstant::ConstD;
         CompoundNamespace\ConstInCompoundNamespace::ConstE;
         PackageConst::ConstF;
+        \ReflectionProperty\IS_PUBLIC;
     }
 
     #[SetUp]

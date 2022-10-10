@@ -33,9 +33,9 @@ class PhpFile
                 switch ($id) {
                     case T_COMMENT:
                     case T_DOC_COMMENT:
-                        // no action on comments
+                    case T_CONSTANT_ENCAPSED_STRING:
+                    case T_ENCAPSED_AND_WHITESPACE:
                         break;
-
                     default:
                         // anything else -> output "as is"
                         $newContent .= $text;
@@ -125,10 +125,10 @@ class PhpFile
         $importedConstants = $this->importedConstants();
         $importedClasses = $this->importedClasses();
 
-        preg_match_all("/(\w+\\\\)*\w+::\w+\W/", $this->content, $usedConstants, PREG_OFFSET_CAPTURE);
+        preg_match_all("/\W(\w+\\\\)*\w+::\w+\W/", $this->content, $usedConstants, PREG_OFFSET_CAPTURE);
 
         $usedConstants = array_filter($usedConstants[0], function ($usedConstant) {
-            $usedConstant = $usedConstant[0];
+            $usedConstant = Str\remove_first_character($usedConstant[0]);
 
             return ! str_ends_with($usedConstant, '(')
                 && ! str_ends_with($usedConstant, '::class' . Str\last_character($usedConstant));
@@ -136,6 +136,12 @@ class PhpFile
 
         $inClassUsedConstants = array_map(function ($usedConstant) use ($importedClasses) {
             $usedConstant = Str\remove_last_character($usedConstant[0]);
+
+            if (str_starts_with($usedConstant, '\\')) {
+                return str_replace('::', '\\', $usedConstant);
+            }
+
+            $usedConstant = Str\remove_first_character($usedConstant);
 
             if (str_starts_with($usedConstant, 'self::')
                 || str_starts_with($usedConstant, 'static::')
@@ -235,7 +241,13 @@ class PhpFile
         });
 
         $inFileUsedFunctions = array_map(function ($usedFunction) use ($importedClasses, $importedFunctions) {
-            $usedFunction = Str\remove_last_character(Str\remove_first_character($usedFunction[0]));
+            $usedFunction = Str\remove_last_character($usedFunction[0]);
+
+            if (str_starts_with($usedFunction, '\\')) {
+                return $usedFunction;
+            }
+
+            $usedFunction = Str\remove_first_character($usedFunction);
 
             $function = str_contains($usedFunction, '\\')
                 ? Str\after_last_occurrence($usedFunction, '\\')
@@ -339,17 +351,18 @@ class PhpFile
     {
         $importedClasses = $this->importedClasses();
 
-        preg_match_all("/(\w+\\\\)*\w+::\w+/", $this->content, $usedStaticClasses, PREG_OFFSET_CAPTURE);
+        preg_match_all("/\W(\w+\\\\)*\w+::\w+/", $this->content, $usedStaticClasses, PREG_OFFSET_CAPTURE);
 
         $usedStaticClasses = array_filter($usedStaticClasses[0], function ($usedStaticClass) {
-            return ! str_ends_with($usedStaticClass[0], '::class')
-                && ! str_starts_with($usedStaticClass[0], 'parent')
-                && ! str_starts_with($usedStaticClass[0], 'static')
-                && ! str_starts_with($usedStaticClass[0], 'self');
+            return ! str_starts_with($usedStaticClass[0], '\\')
+                && ! str_ends_with(Str\remove_first_character($usedStaticClass[0]), '::class')
+                && ! str_starts_with(Str\remove_first_character($usedStaticClass[0]), 'parent')
+                && ! str_starts_with(Str\remove_first_character($usedStaticClass[0]), 'static')
+                && ! str_starts_with(Str\remove_first_character($usedStaticClass[0]), 'self');
         });
 
         $usedStaticClassesInFile = array_map(function ($usedStaticClass) use ($importedClasses) {
-            $usedStaticClass = $usedStaticClass[0];
+            $usedStaticClass = Str\remove_first_character($usedStaticClass[0]);
             [$class, $method] = explode('::', $usedStaticClass);
 
             foreach ($importedClasses as $path => $alias) {
@@ -370,6 +383,12 @@ class PhpFile
         }, $usedStaticClasses);
 
         preg_match_all("/new (\w+\\\\)*\w+/", $this->content, $usedInstantiatedClasses, PREG_OFFSET_CAPTURE);
+
+        $usedInstantiatedClasses = array_filter($usedInstantiatedClasses[0], function ($usedInstantiatedClass) {
+            return ! str_starts_with($usedInstantiatedClass[0], 'new self')
+                && ! str_starts_with($usedInstantiatedClass[0], 'new parent')
+                && ! str_starts_with($usedInstantiatedClass[0], 'new static');
+        });
 
         $usedInstantiatedClassesInFile = array_map(function ($usedInstantiatedClass) use ($importedClasses) {
             $usedInstantiatedClass = Str\replace_first_occurrance($usedInstantiatedClass[0], 'new ', '');
@@ -392,7 +411,7 @@ class PhpFile
             }
 
             return $this->namespace() . '\\' . $path;
-        }, $usedInstantiatedClasses[0]);
+        }, $usedInstantiatedClasses);
 
         return array_unique(array_merge($usedStaticClassesInFile, $usedInstantiatedClassesInFile));
     }
