@@ -22,11 +22,60 @@ function run()
     $replaceMap = make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $packagesBuildDirectory);
     compile_packages($packagesDirectory, $packagesBuildDirectory, $meta, $replaceMap);
     compile_project_files($projectRoot, $buildDirectory, $packagesBuildDirectory, $config, $meta, $replaceMap);
+    make_entry_points($buildDirectory, $config, $replaceMap);
     add_executables($buildDirectory, $packagesBuildDirectory, $meta);
 
     clearstatcache();
 
     Write\success('Build finished successfully.');
+}
+
+function make_entry_points($buildDirectory, $config, $replaceMap)
+{
+    $autoloadLines = [
+        '',
+        'spl_autoload_register(function ($class) {',
+        '    $classes = [',
+    ];
+
+    foreach ($replaceMap as $namespace => $path) {
+        $autoloadLines[] = "        '$namespace' => '$path',";
+    }
+
+    $autoloadLines = array_merge($autoloadLines, [
+        '    ];',
+        '',
+        '    $realPath = null;',
+        '',
+        '    foreach ($classes as $namespace => $path) {',
+        '        if (str_starts_with($class, $namespace)) {',
+        '            $pos = strpos($class, $namespace);',
+        '            if ($pos !== false) {',
+        '                $realPath = substr_replace($class, $path, $pos, strlen($namespace));',
+        '            }',
+        '            $realPath = str_replace("\\\", "/", $realPath) . \'.php\';',
+        '        }',
+        '    }',
+        '',
+        '    require_once $realPath;',
+        '});',
+    ]);
+
+    foreach ($config['entry-points'] as $entrypoint) {
+        $path = $buildDirectory . $entrypoint;
+        $lines = explode(PHP_EOL, file_get_contents($path));
+        $number = 1;
+        foreach ($lines as $lineNumber => $line) {
+            if (str_contains($line, '<?php')) {
+                $number = $lineNumber;
+                break;
+            }
+        }
+
+        $lines = array_insert_after($lines, $number, $autoloadLines);
+
+        file_put_contents($path, implode(PHP_EOL, $lines));
+    }
 }
 
 function add_executables($buildDirectory, $packagesBuildDirectory, $meta)
@@ -106,71 +155,101 @@ function compile_file($origin, $destination, $replaceMap)
 
 function apply_file_modifications($origin, $replaceMap)
 {
-    $phpFile = new PhpFile(file_get_contents($origin));
+    $content = file_get_contents($origin);
+    $phpFile = new PhpFile($content);
 
-    $requiredConstants = array_map(function ($import) use ($replaceMap) {
-        $path = path_finder($replaceMap, $import, true);
-        if (! $path) {
-            $path = path_finder($replaceMap, Str\before_last_occurrence($import, '\\'), false);
-        }
+    $autoload = [];
+    $shouldImportClasses = [];
+    $usedConstants = $phpFile->usedConstants();
+    $usedFunctions = $phpFile->usedFunctions();
+    $usedClasses = $phpFile->usedClasses();
 
-        return $path;
-    }, $phpFile->usedConstants());
-
-    $requiredFunctions = array_map(function ($import) use ($replaceMap) {
-        $path = path_finder($replaceMap, $import, true);
-        if (! $path) {
-            $path = path_finder($replaceMap, Str\before_last_occurrence($import, '\\'), false);
-        }
-
-        return $path;
-    }, $phpFile->usedFunctions());
-
-    $importedClasses = $phpFile->importedClasses();
-    $shouldImportClasses = $phpFile->usedClasses();
-    $namespace = $phpFile->namespace();
-    $additionalClasses = array_merge(
-        $phpFile->implementedInterfaces(),
-        $phpFile->extendedClasses(),
-        $phpFile->usedTraits(),
-    );
-
-    array_walk($additionalClasses, function ($additionalClass) use ($importedClasses, $namespace, &$shouldImportClasses) {
-        if (str_starts_with($additionalClass, '\\')) {
-            $shouldImportClasses[] = $additionalClass;
-        } else {
-            foreach ($importedClasses as $usedClass => $alias) {
-                if ($usedClass === $additionalClass && ! str_contains($usedClass, '\\')) {
-                    $shouldImportClasses[] = $usedClass;
-                    return;
-                }
-                if ($alias === $additionalClass) {
-                    $shouldImportClasses[] = $usedClass;
-                    return;
-                }
-            }
-
-            if ($namespace) {
-                $shouldImportClasses[] = $namespace . "\\$additionalClass";
-            } else {
+    if ($phpFile->isOop()) {
+        $importedClasses = $phpFile->importedClasses();
+        $namespace = $phpFile->namespace();
+        $additionalClasses = array_merge(
+            $phpFile->implementedInterfaces(),
+            $phpFile->extendedClasses(),
+            $phpFile->usedTraits(),
+        );
+        array_walk($additionalClasses, function ($additionalClass) use ($importedClasses, $namespace, &$shouldImportClasses) {
+            if (str_starts_with($additionalClass, '\\')) {
                 $shouldImportClasses[] = $additionalClass;
+            } else {
+                foreach ($importedClasses as $usedClass => $alias) {
+                    if ($usedClass === $additionalClass && ! str_contains($usedClass, '\\')) {
+                        $shouldImportClasses[] = $usedClass;
+                        return;
+                    }
+                    if ($alias === $additionalClass) {
+                        $shouldImportClasses[] = $usedClass;
+                        return;
+                    }
+                }
+
+                if ($namespace) {
+                    $shouldImportClasses[] = $namespace . "\\$additionalClass";
+                } else {
+                    $shouldImportClasses[] = $additionalClass;
+                }
             }
+        });
+
+        foreach ($shouldImportClasses as $key => $shouldImportClass) {
+            $shouldImportClasses[$key] = path_finder($replaceMap, $shouldImportClass, false);
         }
-    });
 
-    $requiredClasses = array_map(fn ($import) => path_finder($replaceMap, $import, false), $shouldImportClasses);
+        array_walk($usedConstants, function ($import) use (&$shouldImportClasses, $replaceMap) {
+            $path = path_finder($replaceMap, $import, true);
+            if (! $path) {
+                $path = path_finder($replaceMap, Str\before_last_occurrence($import, '\\'), false);
+            }
 
-    $requireStatements = array_filter(array_merge($requiredConstants, $requiredFunctions, $requiredClasses));
+            $shouldImportClasses[] = $path;
+        });
+        array_walk($usedFunctions, function ($import) use (&$shouldImportClasses, $replaceMap) {
+            $path = path_finder($replaceMap, $import, true);
+            if (! $path) {
+                $path = path_finder($replaceMap, Str\before_last_occurrence($import, '\\'), false);
+            }
 
-    if (count($requireStatements) > 0) {
-        $requireStatements = array_unique($requireStatements);
+            $shouldImportClasses[] = $path;
+        });
+        array_walk($usedClasses, function ($import) use (&$autoload, $replaceMap) {
+            $autoload[$import] = path_finder($replaceMap, $import, false);
+        });
+    } else {
+        array_walk($usedConstants, function ($import) use (&$shouldImportClasses, $replaceMap) {
+            $path = path_finder($replaceMap, $import, true);
+            if (! $path) {
+                $path = path_finder($replaceMap, Str\before_last_occurrence($import, '\\'), false);
+            }
 
-        $requireStatements = array_map(fn ($path) => "require_once '$path';", $requireStatements);
+            $shouldImportClasses[] = $path;
+        });
+        array_walk($usedFunctions, function ($import) use (&$shouldImportClasses, $replaceMap) {
+            $path = path_finder($replaceMap, $import, true);
+            if (! $path) {
+                $path = path_finder($replaceMap, Str\before_last_occurrence($import, '\\'), false);
+            }
 
-        return add_requires($requireStatements, $origin);
+            $shouldImportClasses[] = $path;
+        });
+        array_walk($usedClasses, function ($import) use (&$shouldImportClasses, $replaceMap) {
+            $shouldImportClasses[] = path_finder($replaceMap, $import, false);
+        });
     }
 
-    return file_get_contents($origin);
+    $requireStatements = array_unique(array_filter($shouldImportClasses));
+    $autoload = array_unique(array_filter($autoload));
+
+    if (count($requireStatements) > 0 || count($autoload) > 0) {
+        $requireStatements = array_map(fn($path) => "require_once '$path';", $requireStatements);
+
+        return add_requires_and_autoload($requireStatements, $autoload, $origin);
+    }
+
+    return $content;
 }
 
 function path_finder($replaceMap, $import, $absolute)
@@ -184,7 +263,10 @@ function path_finder($replaceMap, $import, $absolute)
             }
         } else {
             if (str_starts_with($import, $namespace)) {
-                $realPath = str_replace($namespace, $path, $import);
+                $pos = strpos($import, $namespace);
+                if ($pos !== false) {
+                    $realPath = substr_replace($import, $path, $pos, strlen($namespace));
+                }
                 $realPath = str_replace('\\', '/', $realPath) . '.php';
             }
         }
@@ -193,7 +275,7 @@ function path_finder($replaceMap, $import, $absolute)
     return $realPath;
 }
 
-function add_requires($requireStatements, $file)
+function add_requires_and_autoload($requireStatements, $autoload, $file)
 {
     $content = '';
 
@@ -204,9 +286,22 @@ function add_requires($requireStatements, $file)
 
         if (str_starts_with($line, 'namespace')) {
             $requiresAdded = true;
-            $content .= PHP_EOL;
-            $content .= implode(PHP_EOL, $requireStatements);
-            $content .= PHP_EOL;
+            if (count($requireStatements) > 0) {
+                $content .= PHP_EOL;
+                $content .= implode(PHP_EOL, $requireStatements);
+                $content .= PHP_EOL;
+            }
+
+            if (count($autoload) > 0) {
+                $content .= PHP_EOL . 'spl_autoload_register(function ($class) {' . PHP_EOL;
+                $content .= '    $classes = [';
+                foreach ($autoload as $class => $path) {
+                    $line = PHP_EOL . "        '$class' => '$path',";
+                    $content .= $line;
+                }
+                $content .= PHP_EOL . '    ];' . PHP_EOL;
+                $content .= PHP_EOL . '    if (array_key_exists($class, $classes)) {' . PHP_EOL . '        require_once $classes[$class];' . PHP_EOL . '    }' . PHP_EOL . '});' . PHP_EOL;
+            }
         }
     }
 

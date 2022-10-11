@@ -9,5 +9,6 @@ class SimpleClass
     public function __construct()
     {
         anImportantFunction();
+        str_replace('hello', 'hi', 'hello world');
     }
 }

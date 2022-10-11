@@ -2,8 +2,6 @@
 
 namespace ProjectWithTests\SampleFile;
 
-use ProjectWithTests\Parents\ParentClass;
-use ProjectWithTests\Interfaces\ClassInterface;
 use ProjectWithTests\TypeClasses\InjectedClassInConstructor;
 use ProjectWithTests\TypeClasses\InjectedPublicClassInConstructor;
 use Saeghe\SimplePackage\TypeClasses\InjectedClassFromPackageToConstructor;
@@ -28,85 +26,80 @@ use Saeghe\SimplePackage\Classes\PackageConst;
 use ProjectWithTests\AnyNamespace as CompoundNamespace;
 use ProjectWithTests\Attributes\SetUp;
 
-class ImportableSample extends ParentClass implements ClassInterface
+function init(
+    InjectedClassInConstructor $injectedClassInConstructor,
+    public InjectedPublicClassInConstructor $injectedPublicClassInConstructor,
+    public readonly InjectedClassFromPackageToConstructor $injectedClassA,
+) {
+}
+
+function method_with_type_parameters(InjectedParameterClass $injectedParameterClass, OtherInjectedParameterClass $otherInjectedParameterClass)
 {
-    use TraitInSameNamespace;
+}
 
-    public function __construct(
-        InjectedClassInConstructor $injectedClassInConstructor,
-        public InjectedPublicClassInConstructor $injectedPublicClassInConstructor,
-        public readonly InjectedClassFromPackageToConstructor $injectedClassA,
-    ) {
-    }
+function method_With_return_type(): ReturnTypeClassA
+{
+}
 
-    protected function method_with_type_parameters(InjectedParameterClass $injectedParameterClass, OtherInjectedParameterClass $otherInjectedParameterClass)
-    {
-    }
+function method_with_multiple_type_parameter(MultipleTypeA|MultipleTypeB $parameter)
+{
+}
 
-    private function method_With_return_type(): ReturnTypeClassA
-    {
-    }
+function method_with_multiple_return_types(): ReturnTypeClassB|ReturnTypeClassC
+{
+}
 
-    public function method_with_multiple_type_parameter(MultipleTypeA|MultipleTypeB $parameter)
-    {
-    }
-
-    public function method_with_multiple_return_types(): ReturnTypeClassB|ReturnTypeClassC
-    {
-    }
-
-    public function get_class_name_examples()
-    {
-        $classNameA = ClassA::class;
-        $classNameB = ClassInSameNamespace::class;
-        if ($var instanceof CLassB::class) {
-
-        }
-        $classNameFromCompoundNamespace = CompoundNamespace\ClassName::class;
-    }
-
-    public function new_instance_examples()
-    {
-        new self();
-        new parent();
-        new static();
-        $newInstance = new NewInstanceClassA();
-        $newFromPackage = new PackageClass();
-        $newInstanceWithParameter = new NewInstanceClassB(new NewInstanceClassC);
-        $newInSameNamespace = new InstanceFromClassInSameNamespace();
-        $newInstanceClassWithoutUse = new ProjectWithTests\SubDirectory\ClassUseAnotherClass();
-        $phpClassInstance = new \ArrayObject();
-        $newInstanceForClassInCompoundNamespace = new CompoundNamespace\ClassA();
-    }
-
-    public function static_call_examples()
-    {
-        $staticCall = StaticClassA::call();
-        $callInInnerClass = StaticClassB::run(StaticClassC::output($staticCall));
-        $staticCallToCompoundNamespaceClass = CompoundNamespace\StaticClass::handle();
-        \Locale::setDefault('en');
-    }
-
-    public function call_functions()
-    {
-        str_replace('', '', '');
-        \strlen($var);
-    }
-
-    public function constants_examples()
-    {
-        self::ConstA;
-        static::ConstB;
-        ClassInSameNamespace::ConstC;
-        ClassWithConstant::ConstD;
-        CompoundNamespace\ConstInCompoundNamespace::ConstE;
-        PackageConst::ConstF;
-        \ReflectionProperty\IS_PUBLIC;
-    }
-
-    #[SetUp]
-    public function use_attributes_example()
-    {
+function get_class_name_examples()
+{
+    $classNameA = ClassA::class;
+    $classNameB = ClassInSameNamespace::class;
+    if ($var instanceof CLassB::class) {
 
     }
+    $classNameFromCompoundNamespace = CompoundNamespace\ClassName::class;
+}
+
+function new_instance_examples()
+{
+    new self();
+    new parent();
+    new static();
+    $newInstance = new NewInstanceClassA();
+    $newFromPackage = new PackageClass();
+    $newInstanceWithParameter = new NewInstanceClassB(new NewInstanceClassC);
+    $newInSameNamespace = new InstanceFromClassInSameNamespace();
+    $newInstanceClassWithoutUse = new ProjectWithTests\SubDirectory\ClassUseAnotherClass();
+    $phpClassInstance = new \ArrayObject();
+    $newInstanceForClassInCompoundNamespace = new CompoundNamespace\ClassA();
+}
+
+function static_call_examples()
+{
+    $staticCall = StaticClassA::call();
+    $callInInnerClass = StaticClassB::run(StaticClassC::output($staticCall));
+    $staticCallToCompoundNamespaceClass = CompoundNamespace\StaticClass::handle();
+    \Locale::setDefault('en');
+}
+
+function call_functions()
+{
+    str_replace('', '', '');
+    \strlen($var);
+}
+
+function constants_examples()
+{
+    self::ConstA;
+    static::ConstB;
+    ClassInSameNamespace::ConstC;
+    ClassWithConstant::ConstD;
+    CompoundNamespace\ConstInCompoundNamespace::ConstE;
+    PackageConst::ConstF;
+    \ReflectionProperty\IS_PUBLIC;
+}
+
+#[SetUp]
+public function use_attributes_example()
+{
+
 }

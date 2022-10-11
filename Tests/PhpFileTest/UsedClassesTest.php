@@ -31,6 +31,7 @@ use Application\Instances\CompoundNamespace as InstanceC;
 use Application\Instances\{InstanceE, InstanceF as InstanceG, UnusedInstance};
 use User;
 use Application\Attributes\SetUp;
+use Application\Constants\ClassH;
 
 /**
  * It should Ignore any call in comment
@@ -72,6 +73,7 @@ class MyClass extends ParentClass implements InterfaceA, interfaceB
 
         Application\SubDirectory\ClassUseAnotherStaticClass::call();
         \Locale::setDefault('en');
+        StaticClassB::run(StaticClassC::output($staticCall))
     }
     
     public function instantiation()
@@ -94,6 +96,11 @@ class MyClass extends ParentClass implements InterfaceA, interfaceB
         $newInstanceClassWithoutUse = new Application\SubDirectory\ClassUseAnotherClass();
     }
     
+    public function constants()
+    {
+        ClassG::Const_A;
+    }
+    
     [#SetUp]
     public function useAttributes()
     {
@@ -109,6 +116,8 @@ EOD;
                 'Application\Statics\ClassE',
                 'Application\Statics\ClassF',
                 'Application\SubDirectory\ClassUseAnotherStaticClass',
+                'Application\StaticClassB',
+                'Application\StaticClassC',
                 'Application\Instances\InstanceA',
                 'Application\Instances\CompoundNamespace\InstanceD',
                 'Application\Instances\InstanceE',

@@ -17,6 +17,17 @@ class PhpFile
         $this->lines = explode(PHP_EOL, $this->content);
     }
 
+    public function isOop()
+    {
+        foreach ($this->lines as $codeLine) {
+            if ($this->isClassSignature($codeLine)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function strip_content($content)
     {
         $newContent = '';
@@ -351,18 +362,19 @@ class PhpFile
     {
         $importedClasses = $this->importedClasses();
 
-        preg_match_all("/\W(\w+\\\\)*\w+::\w+/", $this->content, $usedStaticClasses, PREG_OFFSET_CAPTURE);
+        preg_match_all("/(\w+\\\\)*\w+::\w+\(/", $this->content, $usedStaticClasses, PREG_OFFSET_CAPTURE);
 
         $usedStaticClasses = array_filter($usedStaticClasses[0], function ($usedStaticClass) {
-            return ! str_starts_with($usedStaticClass[0], '\\')
-                && ! str_ends_with(Str\remove_first_character($usedStaticClass[0]), '::class')
-                && ! str_starts_with(Str\remove_first_character($usedStaticClass[0]), 'parent')
-                && ! str_starts_with(Str\remove_first_character($usedStaticClass[0]), 'static')
-                && ! str_starts_with(Str\remove_first_character($usedStaticClass[0]), 'self');
+            $usedStaticClass = Str\remove_last_character($usedStaticClass[0]);
+            return ! str_contains($this->content, '\\' . $usedStaticClass . '(')
+                && ! str_ends_with($usedStaticClass, '::class')
+                && ! str_starts_with($usedStaticClass, 'parent')
+                && ! str_starts_with($usedStaticClass, 'static')
+                && ! str_starts_with($usedStaticClass, 'self');
         });
 
         $usedStaticClassesInFile = array_map(function ($usedStaticClass) use ($importedClasses) {
-            $usedStaticClass = Str\remove_first_character($usedStaticClass[0]);
+            $usedStaticClass = Str\remove_last_character($usedStaticClass[0]);
             [$class, $method] = explode('::', $usedStaticClass);
 
             foreach ($importedClasses as $path => $alias) {
@@ -504,7 +516,8 @@ class PhpFile
             || str_starts_with($line, 'interface ')
             || str_starts_with($line, 'abstract class ')
             || str_starts_with($line, 'final class ')
-            || str_starts_with($line, 'trait ');
+            || str_starts_with($line, 'trait ')
+            || str_starts_with($line, 'enum ');
     }
 
     private function namespaceClasses($alias)

@@ -1,6 +1,30 @@
 #!/usr/bin/env php
 <?php
 
+spl_autoload_register(function ($class) {
+    $classes = [
+        'Saeghe\SimplePackage' => '$environmentBuildPath/Packages/saeghe/simple-package/Source',
+        'ProjectWithTests' => '$environmentBuildPath/Source',
+        'Tests' => '$environmentBuildPath/Tests',
+        'ProjectWithTests\Service\helper' => '$environmentBuildPath/Services/Functions.php',
+        'ProjectWithTests\Service\HELPER_CONST' => '$environmentBuildPath/Services/Constants.php',
+    ];
+
+    $realPath = null;
+
+    foreach ($classes as $namespace => $path) {
+        if (str_starts_with($class, $namespace)) {
+            $pos = strpos($class, $namespace);
+            if ($pos !== false) {
+                $realPath = substr_replace($class, $path, $pos, strlen($namespace));
+            }
+            $realPath = str_replace("\\", "/", $realPath) . '.php';
+        }
+    }
+
+    require_once $realPath;
+});
+
 require_once '$environmentBuildPath/Source/SubDirectory/SimpleClass.php';
 require_once '$environmentBuildPath/Source/SubDirectory/ClassUseAnotherClass.php';
 

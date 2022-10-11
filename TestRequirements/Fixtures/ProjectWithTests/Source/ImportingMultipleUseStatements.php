@@ -4,12 +4,9 @@ namespace ProjectWithTests;
 
 use ProjectWithTests\SampleFile as AnotherFile, ProjectWithTests\SubDirectory\SimpleClass;
 
-class ImportingMultipleUseStatements
+function call()
 {
-    public function __construct()
-    {
-        AnotherFile\anImportantFunction();
+    AnotherFile\anImportantFunction();
 
-        $x = AnotherFile\anImportantFunction() || new SimpleClass();
-    }
+    $x = AnotherFile\anImportantFunction() || new SimpleClass();
 }

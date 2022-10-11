@@ -110,6 +110,14 @@ function file_preserve_modify($origin, $destination, $content)
     chmod($destination, fileperms($origin) & 0x0FFF);
 }
 
+function array_insert_after($array, $key, array $additional) {
+    $keys = array_keys($array);
+    $index = array_search($key, $keys);
+    $pos = false === $index ? count($array) : $index + 1;
+
+    return array_merge(array_slice($array, 0, $pos), $additional, array_slice($array, $pos));
+}
+
 function array_merge_json($array, $path)
 {
     return array_merge($array, json_to_array($path));
