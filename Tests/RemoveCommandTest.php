@@ -5,7 +5,7 @@ namespace Tests\RemoveCommandTest;
 test(
     title: 'it should remove a package',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe remove --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe remove git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/EmptyProject");
 
         assert_desired_data_in_packages_directory('Package has not been deleted from Packages directory!' . $output);
         assert_config_file_is_clean('Packages has not been deleted from config file!' . $output);
@@ -14,7 +14,7 @@ test(
     before: function () {
         shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json');
         shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json');
-        shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/complex-package.git");
+        shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
         shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json');

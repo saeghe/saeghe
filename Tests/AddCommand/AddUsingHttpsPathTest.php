@@ -7,7 +7,7 @@ use Saeghe\TestRunner\Assertions\File;
 test(
     title: 'it should add package to the project',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=https://github.com/symfony/thanks.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add https://github.com/symfony/thanks.git --project=TestRequirements/Fixtures/EmptyProject");
 
         assert_config_file_created_for_http_project('Config file is not created!' . $output);
         assert_http_package_added_to_config('Http Package does not added to config file properly! ' . $output);
@@ -30,7 +30,7 @@ test(
 test(
     title: 'it should add package to the project without trailing .git',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=https://github.com/symfony/thanks.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add https://github.com/symfony/thanks.git --project=TestRequirements/Fixtures/EmptyProject");
 
         assert_http_package_cloned('Http package does not cloned!' . $output);
     },

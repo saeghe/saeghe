@@ -7,7 +7,7 @@ use Saeghe\TestRunner\Assertions\File;
 test(
     title: 'it should add package to the given directory',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/simple-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject");
 
         assert_package_directory_added_to_config('Config does not contains the custom package directory!');
         assert_config_file_created_for_simple_project('Config file is not created!' . $output);

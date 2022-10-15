@@ -14,10 +14,10 @@ Initializing the project:
                     directory instead of the default `Packages` directory.
 
 Build project files:
-    build {--environment=}
+    build [{dev}|production]
                     Builds project and adds built files to environment's build directory under the `build` directory. By
-                    default environment will be `development`. You can pass the `environment` option as `production` when
-                    you want to build the production environment.
+                    default environment will be `development`. You can pass the environment argument as `production` 
+                    when you want to build the production environment.
 
 Flush built files:
     flush
@@ -29,17 +29,17 @@ Watch for development:
                     always builds files under the `development` environment.
 
 Add a package to the project:
-    add --package= {--version=}
-                    Adds the given package to your project. This command needs a required `package` option. You can pass an
-                    optional `version` option, then Saeghe will add the given version of the given package, otherwise, it
-                    adds the latest released version on the package. The package’s source code will be added under your package’s
-                    directory, the package's path and installed version will be added to your `saeghe.config.json` file and
-                    its metadata will be added to the `saeghe.config-lock.json` file.
+    add <package> {--version=}
+                    Adds the given package to your project. This command needs a required `package` argument. You can 
+                    pass an optional `version` option, then Saeghe will add the given version of the given package, 
+                    otherwise, it adds the latest released version on the package. The package’s source code will be 
+                    added under your package’s directory, the package's path and installed version will be added to your
+                     `saeghe.config.json` file and its metadata will be added to the `saeghe.config-lock.json` file.
 
 Remove package from the project:
-    remove --package=
-                    Removes the given package from your project. This command needs a required `package` option. It deleted
-                    given package's source files from your packages directory and also removes the package from
+    remove <package>
+                    Removes the given package from your project. This command needs a required `package` argument. It 
+                    deleted given package's source files from your packages directory and also removes the package from
                     `saeghe.config.json` and its metadata from `saeghe.config-lock.json`.
 
 Install packages on a cloned project:
@@ -49,10 +49,11 @@ Install packages on a cloned project:
                     command, Saeghe will download added packages to your packages directory.
 
 Update installed packages:
-    update --package= {--version=}
+    update <package> {--version=}
                     If you need to get the latest version of an added package, you can run the update command. This command
-                    needs a required `package` option. You can also path an optional `version` option, if passed, then
+                    needs a required `package` argument. You can also path an optional `version` option, if passed, then
                     Saeghe will download the exact version number, if not passed, it downloads the latest available version.
+                    
 
 EOD;
 

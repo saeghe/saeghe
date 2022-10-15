@@ -13,7 +13,7 @@ test(
         assert_zip_file_deleted('Zip file has not been deleted.' . $output);
     },
     before: function () {
-        shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/EmptyProject --package=git@github.com:saeghe/released-package.git --version=v1.0.3");
+        shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject");
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
     },
     after: function () {

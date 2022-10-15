@@ -5,7 +5,7 @@ namespace Tests\AddCommand\AddingComplexProjectTest;
 test(
     title: 'it should add a complex project',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/ProjectWithTests --package=git@github.com:saeghe/complex-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/ProjectWithTests");
 
         assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
         assert_config_file_has_desired_data('Config file for adding complex package does not have desired data!' . $output);
@@ -27,7 +27,7 @@ test(
 test(
     title: 'it should add a complex project with http path',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe add --project=TestRequirements/Fixtures/ProjectWithTests --package=https://github.com/saeghe/complex-package.git");
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add https://github.com/saeghe/complex-package.git --project=TestRequirements/Fixtures/ProjectWithTests");
 
         assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
     },
