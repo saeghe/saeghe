@@ -42,6 +42,7 @@ class MyClass
         $varC = function_c();
         $varD = function_d();
         $varE = g();
+        $dynamicCall();
     }
     
     protected function my_method()

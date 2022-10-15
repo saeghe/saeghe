@@ -46,6 +46,7 @@ class MyClass
         A::CONST_I;
         ClassB::CONST_J;
         \ReflectionProperty::IS_PUBLIC
+        $class::CONST;
     }
 }
 EOD;
@@ -66,7 +67,6 @@ EOD;
                 'Application\Constants\CONST_F',
                 'Application\Constants\CONST_G',
                 'Application\Constants\CONST_H',
-
             ] === (new PhpFile($content))->usedConstants(),
             'Class constants are not detected!'
         );

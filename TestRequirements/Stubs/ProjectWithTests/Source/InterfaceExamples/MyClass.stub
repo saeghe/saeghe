@@ -2,11 +2,6 @@
 
 namespace ProjectWithTests\InterfaceExamples;
 
-require_once '$environmentBuildPath/Source/InterfaceExamples/FirstInterface.php';
-require_once '$environmentBuildPath/Source/InterfaceExamples/ThirdInterface.php';
-require_once '$environmentBuildPath/Source/InterfaceExamples/InnerInterfaces/OtherInnerInterface.php';
-require_once '$environmentBuildPath/Source/SubDirectory/SimpleClass.php';
-
 use ProjectWithTests\InterfaceExamples\InnerInterfaces\OtherInnerInterface;
 use ProjectWithTests\SubDirectory\SimpleClass;
 

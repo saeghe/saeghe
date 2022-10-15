@@ -2,10 +2,6 @@
 
 namespace ProjectWithTests\UsedTraits;
 
-require_once '$environmentBuildPath/Source/SubDirectory/SimpleClass.php';
-require_once '$environmentBuildPath/Source/UsedTraits/FirstTrait.php';
-require_once '$environmentBuildPath/Source/UsedTraits/ThirdTrait.php';
-
 use ProjectWithTests\SubDirectory\SimpleClass;
 
 class ClassWithTrait extends SimpleClass

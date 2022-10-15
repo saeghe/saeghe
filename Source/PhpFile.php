@@ -136,23 +136,22 @@ class PhpFile
         $importedConstants = $this->importedConstants();
         $importedClasses = $this->importedClasses();
 
-        preg_match_all("/\W(\w+\\\\)*\w+::\w+\W/", $this->content, $usedConstants, PREG_OFFSET_CAPTURE);
+        preg_match_all("/(\w+\\\\)*\w+::\w+\W/", $this->content, $usedConstants, PREG_OFFSET_CAPTURE);
 
         $usedConstants = array_filter($usedConstants[0], function ($usedConstant) {
-            $usedConstant = Str\remove_first_character($usedConstant[0]);
+            $usedConstant = $usedConstant[0];
 
-            return ! str_ends_with($usedConstant, '(')
+            return ! str_starts_with($usedConstant, 'class::')
+                && ! str_ends_with($usedConstant, '(')
                 && ! str_ends_with($usedConstant, '::class' . Str\last_character($usedConstant));
         });
 
         $inClassUsedConstants = array_map(function ($usedConstant) use ($importedClasses) {
-            $usedConstant = Str\remove_last_character($usedConstant[0]);
-
-            if (str_starts_with($usedConstant, '\\')) {
-                return str_replace('::', '\\', $usedConstant);
+            if (str_contains($this->content, '\\' . $usedConstant[0])) {
+                return Str\remove_last_character(str_replace('::', '\\', '\\' . $usedConstant[0]));
             }
 
-            $usedConstant = Str\remove_first_character($usedConstant);
+            $usedConstant = Str\remove_last_character($usedConstant[0]);
 
             if (str_starts_with($usedConstant, 'self::')
                 || str_starts_with($usedConstant, 'static::')
@@ -248,7 +247,9 @@ class PhpFile
         preg_match_all("/\W(\w+\\\\)*\w+\(/", $content, $usedFunctions, PREG_OFFSET_CAPTURE);
 
         $usedFunctions = array_filter($usedFunctions[0], function ($usedFunction) {
-            return ! str_starts_with($usedFunction[0], ':') && ! str_starts_with($usedFunction[0], '>');
+            return ! str_starts_with($usedFunction[0], '$')
+                && ! str_starts_with($usedFunction[0], ':')
+                && ! str_starts_with($usedFunction[0], '>');
         });
 
         $inFileUsedFunctions = array_map(function ($usedFunction) use ($importedClasses, $importedFunctions) {
@@ -457,8 +458,30 @@ class PhpFile
             }
         }
 
-        return array_map(function ($parent) {
-            return trim(str_replace('{', '', $parent));
+        $importedClasses = $this->importedClasses();
+
+        return array_map(function ($parent) use ($importedClasses) {
+            $parent = trim(str_replace('{', '', $parent));
+
+            if (str_starts_with($parent, '\\')) {
+                return $parent;
+            }
+
+            foreach ($importedClasses as $path => $alias) {
+                if ($parent === $path || $parent === '\\' . $path) {
+                    return $path;
+                }
+
+                if ($alias === $parent) {
+                    return $path;
+                }
+
+                if (str_starts_with($parent, $alias . '\\')) {
+                    return Str\replace_first_occurrance($parent, $alias, $path);
+                }
+            }
+
+            return $this->namespace() . '\\' . $parent;
         }, $parents);
     }
 
@@ -479,8 +502,30 @@ class PhpFile
             }
         }
 
-        return array_map(function ($interface) {
-            return trim(str_replace('{', '', $interface));
+        $importedClasses = $this->importedClasses();
+
+        return array_map(function ($interface) use ($importedClasses) {
+            $interface = trim(str_replace('{', '', $interface));
+
+            if (str_starts_with($interface, '\\')) {
+                return $interface;
+            }
+
+            foreach ($importedClasses as $path => $alias) {
+                if ($interface === $path || $interface === '\\' . $path) {
+                    return $path;
+                }
+
+                if ($alias === $interface) {
+                    return $path;
+                }
+
+                if (str_starts_with($interface, $alias . '\\')) {
+                    return Str\replace_first_occurrance($interface, $alias, $path);
+                }
+            }
+
+            return $this->namespace() . '\\' . $interface;
         }, $interfaces);
     }
 
@@ -500,13 +545,28 @@ class PhpFile
             }
         }
 
-        return array_map(function ($usedTrait) {
+        $importedClasses = $this->importedClasses();
+
+        return array_map(function ($usedTrait) use ($importedClasses) {
             $usedTrait = trim($usedTrait);
             if (str_contains($usedTrait, '{')) {
                 $usedTrait = trim(Str\before_first_occurrence($usedTrait, '{'));
             }
 
-            return $usedTrait;
+            foreach ($importedClasses as $path => $alias) {
+                if ($usedTrait === $path) {
+                    return $usedTrait;
+                }
+
+                if ($alias === $usedTrait) {
+                    return $path;
+                }
+
+                if (str_starts_with($usedTrait, $alias . '\\')) {
+                    return Str\replace_first_occurrance($usedTrait, $alias, $path);
+                }
+            }
+            return $this->namespace() . '\\' . $usedTrait;
         }, $traits);
     }
 
@@ -520,34 +580,6 @@ class PhpFile
             || str_starts_with($line, 'enum ');
     }
 
-    private function namespaceClasses($alias)
-    {
-        preg_match_all("/new $alias\\\\\w+(\\\\\w+)*[^\w]/", $this->content, $newInstances, PREG_OFFSET_CAPTURE);
-
-        preg_match_all("/[^\w]+$alias\\\\\w+(\\\\\w+)*::\w+/", $this->content, $staticCalls, PREG_OFFSET_CAPTURE);
-
-        $staticCalls = array_filter($staticCalls[0], fn ($usage) => ! str_ends_with($usage[0], '::class'));
-
-        return array_merge(
-            array_map(function ($match) {
-                $class = str_replace('new ', '', $match[0]);
-
-                return Str\remove_last_character($class);
-            }, $newInstances[0]),
-            array_map(function ($match) use ($alias) {
-                $class = $match[0];
-                $nonAcceptableCharacters = Str\before_first_occurrence($class, $alias);
-                $class = str_replace($nonAcceptableCharacters, '', $class);
-
-                if (str_contains($class, '::')) {
-                    return Str\before_first_occurrence($class, '::');
-                }
-
-                return $class;
-            }, $staticCalls)
-        );
-    }
-
     private function aliasIsNamespace($alias)
     {
         preg_match_all("/new $alias\\\\\w+(\\\\\w+)*[^\w]/", $this->content, $newInstances, PREG_OFFSET_CAPTURE);
@@ -555,12 +587,5 @@ class PhpFile
         preg_match_all("/[^\w]+$alias\\\\\w+(\\\\\w+)*::\w+/", $this->content, $staticCalls, PREG_OFFSET_CAPTURE);
 
         return count(array_merge($newInstances[0], $staticCalls[0])) > 0;
-    }
-
-    private function aliasFunctionHasBeenUsed($alias)
-    {
-        preg_match_all("/[^\w]$alias\\\\\w+\(/", $this->content, $functions, PREG_OFFSET_CAPTURE);
-
-        return isset($functions[0][0]) && count($functions[0][0]) > 0;
     }
 }

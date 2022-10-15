@@ -2,8 +2,6 @@
 
 namespace Saeghe\ComplexPackage\Controllers;
 
-require_once '$environmentBuildPath/Packages/saeghe/simple-package/Source/SimpleClass.php';
-
 use Saeghe\SimplePackage\SimpleClass;
 
 class Controller extends SimpleClass

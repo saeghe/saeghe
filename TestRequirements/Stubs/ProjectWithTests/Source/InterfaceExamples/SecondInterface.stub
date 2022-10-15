@@ -2,9 +2,6 @@
 
 namespace ProjectWithTests\InterfaceExamples;
 
-require_once '$environmentBuildPath/Source/InterfaceExamples/InnerInterfaces/ExtendableInterface.php';
-require_once '$environmentBuildPath/Source/InterfaceExamples/FirstInterface.php';
-
 use ArrayAccess;
 use ProjectWithTests\InterfaceExamples\InnerInterfaces\ExtendableInterface as ExtendInterface;
 

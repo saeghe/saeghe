@@ -75,5 +75,10 @@ function remove_last_character($subject)
 
 function replace_first_occurrance($subject, $search, $replace)
 {
-    return preg_replace('/' . $search . '/', $replace, $subject, 1);
+    $pos = strpos($subject, $search);
+    if ($pos !== false) {
+        return substr_replace($subject, $replace, $pos, strlen($search));
+    }
+
+    return $subject;
 }

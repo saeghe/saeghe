@@ -2,8 +2,6 @@
 
 namespace ProjectWithTests\UsedTraits;
 
-require_once '$environmentBuildPath/Source/SimpleTrait.php';
-
 use ProjectWithTests\SimpleTrait;
 
 trait ThirdTrait

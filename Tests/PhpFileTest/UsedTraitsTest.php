@@ -43,7 +43,7 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['MyTrait'] === $phpFile->usedTraits());
+        assert(['MyApp\MyTrait'] === $phpFile->usedTraits());
     }
 );
 
@@ -55,6 +55,8 @@ test(
 
 namespace MyApp;
 
+use Application\OtherNamespace\MyOtherTrait;
+
 class MyClass
 {
     use MyTrait;
@@ -65,7 +67,7 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['MyTrait', 'MyOtherTrait'] === $phpFile->usedTraits());
+        assert(['MyApp\MyTrait', 'Application\OtherNamespace\MyOtherTrait'] === $phpFile->usedTraits());
     }
 );
 
@@ -77,17 +79,29 @@ test(
 
 namespace MyApp;
 
+use Application\OtherNamespace\MyOtherTrait;
+use Application\Traits\{ATrait as FollowingTrait, HelloWorld }
+use Application\CompoundNamespace as Concerns;
+
 class MyClass
 {
     use MyTrait;
     use MyOtherTrait, FollowingTrait;
     use HelloWorld { sayHello as protected; }
+    use Concerns\ATrait;
 }
 
 EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['MyTrait', 'MyOtherTrait', 'FollowingTrait', 'HelloWorld'] === $phpFile->usedTraits());
+        assert([
+            'MyApp\MyTrait',
+            'Application\OtherNamespace\MyOtherTrait',
+            'Application\Traits\ATrait',
+            'Application\Traits\HelloWorld',
+            'Application\CompoundNamespace\ATrait',
+            ] === $phpFile->usedTraits()
+        );
     }
 );

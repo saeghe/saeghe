@@ -43,7 +43,7 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['MyInterface'] === $phpFile->implementedInterfaces());
+        assert(['MyApp\MyInterface'] === $phpFile->implementedInterfaces());
     }
 );
 
@@ -64,6 +64,42 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['FirstInterface', 'SecondInterface', 'ThirdInterface'] === $phpFile->implementedInterfaces());
+        assert(['MyApp\FirstInterface', 'MyApp\SecondInterface', 'MyApp\ThirdInterface'] === $phpFile->implementedInterfaces());
+    }
+);
+
+test(
+    title: 'it should detect implemented interfaces with compound namespaces',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace MyApp;
+
+use Application\FirstInterface;
+use Application\ForthInterface as SecondInterface;
+use Application\Namespaces\{ThirdInterface, FifthInterface as SixthInterface};
+use Application\CompoundNamespace as OtherNamespace
+use \ArrayAccess
+
+class MyClass extends ParentClass implements FirstInterface, SecondInterface, ThirdInterface , SixthInterface, OtherNamespace\AnyNamespace, \Iterator, ArrayAccess extends JustForTest
+{
+
+}
+
+EOD;
+
+        $phpFile = new PhpFile($content);
+
+        assert([
+                'Application\FirstInterface',
+                'Application\ForthInterface',
+                'Application\Namespaces\ThirdInterface',
+                'Application\Namespaces\FifthInterface',
+                'Application\CompoundNamespace\AnyNamespace',
+                '\Iterator',
+                '\ArrayAccess',
+            ] === $phpFile->implementedInterfaces()
+        );
     }
 );

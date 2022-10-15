@@ -2,16 +2,6 @@
 
 namespace ProjectWithTests\SampleFile;
 
-spl_autoload_register(function ($class) {
-    $classes = [
-        'Saeghe\SimplePackage\AUsefulClass' => '$environmentBuildPath/Packages/saeghe/simple-package/Source/AUsefulClass.php',
-    ];
-
-    if (array_key_exists($class, $classes)) {
-        require_once $classes[$class];
-    }
-});
-
 use Saeghe\SimplePackage\AUsefulClass;
 
 class FileWithPackageDependency

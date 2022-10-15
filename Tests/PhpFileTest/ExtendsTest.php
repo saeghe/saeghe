@@ -45,7 +45,143 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['ParentClass'] === $phpFile->extendedClasses());
+        assert(['MyApp\ParentClass'] === $phpFile->extendedClasses());
+    }
+);
+
+test(
+    title: 'it should detect extend class from php classes',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace MyApp;
+
+use \ArrayObject;
+
+class MyClass extends ArrayObject
+{
+
+}
+
+EOD;
+
+        $phpFile = new PhpFile($content);
+
+        assert(['\ArrayObject'] === $phpFile->extendedClasses());
+    }
+);
+
+test(
+    title: 'it should detect extend class for class',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace MyApp;
+
+class MyClass extends \ArrayObject
+{
+
+}
+
+EOD;
+
+        $phpFile = new PhpFile($content);
+
+        assert(['\ArrayObject'] === $phpFile->extendedClasses());
+    }
+);
+
+test(
+    title: 'it should detect extend class from imported classes',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace MyApp;
+
+use Application\ParentClass;
+
+class MyClass extends ParentClass
+{
+
+}
+
+EOD;
+
+        $phpFile = new PhpFile($content);
+
+        assert(['Application\ParentClass'] === $phpFile->extendedClasses());
+    }
+);
+
+test(
+    title: 'it should detect extend class from compound namespaces',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace MyApp;
+
+use Application\SubNamespace as OtherNamespace;
+
+class MyClass extends OtherNamespace\ParentClass
+{
+
+}
+
+EOD;
+
+        $phpFile = new PhpFile($content);
+
+        assert(['Application\SubNamespace\ParentClass'] === $phpFile->extendedClasses());
+    }
+);
+
+test(
+    title: 'it should detect extend class from alias',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace MyApp;
+
+use Application\SubNamespace\ParentClass as NormalClass;
+
+class MyClass extends NormalClass
+{
+
+}
+
+EOD;
+
+        $phpFile = new PhpFile($content);
+
+        assert(['Application\SubNamespace\ParentClass'] === $phpFile->extendedClasses());
+    }
+);
+
+test(
+    title: 'it should detect extend class from aliases',
+    case: function () {
+        $content = <<<EOD
+<?php
+
+namespace MyApp;
+
+use Application\SubNamespace\{ParentClass as NormalClass, OtherClass };
+
+class MyClass extends NormalClass
+{
+
+}
+
+EOD;
+
+        $phpFile = new PhpFile($content);
+
+        assert(['Application\SubNamespace\ParentClass'] === $phpFile->extendedClasses());
     }
 );
 
@@ -67,7 +203,7 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['ParentClass'] === $phpFile->extendedClasses());
+        assert(['MyApp\ParentClass'] === $phpFile->extendedClasses());
     }
 );
 
@@ -87,7 +223,7 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['ParentClass'] === $phpFile->extendedClasses());
+        assert(['MyApp\ParentClass'] === $phpFile->extendedClasses());
     }
 );
 
@@ -105,7 +241,7 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['ParentAbstractClass'] === $phpFile->extendedClasses());
+        assert(['MyApp\ParentAbstractClass'] === $phpFile->extendedClasses());
     }
 );
 
@@ -125,7 +261,7 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['OtherInterface'] === $phpFile->extendedClasses());
+        assert(['MyApp\OtherInterface'] === $phpFile->extendedClasses());
     }
 );
 
@@ -145,7 +281,7 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['OtherTrait'] === $phpFile->extendedClasses());
+        assert(['MyApp\OtherTrait'] === $phpFile->extendedClasses());
     }
 );
 
@@ -166,6 +302,6 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['SecondInterface', 'ThirdInterface', 'ForthInterface'] === $phpFile->extendedClasses());
+        assert(['MyApp\SecondInterface', 'MyApp\ThirdInterface', 'MyApp\ForthInterface'] === $phpFile->extendedClasses());
     }
 );

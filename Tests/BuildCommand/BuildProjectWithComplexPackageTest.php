@@ -48,20 +48,20 @@ function delete_packages_directory()
 
 function assert_build_for_packages($message)
 {
-   assert(
-       build_exists_and_same_as_stub('src/Controllers/Controller.php')
-       && build_exists_and_same_as_stub('src/Controllers/HomeController.php')
-       && build_exists_and_same_as_stub('src/Models/User.php')
-       && build_exists_and_same_as_stub('src/Views/home.php')
-       && build_exists_and_same_as_stub('src/Helpers.php')
-       && build_exists_and_same_as_stub('tests/Features/FirstFeature.php')
-       && build_exists_and_same_as_stub('tests/TestHelper.php')
-       && build_exists_and_same_as_stub('saeghe.config.json')
-       && build_exists_and_same_as_stub('saeghe.config-lock.json')
-       && build_exists_and_same_as_stub('cli-command')
-       ,
-       $message
-   );
+    assert(
+        build_exists_and_same_as_stub('src/Controllers/Controller.php')
+        && build_exists_and_same_as_stub('src/Controllers/HomeController.php')
+        && build_exists_and_same_as_stub('src/Models/User.php')
+        && build_exists_and_same_as_stub('src/Views/home.php')
+        && build_exists_and_same_as_stub('src/Helpers.php')
+        && build_exists_and_same_as_stub('tests/Features/FirstFeature.php')
+        && build_exists_and_same_as_stub('tests/TestHelper.php')
+        && build_exists_and_same_as_stub('saeghe.config.json')
+        && build_exists_and_same_as_stub('saeghe.config-lock.json')
+        && build_exists_and_same_as_stub('cli-command')
+        ,
+        $message
+    );
 }
 
 function build_exists_and_same_as_stub($file)

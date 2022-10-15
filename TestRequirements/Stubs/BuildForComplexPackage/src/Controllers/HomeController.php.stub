@@ -3,8 +3,6 @@
 namespace Saeghe\ComplexPackage\Controllers;
 
 require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Helpers.php';
-require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Models/User.php';
-require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Controllers/Controller.php';
 
 use Saeghe\ComplexPackage\Models\User;
 use function Saeghe\ComplexPackage\Helpers\helper1;

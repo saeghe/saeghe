@@ -2,8 +2,6 @@
 
 namespace ProjectWithTests\SubDirectory;
 
-require_once '$environmentBuildPath/Source/ProjectWithTests/ProjectWithTests.php';
-
 use ProjectWithTests\ProjectWithTests\ProjectWithTests;
 
 class ClassUseNamespaceTwice extends ProjectWithTests
