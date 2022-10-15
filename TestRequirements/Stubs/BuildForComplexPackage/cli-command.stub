@@ -1,6 +1,101 @@
 #!/usr/bin/env php
 <?php
 
+spl_autoload_register(function ($class) {
+    $classes = [
+        'Saeghe\SimplePackage\SimpleClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/Source/SimpleClass.php',
+        'Saeghe\ComplexPackage\Models\User' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/complex-package/src/Models/User.php',
+        'Saeghe\ComplexPackage\Helpers' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/complex-package/src/Helpers.php',
+        'Saeghe\ComplexPackage\Controllers\Controller' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/complex-package/src/Controllers/Controller.php',
+        'Tests\TestHelper' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Tests/TestHelper.php',
+        'Saeghe\ComplexPackage\Controllers\HomeController' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/complex-package/src/Controllers/HomeController.php',
+        'Saeghe\SimplePackage\ImaginaryClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/Source/ImaginaryClass.php',
+        'ProjectWithTests\CompoundNamespace\Foo\ClassBaz' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/CompoundNamespace/Foo/ClassBaz.php',
+        'ProjectWithTests\CompoundNamespace\Foo\ClassFoo' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/CompoundNamespace/Foo/ClassFoo.php',
+        'ProjectWithTests\CompoundNamespace\Foo' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/CompoundNamespace/Foo.php',
+        'ProjectWithTests\ExtendExamples\ParentAbstractClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/ExtendExamples/ParentAbstractClass.php',
+        'ProjectWithTests\ExtendExamples\ParentClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/ExtendExamples/ParentClass.php',
+        'ProjectWithTests\SubDirectory\SimpleClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/SubDirectory/SimpleClass.php',
+        'ProjectWithTests\ExtendExamples\AbstractClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/ExtendExamples/AbstractClass.php',
+        'Saeghe\SimplePackage\AUsefulClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/Source/AUsefulClass.php',
+        'ProjectWithTests\SubDirectory\ClassUseAnotherClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/SubDirectory/ClassUseAnotherClass.php',
+        'ProjectWithTests\Classes\StaticClassA' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Classes/StaticClassA.php',
+        'ProjectWithTests\Classes\StaticClassB' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Classes/StaticClassB.php',
+        'ProjectWithTests\Classes\StaticClassC' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Classes/StaticClassC.php',
+        'ProjectWithTests\AnyNamespace\StaticClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/AnyNamespace/StaticClass.php',
+        'ProjectWithTests\Classes\NewInstanceClassA' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Classes/NewInstanceClassA.php',
+        'Saeghe\SimplePackage\Classes\PackageClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/Source/Classes/PackageClass.php',
+        'ProjectWithTests\Classes\NewInstanceClassB' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Classes/NewInstanceClassB.php',
+        'ProjectWithTests\Classes\NewInstanceClassC' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Classes/NewInstanceClassC.php',
+        'ProjectWithTests\SampleFile\InstanceFromClassInSameNamespace' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/SampleFile/InstanceFromClassInSameNamespace.php',
+        'ProjectWithTests\AnyNamespace\ClassA' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/AnyNamespace/ClassA.php',
+        'Saeghe\SimplePackage\TypeClasses\InjectedClassFromPackageToConstructor' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/Source/TypeClasses/InjectedClassFromPackageToConstructor.php',
+        'ProjectWithTests\TypeClasses\InjectedPublicClassInConstructor' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/TypeClasses/InjectedPublicClassInConstructor.php',
+        'ProjectWithTests\TypeClasses\OtherInjectedParameterClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/TypeClasses/OtherInjectedParameterClass.php',
+        'ProjectWithTests\TypeClasses\InjectedClassInConstructor' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/TypeClasses/InjectedClassInConstructor.php',
+        'ProjectWithTests\TypeClasses\InjectedParameterClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/TypeClasses/InjectedParameterClass.php',
+        'ProjectWithTests\TypeClasses\ReturnTypeClassA' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/TypeClasses/ReturnTypeClassA.php',
+        'ProjectWithTests\TypeClasses\ReturnTypeClassB' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/TypeClasses/ReturnTypeClassB.php',
+        'ProjectWithTests\TypeClasses\ReturnTypeClassC' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/TypeClasses/ReturnTypeClassC.php',
+        'ProjectWithTests\TypeClasses\MultipleTypeA' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/TypeClasses/MultipleTypeA.php',
+        'ProjectWithTests\TypeClasses\MultipleTypeB' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/TypeClasses/MultipleTypeB.php',
+        'ProjectWithTests\Classes\ClassWithConstant' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Classes/ClassWithConstant.php',
+        'Saeghe\SimplePackage\Classes\PackageConst' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/Source/Classes/PackageConst.php',
+        'ProjectWithTests\ClassName\ClassA' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/ClassName/ClassA.php',
+        'ProjectWithTests\ClassName\ClassB' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/ClassName/ClassB.php',
+        'ProjectWithTests\Attributes\SetUp' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Attributes/SetUp.php',
+        'ProjectWithTests\AnyNamespace' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/AnyNamespace.php',
+        'ProjectWithTests\Helper' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Helper.php',
+        'ProjectWithTests\Parents\ParentClass' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Parents/ParentClass.php',
+        'ProjectWithTests\Interfaces\ClassInterface' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/Interfaces/ClassInterface.php',
+        'ProjectWithTests\SampleFile\TraitInSameNamespace' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/SampleFile/TraitInSameNamespace.php',
+        'ProjectWithTests\ClassWithConstants' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/ClassWithConstants.php',
+        'ProjectWithTests\SampleFile' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/SampleFile.php',
+        'ProjectWithTests\InterfaceExamples\SecondInterface' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/InterfaceExamples/SecondInterface.php',
+        'ProjectWithTests\InterfaceExamples\InnerInterfaces\InnerInterface' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/InterfaceExamples/InnerInterfaces/InnerInterface.php',
+        'ProjectWithTests\InterfaceExamples\FirstInterface' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/InterfaceExamples/FirstInterface.php',
+        'ProjectWithTests\InterfaceExamples\ThirdInterface' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/InterfaceExamples/ThirdInterface.php',
+        'ProjectWithTests\InterfaceExamples\InnerInterfaces\OtherInnerInterface' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/InterfaceExamples/InnerInterfaces/OtherInnerInterface.php',
+        'ProjectWithTests\InterfaceExamples\InnerInterfaces\ExtendableInterface' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/InterfaceExamples/InnerInterfaces/ExtendableInterface.php',
+        'ProjectWithTests\ProjectWithTests\ProjectWithTests' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/ProjectWithTests/ProjectWithTests.php',
+        'ProjectWithTests\UsedTraits\FirstTrait' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/UsedTraits/FirstTrait.php',
+        'ProjectWithTests\UsedTraits\ThirdTrait' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/UsedTraits/ThirdTrait.php',
+        'ProjectWithTests\UsedTraits\SecondTrait' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/UsedTraits/SecondTrait.php',
+        'ProjectWithTests\SimpleTrait' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source/SimpleTrait.php',
+        'Tests\Helper' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Tests/Helper.php',
+    ];
+
+    if (array_key_exists($class, $classes)) {
+        require $classes[$class];
+    }
+
+}, true, true);
+
+spl_autoload_register(function ($class) {
+    $namespaces = [
+        'Saeghe\SimplePackage' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/Source',
+        'Saeghe\ComplexPackage' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/complex-package/src',
+        'Tests' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Tests',
+        'ProjectWithTests' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Source',
+        'ProjectWithTests\Service\helper' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Services/Functions.php',
+        'ProjectWithTests\Service\HELPER_CONST' => '/Users/morteza/saeghe/saeghe/TestRequirements/Fixtures/ProjectWithTests/builds/development/Services/Constants.php',
+    ];
+
+    $realPath = null;
+
+    foreach ($namespaces as $namespace => $path) {
+        if (str_starts_with($class, $namespace)) {
+            $pos = strpos($class, $namespace);
+            if ($pos !== false) {
+                $realPath = substr_replace($class, $path, $pos, strlen($namespace));
+            }
+            $realPath = str_replace("\\", "/", $realPath) . '.php';
+            require $realPath;
+            return ;
+        }
+    }
+});
+
 require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Helpers.php';
 
 use Saeghe\ComplexPackage\Models\User;

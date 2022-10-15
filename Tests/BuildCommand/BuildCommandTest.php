@@ -161,13 +161,11 @@ function assert_executables_are_linked($message)
 {
     $linkFile = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/run-executable';
     $linkSource = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/simple-package/run.php';
+    $stub = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/simple-package-run-executable.stub';
+    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
 
-    assert(
-        is_link($linkFile)
-        && readlink($linkFile) === $linkSource
-        ,
-        $message
-    );
+    assert(is_link($linkFile) && readlink($linkFile) === $linkSource, $message);
+    assert(str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stub)) === file_get_contents($linkSource), 'Executable content is not correct! ' . $message);
 }
 
 function assert_build_for_project_entry_points($message)

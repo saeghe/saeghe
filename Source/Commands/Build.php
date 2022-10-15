@@ -26,7 +26,7 @@ function run()
     compile_project_files($projectRoot, $buildDirectory, $packagesBuildDirectory, $config, $meta, $replaceMap);
     global $autoloads;
     make_entry_points($buildDirectory, $config, $replaceMap, $autoloads);
-    add_executables($buildDirectory, $packagesBuildDirectory, $meta);
+    add_executables($buildDirectory, $packagesBuildDirectory, $meta, $replaceMap, $autoloads);
 
     clearstatcache();
 
@@ -35,75 +35,13 @@ function run()
 
 function make_entry_points($buildDirectory, $config, $replaceMap, $autoloads)
 {
-    $autoloadLines = [];
-
-    $autoloadLines = array_merge($autoloadLines, [
-        '',
-        'spl_autoload_register(function ($class) {',
-        '    $classes = [',
-    ]);
-
-    foreach ($autoloads as $class => $path) {
-        $autoloadLines[] = "        '$class' => '$path',";
-    }
-
-    $autoloadLines = array_merge($autoloadLines, [
-        '    ];',
-        '',
-        '    if (array_key_exists($class, $classes)) {',
-        '        require $classes[$class];',
-        '    }',
-        '',
-        '}, true, true);',
-    ]);
-
-    $autoloadLines = array_merge($autoloadLines, [
-        '',
-        'spl_autoload_register(function ($class) {',
-        '    $namespaces = [',
-    ]);
-
-    foreach ($replaceMap as $namespace => $path) {
-        $autoloadLines[] = "        '$namespace' => '$path',";
-    }
-
-    $autoloadLines = array_merge($autoloadLines, [
-        '    ];',
-        '',
-        '    $realPath = null;',
-        '',
-        '    foreach ($namespaces as $namespace => $path) {',
-        '        if (str_starts_with($class, $namespace)) {',
-        '            $pos = strpos($class, $namespace);',
-        '            if ($pos !== false) {',
-        '                $realPath = substr_replace($class, $path, $pos, strlen($namespace));',
-        '            }',
-        '            $realPath = str_replace("\\\", "/", $realPath) . \'.php\';',
-        '            require $realPath;',
-        '            return ;',
-        '        }',
-        '    }',
-        '});',
-    ]);
-
     foreach ($config['entry-points'] as $entrypoint) {
         $path = $buildDirectory . $entrypoint;
-        $lines = explode(PHP_EOL, file_get_contents($path));
-        $number = 1;
-        foreach ($lines as $lineNumber => $line) {
-            if (str_contains($line, '<?php')) {
-                $number = $lineNumber;
-                break;
-            }
-        }
-
-        $lines = array_insert_after($lines, $number, $autoloadLines);
-
-        file_put_contents($path, implode(PHP_EOL, $lines));
+        add_autoloads($path, $replaceMap, $autoloads);
     }
 }
 
-function add_executables($buildDirectory, $packagesBuildDirectory, $meta)
+function add_executables($buildDirectory, $packagesBuildDirectory, $meta, $replaceMap, $autoloads)
 {
     foreach ($meta['packages'] ?? [] as $package => $packageMeta) {
         $packageBuildDirectory = $packagesBuildDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
@@ -115,6 +53,7 @@ function add_executables($buildDirectory, $packagesBuildDirectory, $meta)
                 $target = $packageBuildDirectory . $source;
                 $link = $buildDirectory . $linkName;
                 symlink($target, $link);
+                add_autoloads($target, $replaceMap, $autoloads);
             }
         }
     }
@@ -367,4 +306,71 @@ function file_needs_modification($file, $config)
             initial: false
         )
         || str_ends_with($file, '.php');
+}
+
+function add_autoloads($target, $replaceMap, $autoloads)
+{
+    $autoloadLines = [];
+
+    $autoloadLines = array_merge($autoloadLines, [
+        '',
+        'spl_autoload_register(function ($class) {',
+        '    $classes = [',
+    ]);
+
+    foreach ($autoloads as $class => $path) {
+        $autoloadLines[] = "        '$class' => '$path',";
+    }
+
+    $autoloadLines = array_merge($autoloadLines, [
+        '    ];',
+        '',
+        '    if (array_key_exists($class, $classes)) {',
+        '        require $classes[$class];',
+        '    }',
+        '',
+        '}, true, true);',
+    ]);
+
+    $autoloadLines = array_merge($autoloadLines, [
+        '',
+        'spl_autoload_register(function ($class) {',
+        '    $namespaces = [',
+    ]);
+
+    foreach ($replaceMap as $namespace => $path) {
+        $autoloadLines[] = "        '$namespace' => '$path',";
+    }
+
+    $autoloadLines = array_merge($autoloadLines, [
+        '    ];',
+        '',
+        '    $realPath = null;',
+        '',
+        '    foreach ($namespaces as $namespace => $path) {',
+        '        if (str_starts_with($class, $namespace)) {',
+        '            $pos = strpos($class, $namespace);',
+        '            if ($pos !== false) {',
+        '                $realPath = substr_replace($class, $path, $pos, strlen($namespace));',
+        '            }',
+        '            $realPath = str_replace("\\\", "/", $realPath) . \'.php\';',
+        '            require $realPath;',
+        '            return ;',
+        '        }',
+        '    }',
+        '});',
+    ]);
+
+    $lines = explode(PHP_EOL, file_get_contents($target));
+    $number = 1;
+    foreach ($lines as $lineNumber => $line) {
+        if (str_contains($line, '<?php')) {
+            $number = $lineNumber;
+            break;
+        }
+    }
+
+    $lines = array_insert_after($lines, $number, $autoloadLines);
+
+    file_put_contents($target, implode(PHP_EOL, $lines));
 }
