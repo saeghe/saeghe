@@ -17,17 +17,6 @@ class PhpFile
         $this->lines = explode(PHP_EOL, $this->content);
     }
 
-    public function isOop()
-    {
-        foreach ($this->lines as $codeLine) {
-            if ($this->isClassSignature($codeLine)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private function strip_content($content)
     {
         $newContent = '';
