@@ -24,6 +24,7 @@ use Application\Model\{User, Order as Orders, NotUsed};
 use Application\CallFromNewInstance;
 use Application\Str;
 use Application\CompoundNamespaceClass as Compound;
+use function \str_pad;
 
 class MyClass
 {
@@ -43,6 +44,8 @@ class MyClass
         $varD = function_d();
         $varE = g();
         $dynamicCall();
+        str_pad();
+        \str_ends_with();
     }
     
     protected function my_method()
@@ -75,6 +78,7 @@ EOD;
                 'str_replace',
                 '\strlen',
                 'Application\SameNamespace\method_call',
+                '\str_ends_with',
                 'Application\CompoundNamespace\HelperFiles\methodCall',
                 'Application\OtherHelper\function_a',
                 'Application\Str\remove_last_character',
@@ -82,6 +86,7 @@ EOD;
                 'Application\Helpers\function_b',
                 'Application\Helpers\function_d',
                 'Application\Helpers\function_e',
+                '\str_pad',
             ] === (new PhpFile($content))->usedFunctions(),
             'Used functions are not detected!'
         );

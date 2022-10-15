@@ -89,6 +89,7 @@ class MyClass
     use MyOtherTrait, FollowingTrait;
     use HelloWorld { sayHello as protected; }
     use Concerns\ATrait;
+    use \BuiltInTrait;
 }
 
 EOD;
@@ -101,6 +102,7 @@ EOD;
             'Application\Traits\ATrait',
             'Application\Traits\HelloWorld',
             'Application\CompoundNamespace\ATrait',
+            '\BuiltInTrait',
             ] === $phpFile->usedTraits()
         );
     }

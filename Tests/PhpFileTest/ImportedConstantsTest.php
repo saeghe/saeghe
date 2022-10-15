@@ -85,6 +85,7 @@ use MyApp\SomeClass;use const MyApp\OtherNamespace\ConstantA;
 use const MyApp\OtherNamespace\{ConstantB, ConstantC as C, ConstantD};use function MyApp\\function;
 use const MyApp\OtherNamespace\ConstantE as ConstantF;use const MyApp\OtherNamespace\ConstantG;
 use const MyApp\FirstConst, MyApp\AnotherNamespace\SecondConst;
+use const \PHP_BINARY;
 
 EOD;
 
@@ -99,6 +100,7 @@ EOD;
                 'MyApp\OtherNamespace\ConstantG' => 'ConstantG',
                 'MyApp\FirstConst' => 'FirstConst',
                 'MyApp\AnotherNamespace\SecondConst' => 'SecondConst',
+                '\PHP_BINARY' => 'PHP_BINARY',
             ] === $phpFile->importedConstants()
         );
     }

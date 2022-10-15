@@ -27,8 +27,10 @@ use ProjectWithTests\Classes\ClassWithConstant;
 use Saeghe\SimplePackage\Classes\PackageConst;
 use ProjectWithTests\AnyNamespace as CompoundNamespace;
 use ProjectWithTests\Attributes\SetUp;
+use \ArrayAccess;
+use ProjectWithTests\ClassWithConstants;
 
-class ImportableSampleClass extends ParentClass implements ClassInterface
+class ImportableSampleClass extends ParentClass implements ClassInterface, ArrayAccess, \Iterator
 {
     use TraitInSameNamespace;
 
@@ -77,6 +79,7 @@ class ImportableSampleClass extends ParentClass implements ClassInterface
         $newInstanceClassWithoutUse = new ProjectWithTests\SubDirectory\ClassUseAnotherClass();
         $phpClassInstance = new \ArrayObject();
         $newInstanceForClassInCompoundNamespace = new CompoundNamespace\ClassA();
+        new ClassWithConstants();
     }
 
     public function static_call_examples()
@@ -102,6 +105,7 @@ class ImportableSampleClass extends ParentClass implements ClassInterface
         CompoundNamespace\ConstInCompoundNamespace::ConstE;
         PackageConst::ConstF;
         \ReflectionProperty\IS_PUBLIC;
+        ClassWithConstants::CONSTANT;
     }
 
     #[SetUp]

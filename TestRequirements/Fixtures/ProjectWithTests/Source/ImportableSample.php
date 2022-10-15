@@ -25,6 +25,10 @@ use ProjectWithTests\Classes\ClassWithConstant;
 use Saeghe\SimplePackage\Classes\PackageConst;
 use ProjectWithTests\AnyNamespace as CompoundNamespace;
 use ProjectWithTests\Attributes\SetUp;
+use ProjectWithTests\Helper;
+use function ProjectWithTests\AnotherHelper\aFunction;
+use const \PHP_EOL;
+use function \str_pad;
 
 function init(
     InjectedClassInConstructor $injectedClassInConstructor,
@@ -96,6 +100,11 @@ function constants_examples()
     CompoundNamespace\ConstInCompoundNamespace::ConstE;
     PackageConst::ConstF;
     \ReflectionProperty\IS_PUBLIC;
+    \PHP_EOL;
+    str_pad();
+    str_contains();
+    \array_walk();
+    Helper\aFunction();
 }
 
 #[SetUp]

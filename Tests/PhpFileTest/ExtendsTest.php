@@ -293,7 +293,9 @@ test(
 
 namespace MyApp;
 
-interface FirstInterface extends SecondInterface,ThirdInterface, ForthInterface 
+use \ArrayAccess;
+
+interface FirstInterface extends SecondInterface,ThirdInterface, ForthInterface, \Iterator, ArrayAccess
 {
 
 }
@@ -302,6 +304,12 @@ EOD;
 
         $phpFile = new PhpFile($content);
 
-        assert(['MyApp\SecondInterface', 'MyApp\ThirdInterface', 'MyApp\ForthInterface'] === $phpFile->extendedClasses());
+        assert([
+            'MyApp\SecondInterface',
+            'MyApp\ThirdInterface',
+            'MyApp\ForthInterface',
+            '\Iterator',
+            '\ArrayAccess',
+        ] === $phpFile->extendedClasses());
     }
 );

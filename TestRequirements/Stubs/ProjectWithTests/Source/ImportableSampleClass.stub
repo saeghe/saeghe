@@ -6,6 +6,7 @@ require_once '$environmentBuildPath/Source/SampleFile/ClassInSameNamespace.php';
 require_once '$environmentBuildPath/Source/Classes/ClassWithConstant.php';
 require_once '$environmentBuildPath/Source/AnyNamespace/ConstInCompoundNamespace.php';
 require_once '$environmentBuildPath/Packages/saeghe/simple-package/Source/Classes/PackageConst.php';
+require_once '$environmentBuildPath/Source/ClassWithConstants.php';
 
 use ProjectWithTests\Parents\ParentClass;
 use ProjectWithTests\Interfaces\ClassInterface;
@@ -32,8 +33,10 @@ use ProjectWithTests\Classes\ClassWithConstant;
 use Saeghe\SimplePackage\Classes\PackageConst;
 use ProjectWithTests\AnyNamespace as CompoundNamespace;
 use ProjectWithTests\Attributes\SetUp;
+use \ArrayAccess;
+use ProjectWithTests\ClassWithConstants;
 
-class ImportableSampleClass extends ParentClass implements ClassInterface
+class ImportableSampleClass extends ParentClass implements ClassInterface, ArrayAccess, \Iterator
 {
     use TraitInSameNamespace;
 
@@ -82,6 +85,7 @@ class ImportableSampleClass extends ParentClass implements ClassInterface
         $newInstanceClassWithoutUse = new ProjectWithTests\SubDirectory\ClassUseAnotherClass();
         $phpClassInstance = new \ArrayObject();
         $newInstanceForClassInCompoundNamespace = new CompoundNamespace\ClassA();
+        new ClassWithConstants();
     }
 
     public function static_call_examples()
@@ -107,6 +111,7 @@ class ImportableSampleClass extends ParentClass implements ClassInterface
         CompoundNamespace\ConstInCompoundNamespace::ConstE;
         PackageConst::ConstF;
         \ReflectionProperty\IS_PUBLIC;
+        ClassWithConstants::CONSTANT;
     }
 
     #[SetUp]

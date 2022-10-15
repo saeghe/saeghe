@@ -22,6 +22,8 @@ use const Application\Constants\{CONST_G as G, CONST_H, CONST_NOT_USED as NOT_US
 use Model;
 use Application\SubNamespace as OtherNamespace;
 use Application\OtherNamespace\{ClassA as A, ClassB};
+use const PHP_BINARY;
+use const \PHP_BINARY_READ;
 
 class MyClass
 {
@@ -47,15 +49,15 @@ class MyClass
         ClassB::CONST_J;
         \ReflectionProperty::IS_PUBLIC
         $class::CONST;
+        \PHP_EOL;
+        PHP_BINARY;
+        \PHP_BINARY_READ;
     }
 }
 EOD;
 
         assert(
             [
-                'self\CONST_A',
-                'static\CONST_B',
-                'parent\CONST_PARENT',
                 'Application\ClassInSameNamespace\CONST_C',
                 'Application\AnyNamespace\UsedClass\CONST_D',
                 'Model\CONST_1',
@@ -67,6 +69,8 @@ EOD;
                 'Application\Constants\CONST_F',
                 'Application\Constants\CONST_G',
                 'Application\Constants\CONST_H',
+                'PHP_BINARY',
+                '\PHP_BINARY_READ',
             ] === (new PhpFile($content))->usedConstants(),
             'Class constants are not detected!'
         );

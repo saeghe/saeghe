@@ -131,6 +131,9 @@ class PhpFile
             $usedConstant = $usedConstant[0];
 
             return ! str_starts_with($usedConstant, 'class::')
+                && ! str_starts_with($usedConstant, 'self::')
+                && ! str_starts_with($usedConstant, 'parent::')
+                && ! str_starts_with($usedConstant, 'static::')
                 && ! str_ends_with($usedConstant, '(')
                 && ! str_ends_with($usedConstant, '::class' . Str\last_character($usedConstant));
         });
@@ -141,13 +144,6 @@ class PhpFile
             }
 
             $usedConstant = Str\remove_last_character($usedConstant[0]);
-
-            if (str_starts_with($usedConstant, 'self::')
-                || str_starts_with($usedConstant, 'static::')
-                || str_starts_with($usedConstant, 'parent::')
-            ) {
-                return str_replace('::', '\\', $usedConstant);
-            }
 
             [$class, $const] = explode('::', $usedConstant);
 
@@ -540,6 +536,10 @@ class PhpFile
             $usedTrait = trim($usedTrait);
             if (str_contains($usedTrait, '{')) {
                 $usedTrait = trim(Str\before_first_occurrence($usedTrait, '{'));
+            }
+
+            if (str_starts_with($usedTrait, '\\')) {
+                return $usedTrait;
             }
 
             foreach ($importedClasses as $path => $alias) {
