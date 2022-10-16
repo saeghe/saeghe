@@ -4,6 +4,7 @@ namespace Saeghe\Saeghe\Commands\Add;
 
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Read\argument_after;
+use function Saeghe\Cli\IO\Write\success;
 
 function run()
 {
@@ -19,6 +20,8 @@ function run()
     $config['packages'][$package] = $packageMeta['version'];
 
     json_put($configPath, $config);
+
+    success("Package $package has been added successfully.");
 }
 
 function add($packagesDirectory, $package, $version)

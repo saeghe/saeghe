@@ -2,6 +2,10 @@
 
 namespace Tests\FlushCommandTest;
 
+require_once __DIR__ . '/../Packages/saeghe/cli/Source/IO/Write.php';
+
+use function Saeghe\Cli\IO\Write\assert_success;
+
 test(
     title: 'it should flush builds',
     case: function () {
@@ -9,6 +13,7 @@ test(
 
         assert_development_build_is_empty('Development build directory is not empty.' . $output);
         assert_production_build_is_empty('Production build directory is not empty.' . $output);
+        assert_success('Build directory has been flushed.', $output);
     },
     before: function () {
         shell_exec($_SERVER['PWD'] . '/saeghe build --project=TestRequirements/Fixtures/ProjectWithTests');

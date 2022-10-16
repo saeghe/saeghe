@@ -2,6 +2,9 @@
 
 namespace Tests\AddCommand\AddCommandTest;
 
+require_once __DIR__ . '/../../Packages/saeghe/cli/Source/IO/Write.php';
+
+use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;
 
 test(
@@ -14,6 +17,7 @@ test(
         assert_packages_directory_created_for_empty_project('Package directory does not created.' . $output);
         assert_simple_package_cloned('Simple package does not cloned!' . $output);
         assert_meta_has_desired_data('Meta data is not what we want.' . $output);
+        assert_success('Package git@github.com:saeghe/simple-package.git has been added successfully.', $output);
     },
     before: function () {
         delete_empty_project_config_file();

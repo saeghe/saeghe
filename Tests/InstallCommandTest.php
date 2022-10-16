@@ -2,6 +2,10 @@
 
 namespace Tests\InstallCommand;
 
+require_once __DIR__ . '/../Packages/saeghe/cli/Source/IO/Write.php';
+
+use function Saeghe\Cli\IO\Write\assert_success;
+
 test(
     title: 'it should install packages from lock file',
     case: function () {
@@ -11,6 +15,7 @@ test(
         assert_meta_file_content_not_changed('Released Package meta data does not added to meta file properly! ' . $output);
         assert_package_exists_in_packages_directory('Package does not exist in the packages directory.' . $output);
         assert_zip_file_deleted('Zip file has not been deleted.' . $output);
+        assert_success('Packages has been installed successfully.', $output);
     },
     before: function () {
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject");

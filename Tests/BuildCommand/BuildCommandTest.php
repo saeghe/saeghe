@@ -2,6 +2,10 @@
 
 namespace Tests\BuildCommand\BuildCommandTest;
 
+require_once __DIR__ . '/../../Packages/saeghe/cli/Source/IO/Write.php';
+
+use function Saeghe\Cli\IO\Write\assert_success;
+
 test(
     title: 'it should build the project',
     case: function () {
@@ -24,6 +28,7 @@ test(
         assert_build_for_traits('Traits has not been built properly!' . $output);
         assert_build_for_specified_file('Specified file has not been built properly!' . $output);
         assert_build_for_compound_namespaces('Compounded namespaces has not been built properly!' . $output);
+        assert_success('Build finished successfully.', $output);
     },
     before: function () {
         delete_build_directory();

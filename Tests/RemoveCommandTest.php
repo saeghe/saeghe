@@ -2,6 +2,10 @@
 
 namespace Tests\RemoveCommandTest;
 
+require_once __DIR__ . '/../Packages/saeghe/cli/Source/IO/Write.php';
+
+use function Saeghe\Cli\IO\Write\assert_success;
+
 test(
     title: 'it should remove a package',
     case: function () {
@@ -10,6 +14,7 @@ test(
         assert_desired_data_in_packages_directory('Package has not been deleted from Packages directory!' . $output);
         assert_config_file_is_clean('Packages has not been deleted from config file!' . $output);
         assert_meta_is_clean('Packages has not been deleted from meta!' . $output);
+        assert_success('Package git@github.com:saeghe/complex-package.git has been removed successfully.', $output);
     },
     before: function () {
         shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json');

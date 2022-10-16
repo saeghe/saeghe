@@ -2,6 +2,10 @@
 
 namespace Tests\UpdateCommandTest;
 
+require_once __DIR__ . '/../Packages/saeghe/cli/Source/IO/Write.php';
+
+use function Saeghe\Cli\IO\Write\assert_success;
+
 test(
     title: 'it should update to the latest version',
     case: function () {
@@ -9,6 +13,7 @@ test(
 
         assert_version_upgraded_in_config_file($output);
         assert_meta_updated($output);
+        assert_success('Package git@github.com:saeghe/released-package.git has been updated.', $output);
     },
     before: function () {
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject");

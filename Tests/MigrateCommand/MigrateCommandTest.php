@@ -1,6 +1,10 @@
 <?php
 
-namespace Tests\MigrateCommandTest;
+namespace Tests\MigrateCommand\MigrateCommandTest;
+
+require_once __DIR__ . '/../../Packages/saeghe/cli/Source/IO/Write.php';
+
+use Saeghe\Cli\IO\Write;
 
 test(
     title: 'it should migrate symfony package',
@@ -10,6 +14,7 @@ test(
         assert_correct_config_file('Config file is not correct!' . $output);
         assert_correct_meta_file('Meta file data is not correct!' . $output);
         assert_package_directory_content('Package directory content is not what we want!' . $output);
+        Write\assert_success('Project migrated successfully.', $output);
     },
     before: function () {
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/saeghe.config.json');

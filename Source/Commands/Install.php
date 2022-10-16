@@ -2,6 +2,8 @@
 
 namespace Saeghe\Saeghe\Commands\Install;
 
+use function Saeghe\Cli\IO\Write\success;
+
 function run()
 {
     global $meta;
@@ -10,6 +12,8 @@ function run()
     foreach ($meta['packages'] as $package => $meta) {
         install($meta, $packagesDirectory);
     }
+
+    success('Packages has been installed successfully.');
 }
 
 function install($meta, $packagesDirectory)

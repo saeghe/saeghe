@@ -3,6 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Remove;
 
 use function Saeghe\Cli\IO\Read\argument_after;
+use function Saeghe\Cli\IO\Write\success;
 
 function run()
 {
@@ -13,6 +14,8 @@ function run()
     global $packagesDirectory;
 
     remove($package, $config, $meta, $packagesDirectory);
+
+    success("Package $package has been removed successfully.");
 }
 
 function remove($package, $config, $meta, $packagesDirectory)

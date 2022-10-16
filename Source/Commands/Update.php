@@ -6,6 +6,7 @@ use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Read\argument_after;
 use function Saeghe\Saeghe\Commands\Add\add;
 use function Saeghe\Saeghe\Commands\Remove\remove;
+use function Saeghe\Cli\IO\Write\success;
 
 function run()
 {
@@ -24,4 +25,6 @@ function run()
 
     $configFile = $projectRoot . DEFAULT_CONFIG_FILENAME;
     file_put_contents($configFile, json_encode($config, JSON_PRETTY_PRINT));
+
+    success("Package $package has been updated.");
 }

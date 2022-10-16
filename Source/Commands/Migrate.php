@@ -2,6 +2,8 @@
 
 namespace Saeghe\Saeghe\Commands\Migrate;
 
+use Saeghe\Cli\IO\Write;
+
 function run()
 {
     global $projectRoot;
@@ -12,8 +14,21 @@ function run()
     $config = ['map' => [], 'excludes' => ['vendor']];
     $meta = [];
 
-    $composerSetting = json_decode(file_get_contents($projectRoot . '/composer.json'), true);
-    $composerLockSetting = json_decode(file_get_contents($projectRoot . '/composer.lock'), true);
+    $composerFile = $projectRoot . 'composer.json';
+    $composerLockFile = $projectRoot . 'composer.lock';
+
+    if (! file_exists($composerFile)) {
+        Write\error('There is no composer.json file in this project!');
+        return;
+    }
+
+    if (! file_exists($composerLockFile)) {
+        Write\error('There is no composer.lock file in this project!');
+        return;
+    }
+
+    $composerSetting = json_to_array($composerFile);
+    $composerLockSetting = json_to_array($composerLockFile);
 
     if (isset($composerSetting['autoload']['psr-4'])) {
         $config['map'] = [];
@@ -58,6 +73,8 @@ function run()
 
     file_put_contents($configPath, json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
     file_put_contents($metaFilePath, json_encode($meta, JSON_PRETTY_PRINT) . PHP_EOL);
+
+    Write\success('Project migrated successfully.');
 }
 
 function migrate_package($packagesDirectory, $name, $package, $packageMeta)

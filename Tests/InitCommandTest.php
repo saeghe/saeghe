@@ -2,6 +2,9 @@
 
 namespace Tests\InitCommandTest;
 
+require_once __DIR__ . '/../Packages/saeghe/cli/Source/IO/Write.php';
+
+use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;
 
 $initialContent = <<<EOD
@@ -48,7 +51,7 @@ test(
         File\assert_exists($packagesDirectory, 'Packages directory is not created: ' . $output);
         File\assert_content($configPath, $initialContent, 'Config file content is not correct after running init!');
         File\assert_content($metaFilePath, $metaContent, 'Lock file content is not correct after running init!');
-
+        assert_success('Project has been initialized.', $output);
         return [$configPath, $metaFilePath, $packagesDirectory];
     },
     before: function () {
