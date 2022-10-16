@@ -11,6 +11,7 @@ require __DIR__ . '/Source/Commands/Flush.php';
 require __DIR__ . '/Source/Commands/Help.php';
 require __DIR__ . '/Source/Commands/Init.php';
 require __DIR__ . '/Source/Commands/Install.php';
+require __DIR__ . '/Source/Commands/Man.php';
 require __DIR__ . '/Source/Commands/Migrate.php';
 require __DIR__ . '/Source/Commands/Remove.php';
 require __DIR__ . '/Source/Commands/Update.php';
@@ -43,12 +44,17 @@ $buildsPath = $projectRoot . 'builds' . '/';
 
 $command = Read\command() ?? Read\argument('command', 'help');
 
+if ($command === 'help' && Read\option('man')) {
+    $command = 'man';
+}
+
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run(),
     'build' => \Saeghe\Saeghe\Commands\Build\run(),
     'flush' => \Saeghe\Saeghe\Commands\Flush\run(),
     'init' => \Saeghe\Saeghe\Commands\Init\run(),
     'install' => \Saeghe\Saeghe\Commands\Install\run(),
+    'man' => \Saeghe\Saeghe\Commands\Man\run(),
     'migrate' => \Saeghe\Saeghe\Commands\Migrate\run(),
     'remove' => \Saeghe\Saeghe\Commands\Remove\run(),
     'update' => \Saeghe\Saeghe\Commands\Update\run(),
