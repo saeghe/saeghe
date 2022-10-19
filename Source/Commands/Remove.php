@@ -2,12 +2,12 @@
 
 namespace Saeghe\Saeghe\Commands\Remove;
 
-use function Saeghe\Cli\IO\Read\argument_after;
+use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\success;
 
 function run()
 {
-    $package = argument_after('remove');
+    $package = argument(2);
 
     global $config;
     global $meta;

@@ -2,8 +2,8 @@
 
 namespace Saeghe\Saeghe\Commands\Update;
 
+use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
-use function Saeghe\Cli\IO\Read\argument_after;
 use function Saeghe\Saeghe\Commands\Add\add;
 use function Saeghe\Saeghe\Commands\Remove\remove;
 use function Saeghe\Cli\IO\Write\success;
@@ -15,8 +15,8 @@ function run()
     global $meta;
     global $packagesDirectory;
 
-    $package = argument_after('update');
-    $version = argument('version');
+    $package = argument(2);
+    $version = parameter('version');
 
     remove($package, $config, $meta, $packagesDirectory);
     $packageMeta = add($packagesDirectory, $package, $version);

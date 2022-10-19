@@ -5,7 +5,7 @@ namespace Saeghe\Saeghe\Commands\Build;
 use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Str;
-use function Saeghe\Cli\IO\Read\argument_after;
+use function Saeghe\Cli\IO\Read\argument;
 
 $autoloads = [];
 
@@ -16,7 +16,7 @@ function run()
     global $meta;
     global $packagesDirectory;
     global $buildsPath;
-    $environment = argument_after('build', 'development');
+    $environment = argument(2, 'development');
 
     umask(0);
     $buildDirectory = dir_clean($buildsPath . $environment);

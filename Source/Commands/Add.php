@@ -2,8 +2,8 @@
 
 namespace Saeghe\Saeghe\Commands\Add;
 
+use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
-use function Saeghe\Cli\IO\Read\argument_after;
 use function Saeghe\Cli\IO\Write\success;
 
 function run()
@@ -12,8 +12,8 @@ function run()
     global $configPath;
     global $config;
 
-    $package = argument_after('add');
-    $version = argument('version');
+    $package = argument(2);
+    $version = parameter('version');
 
     $packageMeta = add($packagesDirectory, $package, $version);
 

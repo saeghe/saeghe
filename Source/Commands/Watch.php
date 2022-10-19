@@ -2,13 +2,13 @@
 
 namespace Saeghe\Saeghe\Commands\Watch;
 
-use function Saeghe\Cli\IO\Read\argument;
+use function Saeghe\Cli\IO\Read\parameter;
 
 function run()
 {
     global $projectRoot;
 
-    $seconds = (int) argument('wait', 3);
+    $seconds = (int) parameter('wait', 3);
 
     chdir($projectRoot);
 

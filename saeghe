@@ -26,23 +26,23 @@ $config = [
     'entry-points' => [],
     'excludes' => [],
     'executables' => [],
-    'packages-directory' => Read\argument('packages-directory', 'Packages'),
+    'packages-directory' => Read\parameter('packages-directory', 'Packages'),
     'packages' => [],
 ];
 
 $meta = ['packages' => []];
 
 $credentials = json_to_array(__DIR__ . '/credentials.json');
-$project = Read\argument('project', '');
+$project = Read\parameter('project', '');
 $projectRoot = strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SERVER['PWD'] . '/';
-$configPath = $projectRoot . Read\argument('config-file', DEFAULT_CONFIG_FILENAME);
+$configPath = $projectRoot . Read\parameter('config-file', DEFAULT_CONFIG_FILENAME);
 $config = array_merge_json($config, $configPath);
 $metaFilePath = str_replace('.json', '-lock.json', $configPath);
 $meta = array_merge_json($meta, $metaFilePath);
 $packagesDirectory = dir_find_or_create($projectRoot . $config['packages-directory']);
 $buildsPath = $projectRoot . 'builds' . '/';
 
-$command = Read\command() ?? Read\argument('command', 'help');
+$command = Read\command() ?? Read\parameter('command', 'help');
 
 if ($command === 'help' && Read\option('man')) {
     $command = 'man';
