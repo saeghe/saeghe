@@ -73,7 +73,7 @@ function remove_last_character($subject)
     return substr_replace($subject ,"",-1);
 }
 
-function replace_first_occurrance($subject, $search, $replace)
+function replace_first_occurrence($subject, $search, $replace)
 {
     $pos = strpos($subject, $search);
     if ($pos !== false) {

@@ -153,7 +153,7 @@ class PhpFile
                 }
 
                 if (str_starts_with($class, $alias . '\\')) {
-                    $class = Str\replace_first_occurrance($class, $alias, $use);
+                    $class = Str\replace_first_occurrence($class, $alias, $use);
                     return $class . '\\' . $const;
                 }
             }
@@ -260,7 +260,7 @@ class PhpFile
                 }
 
                 if (str_starts_with($file, "$alias\\")) {
-                    return Str\replace_first_occurrance($file, $alias, $class) . '\\' . $function;
+                    return Str\replace_first_occurrence($file, $alias, $class) . '\\' . $function;
                 }
             }
 
@@ -369,7 +369,7 @@ class PhpFile
                 }
 
                 if (str_starts_with($class, $alias . '\\')) {
-                    return Str\replace_first_occurrance($class, $alias, $path);
+                    return Str\replace_first_occurrence($class, $alias, $path);
                 }
             }
 
@@ -389,7 +389,7 @@ class PhpFile
         });
 
         $usedInstantiatedClassesInFile = array_map(function ($usedInstantiatedClass) use ($importedClasses) {
-            $usedInstantiatedClass = Str\replace_first_occurrance($usedInstantiatedClass[0], 'new ', '');
+            $usedInstantiatedClass = Str\replace_first_occurrence($usedInstantiatedClass[0], 'new ', '');
 
             $class = Str\after_last_occurrence($usedInstantiatedClass, '\\');
             $path = Str\before_last_occurrence($usedInstantiatedClass, '\\');
@@ -400,7 +400,7 @@ class PhpFile
                 }
 
                 if ($this->aliasIsNamespace($alias) && str_starts_with($class, $alias . '\\')) {
-                    return Str\replace_first_occurrance($class, $alias, $path);
+                    return Str\replace_first_occurrence($class, $alias, $path);
                 }
             }
 
@@ -462,7 +462,7 @@ class PhpFile
                 }
 
                 if (str_starts_with($parent, $alias . '\\')) {
-                    return Str\replace_first_occurrance($parent, $alias, $path);
+                    return Str\replace_first_occurrence($parent, $alias, $path);
                 }
             }
 
@@ -506,7 +506,7 @@ class PhpFile
                 }
 
                 if (str_starts_with($interface, $alias . '\\')) {
-                    return Str\replace_first_occurrance($interface, $alias, $path);
+                    return Str\replace_first_occurrence($interface, $alias, $path);
                 }
             }
 
@@ -552,7 +552,7 @@ class PhpFile
                 }
 
                 if (str_starts_with($usedTrait, $alias . '\\')) {
-                    return Str\replace_first_occurrance($usedTrait, $alias, $path);
+                    return Str\replace_first_occurrence($usedTrait, $alias, $path);
                 }
             }
             return $this->namespace() . '\\' . $usedTrait;
