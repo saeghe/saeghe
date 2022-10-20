@@ -1,9 +1,14 @@
 # Saeghe package manager
 
-## Introduction
+## About Saeghe
 
 Saeghe is a modern PHP package manager that boosts your code, 
 we've brought back all PHP functionalities for you so you can write code however you want.
+
+- Saeghe supports both, Functional and OOP programming.
+- Saeghe decouples your environments, and opens new doors to a bunch of cool stuff.
+- Saeghe uses git packages directly from repository URLs.
+- Saeghe only requires used files to your project, not all of them.
 
 ## Learning Saeghe
 
@@ -11,14 +16,13 @@ For learning about Saeghe please visit its website at [saeghe.com](https://saegh
 
 All documents can be found under [documentations](https://saeghe.com/documentations)
 
+## Contributing
+
+Thank you for considering contributing to Saeghe! The contribution guide can be found in the [contributing documentation](https://github.com/saeghe/saeghe/blob/master/CONTRIBUTING.md).
+
 ## Code of Conduct
 
-The Saeghe code of conduct is derived from the Ruby code of conduct.
-
-- Participants will be tolerant of opposing views.
-- Participants must ensure that their language and actions are free of personal attacks and disparaging personal remarks.
-- When interpreting the words and actions of others, participants should always assume good intentions.
-- Behavior that can be reasonably considered harassment will not be tolerated.
+In order to ensure that the Saeghe community is welcoming to all, please review and abide by the [Code of Conduct](https://github.com/saeghe/saeghe/blob/master/CODE_OF_CONDUCT.md).
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting Morteza Poussaneh at [morteza@protonmail.com](mailto:morteza@protonmail.com).
 
