@@ -28,6 +28,14 @@ jobs:
           extensions: curl, mbstring, zip, pcntl, fileinfo
           coverage: none
 
+      - name: Install dependencies
+        run: |
+          git submodule init
+          git submodule update
+
+      - name: List Installed Dependencies
+        run: composer show -D
+
       - name: Set Credentials
         run: ./saeghe credential github.com ${{ secrets.GITHUB_TOKEN }}
 
