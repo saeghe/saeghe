@@ -7,6 +7,7 @@ require __DIR__ . '/Source/Str.php';
 require __DIR__ . '/Source/PhpFile.php';
 require __DIR__ . '/Source/Commands/Add.php';
 require __DIR__ . '/Source/Commands/Build.php';
+require __DIR__ . '/Source/Commands/Credential.php';
 require __DIR__ . '/Source/Commands/Flush.php';
 require __DIR__ . '/Source/Commands/Help.php';
 require __DIR__ . '/Source/Commands/Init.php';
@@ -32,7 +33,8 @@ $config = [
 
 $meta = ['packages' => []];
 
-$credentials = json_to_array(__DIR__ . '/credentials.json');
+$credentialsPath = __DIR__ . '/credentials.json';
+$credentials = json_to_array($credentialsPath);
 $project = Read\parameter('project', '');
 $projectRoot = strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SERVER['PWD'] . '/';
 $configPath = $projectRoot . Read\parameter('config-file', DEFAULT_CONFIG_FILENAME);
@@ -51,6 +53,7 @@ if ($command === 'help' && Read\option('man')) {
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run(),
     'build' => \Saeghe\Saeghe\Commands\Build\run(),
+    'credential' => \Saeghe\Saeghe\Commands\Credential\run(),
     'flush' => \Saeghe\Saeghe\Commands\Flush\run(),
     'init' => \Saeghe\Saeghe\Commands\Init\run(),
     'install' => \Saeghe\Saeghe\Commands\Install\run(),
