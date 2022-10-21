@@ -29,7 +29,6 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        continue-on-error: true
         run: |
           git submodule init
           git submodule update
