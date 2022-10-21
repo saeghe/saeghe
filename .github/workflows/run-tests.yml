@@ -1,0 +1,35 @@
+name: run-tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        php: [8.2, 8.1, 8.0]
+
+    name: P${{ matrix.php }} - ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, mbstring, zip, pcntl, fileinfo
+          coverage: none
+
+      - name: Set Credentials
+        run: ./saeghe credential github.com ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Execute tests
+        run: ./run
