@@ -24,11 +24,14 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          host: github.com
-          private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           php-version: ${{ matrix.php }}
           extensions: curl, mbstring, zip, pcntl, fileinfo
           coverage: none
+
+      - name: Add SSH key
+        uses: webfactory/ssh-agent@v0.6.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Install dependencies
         run: |
