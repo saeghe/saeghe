@@ -2,8 +2,6 @@
 
 namespace Tests\InstallCommand;
 
-require_once __DIR__ . '/../Packages/saeghe/cli/Source/IO/Write.php';
-
 use function Saeghe\Cli\IO\Write\assert_success;
 
 test(
