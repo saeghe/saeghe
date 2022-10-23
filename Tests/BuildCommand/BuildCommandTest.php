@@ -168,6 +168,8 @@ function assert_executables_are_linked($message)
     $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
 
     assert(is_link($linkFile) && readlink($linkFile) === $linkSource, $message);
+    clearstatcache();
+    assert(774 == decoct(fileperms($linkSource) & 0777));
     assert(str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stub)) === file_get_contents($linkSource), 'Executable content is not correct! ' . $message);
 }
 
