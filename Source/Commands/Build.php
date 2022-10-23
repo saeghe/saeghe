@@ -54,6 +54,7 @@ function add_executables($buildDirectory, $packagesBuildDirectory, $meta, $repla
                 $link = $buildDirectory . $linkName;
                 symlink($target, $link);
                 add_autoloads($target, $replaceMap, $autoloads);
+                chmod($target, 0774);
             }
         }
     }
