@@ -4,15 +4,22 @@ namespace Saeghe\Saeghe;
 
 class Project
 {
-    public readonly string $buildRoot;
+    /**
+     * $buildRoot is readonly.
+     *  DO NOT modify it!
+     */
+    public string $buildRoot;
 
+    /**
+     * $root, $environment, $configFilePath, $configLockFilePath, $credentialsPath are readonly.
+     *  DO NOT modify them!
+     */
     public function __construct(
-        public readonly string $root,
-        public readonly string $environment,
-        public readonly string $configFilePath,
-        public readonly string $configLockFilePath,
-        public readonly string $credentialsPath,
-
+        public string $root,
+        public string $environment,
+        public string $configFilePath,
+        public string $configLockFilePath,
+        public string $credentialsPath,
     ) {
         $this->buildRoot = $this->root . 'builds/' . $this->environment . '/';
     }
