@@ -60,7 +60,17 @@ function add(Project $project, Config $config, Package $package, $packageUrl)
 
     $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)));
 
-    foreach ($packageConfig->packages as $packageUrl => $package) {
-        add($project, $config, $package, $packageUrl);
+    foreach ($packageConfig->packages as $subPackageUrl => $subPackage) {
+        $subPackageExists = false;
+        foreach ($meta->packages as $installedPackageUrl => $installedPackage) {
+            if ($installedPackage->is($subPackage)) {
+                $subPackageExists = true;
+                break;
+            }
+        }
+
+        if (! $subPackageExists) {
+            add($project, $config, $subPackage, $subPackageUrl);
+        }
     }
 }

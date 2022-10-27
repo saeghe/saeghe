@@ -23,26 +23,26 @@ test(
         delete_packages_directory();
     }
 );
-//
-//test(
-//    title: 'it should add a complex project with http path',
-//    case: function () {
-//        $output = shell_exec($_SERVER['PWD'] . "/saeghe add https://github.com/saeghe/complex-package.git --project=TestRequirements/Fixtures/ProjectWithTests");
-//
-//        assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
-//    },
-//    before: function () {
-//        delete_config_file();
-//        delete_meta_file();
-//        delete_packages_directory();
-//        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
-//    },
-//    after: function () {
-//        delete_config_file();
-//        delete_meta_file();
-//        delete_packages_directory();
-//    }
-//);
+
+test(
+    title: 'it should add a complex project with http path',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add https://github.com/saeghe/complex-package.git --project=TestRequirements/Fixtures/ProjectWithTests");
+
+        assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
+    },
+    before: function () {
+        delete_config_file();
+        delete_meta_file();
+        delete_packages_directory();
+        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
+    },
+    after: function () {
+        delete_config_file();
+        delete_meta_file();
+        delete_packages_directory();
+    }
+);
 
 function delete_config_file()
 {
