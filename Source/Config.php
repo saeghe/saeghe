@@ -4,12 +4,16 @@ namespace Saeghe\Saeghe;
 
 class Config
 {
+    /**
+     * $map, $entryPoints, $excludes, $executables and $packagesDirectory are readonly.
+     *  DO NOT modify them!
+     */
     public function __construct(
-        public readonly array $map,
-        public readonly array $entryPoints,
-        public readonly array $excludes,
-        public readonly array $executables,
-        public readonly string $packagesDirectory,
+        public array $map,
+        public array $entryPoints,
+        public array $excludes,
+        public array $executables,
+        public string $packagesDirectory,
         public array $packages,
     ) {}
 

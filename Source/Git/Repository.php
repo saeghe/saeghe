@@ -17,9 +17,13 @@ class Repository
     public string $version;
     public string $hash;
 
+    /**
+     * $owner and $repo are readonly.
+     *  DO NOT modify them!
+     */
     public function __construct(
-        public readonly string $owner,
-        public readonly string $repo,
+        public string $owner,
+        public string $repo,
     ) {}
 
     public static function fromUrl(string $packageUrl): static
