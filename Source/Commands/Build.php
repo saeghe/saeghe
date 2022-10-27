@@ -3,101 +3,95 @@
 namespace Saeghe\Saeghe\Commands\Build;
 
 use Saeghe\Cli\IO\Write;
+use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\PhpFile;
+use Saeghe\Saeghe\Project;
 use Saeghe\Saeghe\Str;
-use function Saeghe\Cli\IO\Read\argument;
 
 $autoloads = [];
 
-function run()
+function run(Project $project)
 {
-    global $projectRoot;
-    global $config;
-    global $meta;
-    global $packagesDirectory;
-    global $buildsPath;
-    $environment = argument(2, 'development');
-
     umask(0);
-    $buildDirectory = dir_clean($buildsPath . $environment);
-    $packagesBuildDirectory = dir_find_or_create($buildDirectory . $config['packages-directory']);
-    $replaceMap = make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $packagesBuildDirectory);
-    compile_packages($packagesDirectory, $packagesBuildDirectory, $meta, $replaceMap);
-    compile_project_files($projectRoot, $buildDirectory, $packagesBuildDirectory, $config, $meta, $replaceMap);
+
+    $config = Config::fromArray(json_to_array($project->configFilePath));
+    $meta = Meta::fromArray(json_to_array($project->configLockFilePath));
+
+    dir_clean($project->buildRoot);
+    dir_find_or_create($project->buildRoot . $config->packagesDirectory);
+
+    $replaceMap = make_replace_map($project, $config, $meta);
+
+    foreach ($meta->packages as $package) {
+        compile_packages($project, $config, $package, $replaceMap);
+    }
+
+    compile_project_files($project, $config, $replaceMap);
+
     global $autoloads;
-    make_entry_points($buildDirectory, $config, $replaceMap, $autoloads);
-    add_executables($buildDirectory, $packagesBuildDirectory, $meta, $replaceMap, $autoloads);
+    make_entry_points($project, $config, $replaceMap, $autoloads);
+
+    foreach ($meta->packages as $package) {
+        add_executables($project, $config, $package, $replaceMap, $autoloads);
+    }
 
     clearstatcache();
 
     Write\success('Build finished successfully.');
 }
 
-function make_entry_points($buildDirectory, $config, $replaceMap, $autoloads)
+function make_entry_points(Project $project, Config $config, $replaceMap, $autoloads)
 {
-    foreach ($config['entry-points'] as $entrypoint) {
-        $path = $buildDirectory . $entrypoint;
+    foreach ($config->entryPoints as $entrypoint) {
+        $path = $project->buildRoot . $entrypoint;
         add_autoloads($path, $replaceMap, $autoloads);
     }
 }
 
-function add_executables($buildDirectory, $packagesBuildDirectory, $meta, $replaceMap, $autoloads)
+function add_executables(Project $project, Config $config, Package $package, $replaceMap, $autoloads)
 {
-    foreach ($meta['packages'] ?? [] as $package => $packageMeta) {
-        $packageBuildDirectory = $packagesBuildDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
-        $packageConfigPath = $packageBuildDirectory . '/' . DEFAULT_CONFIG_FILENAME;
-        $packageConfig = json_to_array($packageConfigPath);
-
-        if (isset($packageConfig['executables'])) {
-            foreach ($packageConfig['executables'] as $linkName => $source) {
-                $target = $packageBuildDirectory . $source;
-                $link = $buildDirectory . $linkName;
-                symlink($target, $link);
-                add_autoloads($target, $replaceMap, $autoloads);
-                chmod($target, 0774);
-            }
-        }
+    $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)));
+    foreach ($packageConfig->executables as $linkName => $source) {
+        $target = $package->buildRoot($project, $config) . $source;
+        $link = $project->buildRoot . $linkName;
+        symlink($target, $link);
+        add_autoloads($target, $replaceMap, $autoloads);
+        chmod($target, 0774);
     }
 }
 
-function compile_packages($packagesDirectory, $packagesBuildDirectory, $packages, $replaceMap)
+function compile_packages(Project $project, Config $config, Package $package, $replaceMap)
 {
-    foreach ($packages['packages'] as $package => $meta) {
-        $packageDirectory = $packagesDirectory . $meta['owner'] . '/' . $meta['repo'] . '/';
-        $packageBuildDirectory = dir_renew($packagesBuildDirectory . $meta['owner'] . '/' . $meta['repo'] . '/');
+    dir_renew($project->buildRoot . '/' . $config->packagesDirectory . '/' . $package->owner . '/' . $package->repo);
 
-        $packageConfig = array_merge_json(
-            ['map' => [], 'packages' => [], 'excludes' => [], 'executables' => [], 'entry-points' => []],
-            $packageDirectory . '/' . DEFAULT_CONFIG_FILENAME,
-        );
-
-        $filesAndDirectories = should_compile_files_and_directories_for_package($packageDirectory, $packageConfig);
-
-        foreach ($filesAndDirectories as $fileOrDirectory) {
-            compile($fileOrDirectory, $packageDirectory, $packageBuildDirectory, $replaceMap, $packageConfig);
-        }
-    }
-}
-
-function compile_project_files($projectRoot, $buildDirectory, $packagesBuildDirectory, $config, $meta, $replaceMap)
-{
-    $filesAndDirectories = should_compile_files_and_directories($projectRoot, $config);
+    $filesAndDirectories = should_compile_files_and_directories_for_package($project, $config, $package);
+    $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)));
+    $packageRoot = $package->root($project, $config);
+    $packageBuildRoot = $package->buildRoot($project, $config);
 
     foreach ($filesAndDirectories as $fileOrDirectory) {
-        compile($fileOrDirectory, $projectRoot, $buildDirectory, $replaceMap, $config);
+        compile($packageConfig, $packageRoot . $fileOrDirectory, $packageBuildRoot . $fileOrDirectory, $replaceMap);
     }
 }
 
-function compile($fileOrDirectory, $from, $to, $replaceMap, $config)
+function compile_project_files(Project $project, Config $config, $replaceMap)
 {
-    $origin = $from . (str_ends_with($from, '/') ? '' : '/') . $fileOrDirectory;
-    $destination = $to . (str_ends_with($to, '/') ? '' : '/') . $fileOrDirectory;
+    $filesAndDirectories = should_compile_files_and_directories($project, $config);
 
+    foreach ($filesAndDirectories as $fileOrDirectory) {
+        compile($config, $project->root . $fileOrDirectory, $project->buildRoot . $fileOrDirectory, $replaceMap);
+    }
+}
+
+function compile(Config $config, $origin, $destination, $replaceMap)
+{
     if (is_dir($origin)) {
         dir_preserve_copy($origin, $destination);
-        $filesAndDirectories = all_files_and_directories($origin);
-        foreach ($filesAndDirectories as $fileOrDirectory) {
-            compile($fileOrDirectory, $origin, $destination, $replaceMap, $config);
+        $subFilesAndDirectories = all_files_and_directories($origin);
+        foreach ($subFilesAndDirectories as $subFileOrDirectory) {
+            compile($config, $origin . '/' . $subFileOrDirectory, $destination . '/' . $subFileOrDirectory, $replaceMap);
         }
 
         return;
@@ -231,78 +225,77 @@ function add_requires_and_autoload($requireStatements, $file)
     return $content;
 }
 
-function make_replace_map($config, $meta, $buildDirectory, $packagesDirectory, $packagesBuildDirectory)
+function make_replace_map(Project $project, Config $config, Meta $meta): array
 {
     $replaceMap = [];
 
-    foreach ($meta['packages'] as $package => $packageMeta) {
-        $packageSource = $packagesDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
-        $packageBuild = $packagesBuildDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/';
-        $packageConfigPath =  $packageSource . DEFAULT_CONFIG_FILENAME;
-        $packageMetaFilename = str_replace('.json', '-lock.json', DEFAULT_CONFIG_FILENAME);
-        $metaPath =  $packageSource . $packageMetaFilename;
-        $packageConfig = json_to_array($packageConfigPath, ['map' => [], 'packages' => []]);
-        $subPackageMeta = json_to_array($metaPath, []);
+    $mapPackageNamespaces = function (Package $package) use (&$replaceMap, $project, $config) {
+        $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)));
+        $packageRoot = $package->buildRoot($project, $config);
 
-        $subPackageMeta['packages'] = $subPackageMeta['packages'] ?? [];
+        foreach ($packageConfig->map as $namespace => $source) {
+            $replaceMap[$namespace] = $packageRoot . $source;
+        }
+    };
 
-        $replaceMap = array_merge(
-            $replaceMap,
-            make_replace_map($packageConfig, $subPackageMeta, $packageBuild, $packagesDirectory, $packagesBuildDirectory)
-        );
+    foreach ($meta->packages as $package) {
+        $mapPackageNamespaces($package);
     }
 
-    array_walk($config['map'], function ($source, $namespace) use (&$replaceMap, $buildDirectory) {
-        $replaceMap[$namespace] = $buildDirectory . $source;
-    });
+    foreach ($config->map as $namespace => $source) {
+        $replaceMap[$namespace] = $project->buildRoot . $source;
+    }
 
     return $replaceMap;
 }
 
-function should_compile_files_and_directories_for_package($path, $config)
+function should_compile_files_and_directories_for_package(Project $project, Config $config, Package $package)
 {
+    $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)));
+    $packageRoot = $package->root($project, $config);
+
     $excludedPaths = array_map(
-        function ($excludedPath) use ($path) {
-            return $path . $excludedPath;
+        function ($excludedPath) use ($package, $packageRoot) {
+            return $packageRoot . $excludedPath;
         },
-        array_merge(['.', '..', '.git'], $config['excludes'])
+        array_merge(['.', '..', '.git'], $packageConfig->excludes)
     );
 
-    $filesAndDirectories = scandir($path);
+    $filesAndDirectories = scandir($package->root($project, $config));
 
     return array_filter(
         $filesAndDirectories,
-        function ($fileOrDirectory) use ($path, $excludedPaths) {
-            $fileOrDirectoryPath = $path . $fileOrDirectory;
+        function ($fileOrDirectory) use ($package, $excludedPaths, $packageRoot) {
+            $fileOrDirectoryPath = $packageRoot . $fileOrDirectory;
             return ! in_array($fileOrDirectoryPath, $excludedPaths);
         },
     );
 }
 
-function should_compile_files_and_directories($path, $config)
+function should_compile_files_and_directories(Project $project, Config $config)
 {
     $excludedPaths = array_map(
-        function ($excludedPath) use ($path) {
-            return $path . $excludedPath;
+        function ($excludedPath) use ($project) {
+            return $project->root . $excludedPath;
         },
-        array_merge(['.', '..', 'builds', '.git', '.idea', $config['packages-directory']], $config['excludes'])
+        array_merge(['.', '..', 'builds', '.git', '.idea', $config->packagesDirectory], $config->excludes)
     );
 
-    $filesAndDirectories = scandir($path);
+    $filesAndDirectories = scandir($project->root);
 
     return array_filter(
         $filesAndDirectories,
-        function ($fileOrDirectory) use ($path, $excludedPaths) {
-            $fileOrDirectoryPath = $path . $fileOrDirectory;
+        function ($fileOrDirectory) use ($project, $excludedPaths) {
+            $fileOrDirectoryPath = $project->root . $fileOrDirectory;
             return ! in_array($fileOrDirectoryPath, $excludedPaths);
         },
     );
 }
 
-function file_needs_modification($file, $config)
+function file_needs_modification($file, Config $config)
 {
     return array_reduce(
-            array: array_merge(array_values($config['executables']), $config['entry-points']),
+            array: array_merge(array_values($config->executables), $config->entryPoints),
             callback: fn ($carry, $entryPoint) => str_ends_with($file, $entryPoint) || $carry,
             initial: false
         )

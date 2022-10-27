@@ -2,15 +2,14 @@
 
 namespace Saeghe\Saeghe\Commands\Watch;
 
+use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\parameter;
 
-function run()
+function run(Project $project)
 {
-    global $projectRoot;
-
     $seconds = (int) parameter('wait', 3);
 
-    chdir($projectRoot);
+    chdir($project->root);
 
     while (true) {
         echo shell_exec('saeghe --command=build');

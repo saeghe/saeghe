@@ -2,25 +2,21 @@
 
 namespace Saeghe\Saeghe\Commands\Install;
 
+use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Package;
+use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Write\success;
 
-function run()
+function run(Project $project)
 {
-    global $meta;
-    global $packagesDirectory;
+    $config = Config::fromArray(json_to_array($project->configFilePath));
+    $meta = Meta::fromArray(json_to_array($project->configLockFilePath));
 
-    foreach ($meta['packages'] as $package => $meta) {
-        install($meta, $packagesDirectory);
-    }
+    array_walk(
+        $meta->packages,
+        fn (Package $package) => $package->download($package->root($project, $config))
+    );
 
     success('Packages has been installed successfully.');
-}
-
-function install($meta, $packagesDirectory)
-{
-    if (git_has_release($meta['owner'], $meta['repo'])) {
-        git_download($packagesDirectory, $meta['owner'], $meta['repo'], $meta['version']);
-    } else {
-        git_clone($packagesDirectory, $meta['owner'], $meta['repo']);
-    }
 }

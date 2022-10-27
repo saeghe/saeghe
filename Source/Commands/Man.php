@@ -3,8 +3,9 @@
 namespace Saeghe\Saeghe\Commands\Man;
 
 use Saeghe\Cli\IO\Write;
+use Saeghe\Saeghe\Project;
 
-function run()
+function run(Project $project)
 {
     $content = <<<EOD
 usage: saeghe [-h | --help] [--man]

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\InstallCommand;
+namespace Tests\InstallCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
 
@@ -9,13 +9,14 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe install --project=TestRequirements/Fixtures/EmptyProject");
 
+        assert_success('Packages has been installed successfully.', $output);
         assert_config_file_content_not_changed('Config file has been changed!' . $output);
         assert_meta_file_content_not_changed('Released Package meta data does not added to meta file properly! ' . $output);
         assert_package_exists_in_packages_directory('Package does not exist in the packages directory.' . $output);
         assert_zip_file_deleted('Zip file has not been deleted.' . $output);
-        assert_success('Packages has been installed successfully.', $output);
     },
     before: function () {
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject");
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
     },
@@ -44,7 +45,7 @@ function assert_meta_file_content_not_changed($message)
         && 'v1.0.3' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
         && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
-        && '9e9b796' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
+        && '9e9b796915596f7c5e0b91d2f9fa5f916a9b5cc8' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
         $message
     );
 }

@@ -2,57 +2,65 @@
 
 namespace Saeghe\Saeghe\Commands\Add;
 
+use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Package;
+use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
+use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\success;
 
-function run()
+function run(Project $project)
 {
-    global $packagesDirectory;
-    global $configPath;
-    global $config;
-
-    $package = argument(2);
+    $packageUrl = argument(2);
     $version = parameter('version');
 
-    $packageMeta = add($packagesDirectory, $package, $version);
+    if (! file_exists($project->configFilePath)) {
+        error('Project is not initialized. Please try to initialize using the init command.');
+        return;
+    }
 
-    $config['packages'][$package] = $packageMeta['version'];
+    $config = Config::fromArray(json_to_array($project->configFilePath));
 
-    json_put($configPath, $config);
+    $package = array_reduce(
+        $config->packages,
+        function ($carry, Package $package) {
+            return $package->is($carry) ? $package : $carry;
+        },
+        Package::fromUrl($packageUrl)
+    );
 
-    success("Package $package has been added successfully.");
+    if (isset($package->version)) {
+        error("Package $packageUrl is already exists");
+        return;
+    }
+
+    $version ? $package->version($version) : $package->latestVersion();
+
+    if (! file_exists($project->root . $config->packagesDirectory)) {
+        dir_make_recursive($project->root . $config->packagesDirectory);
+    }
+
+    add($project, $config, $package, $packageUrl);
+
+    $config->packages[$packageUrl] = $package;
+    json_put($project->configFilePath, $config->toArray());
+
+    success("Package $packageUrl has been added successfully.");
 }
 
-function add($packagesDirectory, $package, $version)
+function add(Project $project, Config $config, Package $package, $packageUrl)
 {
-    global $metaFilePath;
+    $package->detectHash()->download($package->root($project, $config));
 
-    $owner = git_owner($package);
-    $repo = git_repo($package);
+    $meta = Meta::fromArray(json_to_array($project->configLockFilePath));
+    $meta->packages[$packageUrl] = $package;
+    json_put($project->configLockFilePath, $meta->toArray());
 
-    if ($version !== 'development' && git_has_release($owner, $repo)) {
-        $version = $version ?: git_latest_version($owner, $repo);
-        $hash = git_download($packagesDirectory, $owner, $repo, $version);
-    } else {
-        $version = 'development';
-        $hash = git_clone($packagesDirectory, $owner, $repo);
+    $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)));
+
+    foreach ($packageConfig->packages as $packageUrl => $package) {
+        add($project, $config, $package, $packageUrl);
     }
-
-    $meta = json_to_array($metaFilePath);
-    $meta['packages'][$package] = compact('owner', 'repo', 'version', 'hash');
-    json_put($metaFilePath, $meta);
-
-    $packagePath = $packagesDirectory . "/$owner/$repo/";
-    $packageConfigPath = $packagePath . DEFAULT_CONFIG_FILENAME;
-
-    if (file_exists($packageConfigPath)) {
-        $packageConfig = json_to_array($packageConfigPath, []);
-        $subPackages = $packageConfig['packages'] ?? [];
-        foreach ($subPackages as $subPackage => $subPackageVersion) {
-            add($packagesDirectory, $subPackage, $subPackageVersion);
-        }
-    }
-
-    return compact('owner', 'repo', 'version', 'hash');
 }

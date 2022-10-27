@@ -66,33 +66,6 @@ test(
 );
 
 test(
-    title: 'it makes a new config file with given filename',
-    case: function ($configFile, $configPath, $metaFile) use ($initialContent, $metaContent) {
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe init --config-file=$configFile");
-
-        File\assert_exists($configPath, 'Custom config file does not exists: ' . $output);
-        File\assert_exists($metaFile, 'Custom lock file does not exists: ' . $output);
-        File\assert_content($configPath, $initialContent, 'Custom config file content is not correct after running init!');
-        File\assert_content($metaFile, $metaContent, 'Custom config file content is not correct after running init!');
-
-        return [$configPath, $metaFile];
-    },
-    before: function () {
-        $configFile = 'build-config.json';
-        $metaFile = 'build-config-lock.json';
-        $configPath = $_SERVER['PWD'] . '/' . $configFile;
-        // Make sure file does not exist
-        shell_exec('rm -f ' . $configPath);
-
-        return compact('configFile', 'configPath', 'metaFile');
-    },
-    after: function ($configPath, $metaFile) {
-        shell_exec('rm -f ' . $configPath);
-        shell_exec('rm -f ' . $metaFile);
-    }
-);
-
-test(
     title: 'it makes a new config file with given packages directory',
     case: function () use ($initialContentWithPackagesDirectory) {
         $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';

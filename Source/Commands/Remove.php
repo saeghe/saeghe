@@ -2,79 +2,70 @@
 
 namespace Saeghe\Saeghe\Commands\Remove;
 
+use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Package;
+use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\argument;
+use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\success;
 
-function run()
+function run(Project $project)
 {
-    $package = argument(2);
+    $givenPackageUrl = argument(2);
 
-    global $config;
-    global $meta;
-    global $packagesDirectory;
+    $config = Config::fromArray(json_to_array($project->configFilePath));
 
-    remove($package, $config, $meta, $packagesDirectory);
+    $package = array_reduce(
+        $config->packages,
+        function ($carry, Package $package) {
+            return $package->is($carry) ? $package : $carry;
+        },
+        Package::fromUrl($givenPackageUrl)
+    );
 
-    success("Package $package has been removed successfully.");
-}
+    if (! isset($package->version)) {
+        error("Package $givenPackageUrl does not found in your project!");
 
-function remove($package, $config, $meta, $packagesDirectory)
-{
-    global $projectRoot;
+        return;
+    }
 
-    $packageMeta = $meta['packages'][$package];
+    $packageUrl = $givenPackageUrl;
 
-    $packageConfigPath = $packagesDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'] . '/' . DEFAULT_CONFIG_FILENAME;
-
-    $packageConfig = file_exists($packageConfigPath) ? json_decode(file_get_contents($packageConfigPath), true) : [];
-
-    $packageConfig['packages'] = $packageConfig['packages'] ?? [];
-
-    remove_package_from_meta($package);
-
-    remove_package_from_config($package);
-
-    delete_package_from_packages($package);
-
-    foreach ($packageConfig['packages'] as $subpackage => $version) {
-        if (! isset($config['packages'][$subpackage])) {
-            remove($subpackage, $config, $meta, $packagesDirectory);
+    foreach ($config->packages as $installedPackageUrl => $configPackage) {
+        if ($configPackage->is($package)) {
+            $packageUrl = $installedPackageUrl;
+            break;
         }
     }
 
-    if (isset($packageConfig['executables'])) {
-        foreach ($packageConfig['executables'] as $link => $path) {
-            shell_exec('rm -f ' . $projectRoot . $link);
+    remove($project, $config, $package, $packageUrl);
+
+    unset($config->packages[$packageUrl]);
+    json_put($project->configFilePath, $config->toArray());
+
+    success("Package $givenPackageUrl has been removed successfully.");
+}
+
+function remove(Project $project, Config $config, Package $package, $packageUrl)
+{
+    $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)));
+
+    foreach ($packageConfig->packages as $subPackageUrl => $subPackage) {
+        $subPackageHasBeenUsed = false;
+        foreach ($config->packages as $usedPackages) {
+            $subPackageHasBeenUsed = $subPackageHasBeenUsed || $usedPackages->is($subPackage);
+        }
+
+        if (! $subPackageHasBeenUsed) {
+            remove($project, $config, $subPackage, $subPackageUrl);
         }
     }
-}
 
-function remove_package_from_meta($package)
-{
-    global $metaFilePath;
+    shell_exec('rm -fR ' . $package->root($project, $config));
 
-    $meta = json_decode(json: file_get_contents($metaFilePath), associative: true, flags: JSON_THROW_ON_ERROR);
-    unset($meta['packages'][$package]);
+    $meta = Meta::fromArray(json_to_array($project->configLockFilePath));
 
-    file_put_contents($metaFilePath, json_encode($meta, JSON_PRETTY_PRINT));
-}
-
-function remove_package_from_config($package)
-{
-    global $configPath;
-
-    $config = json_decode(json: file_get_contents($configPath), associative: true, flags: JSON_THROW_ON_ERROR);
-    unset($config['packages'][$package]);
-
-    file_put_contents($configPath, json_encode($config, JSON_PRETTY_PRINT));
-}
-
-function delete_package_from_packages($package)
-{
-    global $packagesDirectory;
-    global $meta;
-
-    $packageMeta = $meta['packages'][$package];
-
-    shell_exec('rm -fR ' . $packagesDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo']);
+    unset($meta->packages[$packageUrl]);
+    json_put($project->configLockFilePath, $meta->toArray());
 }

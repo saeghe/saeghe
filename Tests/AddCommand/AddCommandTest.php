@@ -2,25 +2,35 @@
 
 namespace Tests\AddCommand\AddCommandTest;
 
+use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;
+
+test(
+    title: 'it should show error message when project is not initialized',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject");
+        assert_error('Project is not initialized. Please try to initialize using the init command.', $output);
+    }
+);
 
 test(
     title: 'it should add package to the project',
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject");
 
+        assert_success('Package git@github.com:saeghe/simple-package.git has been added successfully.', $output);
         assert_config_file_created_for_simple_project('Config file is not created!' . $output);
         assert_simple_package_added_to_config('Simple Package does not added to config file properly! ' . $output);
         assert_packages_directory_created_for_empty_project('Package directory does not created.' . $output);
         assert_simple_package_cloned('Simple package does not cloned!' . $output);
         assert_meta_has_desired_data('Meta data is not what we want.' . $output);
-        assert_success('Package git@github.com:saeghe/simple-package.git has been added successfully.', $output);
     },
     before: function () {
         delete_empty_project_config_file();
         delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
         delete_empty_project_packages_directory();
@@ -40,6 +50,32 @@ test(
         delete_empty_project_config_file();
         delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
+    },
+    after: function () {
+        delete_empty_project_packages_directory();
+        delete_empty_project_config_file();
+        delete_empty_project_meta_file();
+    }
+);
+
+test(
+    title: 'it should use same repo with git and https urls',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe add https://github.com/saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject");
+
+        assert_error('Package https://github.com/saeghe/simple-package.git is already exists', $output);
+        $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
+        $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'), true, JSON_THROW_ON_ERROR);
+        assert(count($config['packages']) === 1);
+        assert(count($meta['packages']) === 1);
+    },
+    before: function () {
+        delete_empty_project_config_file();
+        delete_empty_project_meta_file();
+        delete_empty_project_packages_directory();
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
+        shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
         delete_empty_project_packages_directory();
