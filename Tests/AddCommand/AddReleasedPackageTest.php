@@ -20,6 +20,7 @@ test(
         delete_empty_project_config_file();
         delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
         delete_empty_project_packages_directory();
@@ -39,6 +40,7 @@ test(
         delete_empty_project_config_file();
         delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
         delete_empty_project_packages_directory();
@@ -118,7 +120,7 @@ function assert_meta_has_desired_data($message)
         && 'v1.0.5' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
         && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
-        && '5885e5f' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
+        && '5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
         $message
     );
 }

@@ -7,6 +7,7 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe build --project=TestRequirements/Fixtures/ProjectWithTests");
         assert_build_for_packages('Packages file does not built properly!' . $output);
+        assert_build_for_dependency_packages('Dependency Packages file does not built properly!' . $output);
         assert_executable_file_added('Complex executable file has not been created!' . $output);
     },
     before: function () {
@@ -59,6 +60,18 @@ function assert_build_for_packages($message)
         && build_exists_and_same_as_stub('saeghe.config.json')
         && build_exists_and_same_as_stub('saeghe.config-lock.json')
         && build_exists_and_same_as_stub('cli-command')
+        ,
+        $message
+    );
+}
+
+function assert_build_for_dependency_packages($message)
+{
+    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/BuildForComplexPackage';
+    assert(
+        file_get_contents($environmentBuildPath . '/Packages/saeghe/simple-package/run.php')
+        === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/' . 'simple-package.run.php.stub'))
         ,
         $message
     );

@@ -2,14 +2,13 @@
 
 namespace Saeghe\Saeghe\Commands\Flush;
 
+use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Write\success;
 
-function run()
+function run(Project $project)
 {
-    global $buildsPath;
-
-    dir_clean($buildsPath . 'development');
-    dir_clean($buildsPath . 'production');
+    dir_clean($project->buildRoot);
+    dir_clean(dirname($project->buildRoot) . '/production');
 
     success('Build directory has been flushed.');
 }

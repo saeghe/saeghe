@@ -2,21 +2,18 @@
 
 namespace Saeghe\Saeghe\Commands\Credential;
 
+use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\success;
 
-function run()
+function run(Project $project)
 {
-    global $credentialsPath;
-
     $provider = argument(2);
     $token = argument(3);
 
-    $credentials = json_to_array($credentialsPath, []);
-
+    $credentials = json_to_array($project->credentialsPath);
     $credentials[$provider] = ['token' => $token];
-
-    json_put($credentialsPath, $credentials);
+    json_put($project->credentialsPath, $credentials);
 
     success("Credential for $provider has been set successfully.");
 }

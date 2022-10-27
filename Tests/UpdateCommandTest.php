@@ -2,6 +2,7 @@
 
 namespace Tests\UpdateCommandTest;
 
+use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
 
 test(
@@ -9,12 +10,29 @@ test(
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe update git@github.com:saeghe/released-package.git --project=TestRequirements/Fixtures/EmptyProject");
 
+        assert_success('Package git@github.com:saeghe/released-package.git has been updated.', $output);
         assert_version_upgraded_in_config_file($output);
         assert_meta_updated($output);
-        assert_success('Package git@github.com:saeghe/released-package.git has been updated.', $output);
     },
     before: function () {
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject");
+    },
+    after: function () {
+        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
+    }
+);
+
+test(
+    title: 'it should show error message when package does not exists',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . "/saeghe update git@github.com:saeghe/released-package.git --project=TestRequirements/Fixtures/EmptyProject");
+
+        assert_error('Package git@github.com:saeghe/released-package.git does not found in your project!', $output);
+    },
+    before: function () {
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
+        shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
         shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
@@ -29,6 +47,7 @@ test(
         assert_given_version_added('Package did not updated to given package version. ' . $output);
     },
     before: function () {
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.2 --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
@@ -56,7 +75,7 @@ function assert_meta_updated($message)
         && 'v1.0.5' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
         && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
-        && '5885e5f' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
+        && '5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
         $message
     );
 }
@@ -73,7 +92,7 @@ function assert_given_version_added($message)
         && 'v1.0.3' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
         && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
-        && '9e9b796' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
+        && '9e9b796915596f7c5e0b91d2f9fa5f916a9b5cc8' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
         $message
     );
 }

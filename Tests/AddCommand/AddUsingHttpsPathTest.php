@@ -5,7 +5,7 @@ namespace Tests\AddCommand\AddUsingHttpsPath;
 use Saeghe\TestRunner\Assertions\File;
 
 test(
-    title: 'it should add package to the project',
+    title: 'it should add package to the project using https url',
     case: function () {
         $output = shell_exec($_SERVER['PWD'] . "/saeghe add https://github.com/symfony/thanks.git --project=TestRequirements/Fixtures/EmptyProject");
 
@@ -19,6 +19,7 @@ test(
         delete_empty_project_config_file();
         delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
         delete_empty_project_packages_directory();
@@ -38,6 +39,7 @@ test(
         delete_empty_project_config_file();
         delete_empty_project_meta_file();
         delete_empty_project_packages_directory();
+        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
         delete_empty_project_packages_directory();
@@ -101,7 +103,7 @@ function assert_meta_has_desired_data($message)
         && 'v1.2.10' === $meta['packages']['https://github.com/symfony/thanks.git']['version']
         && 'symfony' === $meta['packages']['https://github.com/symfony/thanks.git']['owner']
         && 'thanks' === $meta['packages']['https://github.com/symfony/thanks.git']['repo']
-        && 'e9c4709' === $meta['packages']['https://github.com/symfony/thanks.git']['hash'],
+        && 'e9c4709560296acbd4fe9e12b8d57a925aa7eae8' === $meta['packages']['https://github.com/symfony/thanks.git']['hash'],
         $message
     );
 }

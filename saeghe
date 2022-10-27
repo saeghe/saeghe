@@ -1,10 +1,23 @@
 #!/usr/bin/env php
 <?php
 
+spl_autoload_register(function ($class) {
+    $classMap = [
+        'Saeghe\Saeghe\Git\Repository' => __DIR__ . '/Source/Git/Repository.php',
+        'Saeghe\Saeghe\Config' => __DIR__ . '/Source/Config.php',
+        'Saeghe\Saeghe\Meta' => __DIR__ . '/Source/Meta.php',
+        'Saeghe\Saeghe\Package' => __DIR__ . '/Source/Package.php',
+        'Saeghe\Saeghe\Project' => __DIR__ . '/Source/Project.php',
+    ];
+
+    require_once $classMap[$class];
+});
+
 require __DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php';
 require __DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php';
 require __DIR__ . '/Source/Str.php';
 require __DIR__ . '/Source/PhpFile.php';
+require __DIR__ . '/Source/Git/GitHub.php';
 require __DIR__ . '/Source/Commands/Add.php';
 require __DIR__ . '/Source/Commands/Build.php';
 require __DIR__ . '/Source/Commands/Credential.php';
@@ -19,30 +32,8 @@ require __DIR__ . '/Source/Commands/Update.php';
 require __DIR__ . '/Source/Commands/Watch.php';
 
 use Saeghe\Cli\IO\Read;
-
-const DEFAULT_CONFIG_FILENAME = 'saeghe.config.json';
-
-$config = [
-    'map' => [],
-    'entry-points' => [],
-    'excludes' => [],
-    'executables' => [],
-    'packages-directory' => Read\parameter('packages-directory', 'Packages'),
-    'packages' => [],
-];
-
-$meta = ['packages' => []];
-
-$credentialsPath = __DIR__ . '/credentials.json';
-$credentials = json_to_array($credentialsPath);
-$project = Read\parameter('project', '');
-$projectRoot = strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SERVER['PWD'] . '/';
-$configPath = $projectRoot . Read\parameter('config-file', DEFAULT_CONFIG_FILENAME);
-$config = array_merge_json($config, $configPath);
-$metaFilePath = str_replace('.json', '-lock.json', $configPath);
-$meta = array_merge_json($meta, $metaFilePath);
-$packagesDirectory = dir_find_or_create($projectRoot . $config['packages-directory']);
-$buildsPath = $projectRoot . 'builds' . '/';
+use Saeghe\Saeghe\Project;
+use function Saeghe\Saeghe\Providers\GitHub\github_token;
 
 $command = Read\command() ?? Read\parameter('command', 'help');
 
@@ -50,20 +41,41 @@ if ($command === 'help' && Read\option('man')) {
     $command = 'man';
 }
 
+$project = Read\parameter('project', '');
+
+$project = makeProject(
+    strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SERVER['PWD'] . '/',
+    $command === 'build' ? Read\argument(2, 'development') : 'development'
+);
+
+$credential = json_to_array($project->credentialsPath);
+github_token($credential['github.com']['token'] ?? '');
+
 match ($command) {
-    'add' => \Saeghe\Saeghe\Commands\Add\run(),
-    'build' => \Saeghe\Saeghe\Commands\Build\run(),
-    'credential' => \Saeghe\Saeghe\Commands\Credential\run(),
-    'flush' => \Saeghe\Saeghe\Commands\Flush\run(),
-    'init' => \Saeghe\Saeghe\Commands\Init\run(),
-    'install' => \Saeghe\Saeghe\Commands\Install\run(),
-    'man' => \Saeghe\Saeghe\Commands\Man\run(),
-    'migrate' => \Saeghe\Saeghe\Commands\Migrate\run(),
-    'remove' => \Saeghe\Saeghe\Commands\Remove\run(),
-    'update' => \Saeghe\Saeghe\Commands\Update\run(),
-    'watch' => \Saeghe\Saeghe\Commands\Watch\run(),
-    default => \Saeghe\Saeghe\Commands\Help\run(),
+    'add' => \Saeghe\Saeghe\Commands\Add\run($project),
+    'build' => \Saeghe\Saeghe\Commands\Build\run($project),
+    'credential' => \Saeghe\Saeghe\Commands\Credential\run($project),
+    'flush' => \Saeghe\Saeghe\Commands\Flush\run($project),
+    'init' => \Saeghe\Saeghe\Commands\Init\run($project),
+    'install' => \Saeghe\Saeghe\Commands\Install\run($project),
+    'man' => \Saeghe\Saeghe\Commands\Man\run($project),
+    'migrate' => \Saeghe\Saeghe\Commands\Migrate\run($project),
+    'remove' => \Saeghe\Saeghe\Commands\Remove\run($project),
+    'update' => \Saeghe\Saeghe\Commands\Update\run($project),
+    'watch' => \Saeghe\Saeghe\Commands\Watch\run($project),
+    default => \Saeghe\Saeghe\Commands\Help\run($project),
 };
+
+function makeProject($projectRoot, $environment): Project
+{
+    return new Project(
+        root: $projectRoot,
+        environment: $environment,
+        configFilePath: $projectRoot . 'saeghe.config.json',
+        configLockFilePath: $projectRoot . 'saeghe.config-lock.json',
+        credentialsPath: __DIR__ .'/credentials.json',
+    );
+}
 
 function dir_find_or_create($path)
 {
@@ -134,7 +146,7 @@ function array_merge_json($array, $path)
 
 function json_put($path, array $content)
 {
-    file_put_contents($path, json_encode($content, JSON_PRETTY_PRINT) . PHP_EOL);
+    return file_put_contents($path, json_encode($content, JSON_PRETTY_PRINT) . PHP_EOL) !== false;
 }
 
 function json_to_array($path, $default = [])
@@ -144,111 +156,6 @@ function json_to_array($path, $default = [])
     }
 
     return $default;
-}
-
-function git_clone($packageDirectory, $owner, $repo)
-{
-    $destination = "$packageDirectory$owner/$repo";
-
-    shell_exec("rm -fR $destination");
-    shell_exec("git clone git@github.com:$owner/$repo.git $destination");
-
-    return trim(shell_exec("git --git-dir=$destination/.git rev-parse HEAD"));
-}
-
-function git_has_release($owner, $repo)
-{
-    global $credentials;
-
-    $output = shell_exec('curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/$owner/$repo/releases/latest | grep 'tag_name'");
-
-    return ! is_null($output);
-}
-
-function git_latest_version($owner, $repo)
-{
-    global $credentials;
-
-    $output = shell_exec('curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . $credentials['github.com']['token'] . '" ' .  "https://api.github.com/repos/$owner/$repo/releases/latest | grep 'tag_name'");
-    $version = str_replace('"tag_name": "', '', $output);
-
-    return trim(explode('"', $version)[0]);
-}
-
-function git_download($packageDirectory, $owner, $repo, $version)
-{
-    global $credentials;
-
-    $ownerDirectory = $packageDirectory . $owner . '/';
-
-    if (! file_exists($ownerDirectory)) {
-        mkdir($ownerDirectory);
-    }
-
-    $zipFile = $ownerDirectory . $repo . '.zip';
-
-    $token = $credentials['github.com']['token'];
-    $fp = fopen ($zipFile, 'w+');
-    $ch = curl_init("https://github.com/$owner/$repo/zipball/$version");
-    curl_setopt($ch, CURLOPT_TIMEOUT, 600);
-    curl_setopt($ch, CURLOPT_FILE, $fp);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer $token"]);
-    curl_exec($ch);
-    curl_close($ch);
-    fclose($fp);
-
-    $zip = new ZipArchive;
-    $res = $zip->open($zipFile);
-
-    if ($res === TRUE) {
-        $zip->extractTo($ownerDirectory);
-        $zip->close();
-    } else {
-        var_dump($res);
-    }
-
-    shell_exec('rm -f ' . $zipFile);
-
-    $files = scandir($ownerDirectory);
-
-    $directory = array_reduce($files, function ($carry, $filename) use ($owner, $repo) {
-        return str_starts_with($filename, "$owner-$repo-") ? $filename : $carry;
-    });
-
-    rename($ownerDirectory . $directory, $ownerDirectory . $repo);
-
-    return trim(str_replace("$owner-$repo-", '', $directory));
-}
-
-function git_repo($package)
-{
-    if (str_starts_with($package, 'git@')) {
-        $ownerAndRepo = str_replace('git@github.com:', '', $package);
-    } else {
-        $ownerAndRepo = str_replace('https://github.com/', '', $package);
-    }
-
-    if (str_ends_with($ownerAndRepo, '.git')) {
-        $ownerAndRepo = substr_replace($ownerAndRepo, '', -4);
-    }
-
-    return explode('/', $ownerAndRepo)[1];
-}
-
-function git_owner($package)
-{
-    if (str_starts_with($package, 'git@')) {
-        $ownerAndRepo = str_replace('git@github.com:', '', $package);
-    } else {
-        $ownerAndRepo = str_replace('https://github.com/', '', $package);
-    }
-
-    if (str_ends_with($ownerAndRepo, '.git')) {
-        $ownerAndRepo = substr_replace($ownerAndRepo, '', -4);
-    }
-
-    return explode('/', $ownerAndRepo)[0];
 }
 
 function all_files_and_directories($origin)

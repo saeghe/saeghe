@@ -10,5 +10,6 @@
     ],
     "excludes": [
         "excluded-file.php", "excluded-directory"
-    ]
+    ],
+    "packages": []
 }

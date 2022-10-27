@@ -3,19 +3,18 @@
 namespace Saeghe\Saeghe\Commands\Migrate;
 
 use Saeghe\Cli\IO\Write;
+use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Project;
 
-function run()
+function run(Project $project)
 {
-    global $projectRoot;
-    global $configPath;
-    global $metaFilePath;
-    global $packagesDirectory;
+    $config = Config::init()->toArray();
+    $config['excludes'] = ['vendor'];
+    $meta = Meta::init()->toArray();
 
-    $config = ['map' => [], 'excludes' => ['vendor']];
-    $meta = [];
-
-    $composerFile = $projectRoot . 'composer.json';
-    $composerLockFile = $projectRoot . 'composer.lock';
+    $composerFile = $project->root . 'composer.json';
+    $composerLockFile = $project->root . 'composer.lock';
 
     if (! file_exists($composerFile)) {
         Write\error('There is no composer.json file in this project!');
@@ -68,20 +67,18 @@ function run()
             'repo' => $ownerAndRepo['repo'],
         ];
 
-        migrate_package($packagesDirectory, $name, $package, $meta['packages'][$package]);
+        migrate_package($project, $project->root . $config['packages-directory'] . '/', $name, $package, $meta['packages'][$package]);
     }
 
-    file_put_contents($configPath, json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
-    file_put_contents($metaFilePath, json_encode($meta, JSON_PRETTY_PRINT) . PHP_EOL);
+    json_put($project->configFilePath, $config);
+    json_put($project->configLockFilePath, $meta);
 
     Write\success('Project migrated successfully.');
 }
 
-function migrate_package($packagesDirectory, $name, $package, $packageMeta)
+function migrate_package(Project $project, $packagesDirectory, $name, $package, $packageMeta)
 {
-    global $projectRoot;
-
-    $packageVendorDirectory = $projectRoot . 'vendor/' . $name;
+    $packageVendorDirectory = $project->root . 'vendor/' . $name;
 
     $packageDirectory = $packagesDirectory . $packageMeta['owner'] . '/' . $packageMeta['repo'];
 
@@ -97,7 +94,6 @@ function migrate_package($packagesDirectory, $name, $package, $packageMeta)
 
     if (isset($packageComposerSettings['autoload']['psr-4'])) {
         foreach ($packageComposerSettings['autoload']['psr-4'] as $namespace => $path) {
-            // TODO:
             if (! is_array($namespace) && ! is_array($path)) {
                 $namespace = str_ends_with($namespace, '\\') ? substr_replace($namespace, '', -1) : $namespace;
                 $path = str_ends_with($path, '/') ? substr_replace($path, '', -1) : $path;
@@ -107,9 +103,8 @@ function migrate_package($packagesDirectory, $name, $package, $packageMeta)
         }
     }
 
-    $defaultMetaFilename = str_replace('.json', '-lock.json', DEFAULT_CONFIG_FILENAME);
-    file_put_contents($packageDirectory . '/' . DEFAULT_CONFIG_FILENAME, json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
-    file_put_contents($packageDirectory . '/' . $defaultMetaFilename, json_encode([], JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($packageDirectory . '/saeghe.config.json', json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
+    file_put_contents($packageDirectory . '/saeghe.config-lock.json', json_encode([], JSON_PRETTY_PRINT) . PHP_EOL);
 }
 
 function get_meta_from_package($package)

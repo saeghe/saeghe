@@ -2,29 +2,52 @@
 
 namespace Saeghe\Saeghe\Commands\Update;
 
+use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Package;
+use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
+use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Saeghe\Commands\Add\add;
 use function Saeghe\Saeghe\Commands\Remove\remove;
 use function Saeghe\Cli\IO\Write\success;
 
-function run()
+function run(Project $project)
 {
-    global $projectRoot;
-    global $config;
-    global $meta;
-    global $packagesDirectory;
-
-    $package = argument(2);
+    $givenPackageUrl = argument(2);
     $version = parameter('version');
 
-    remove($package, $config, $meta, $packagesDirectory);
-    $packageMeta = add($packagesDirectory, $package, $version);
+    $config = Config::fromArray(json_to_array($project->configFilePath));
 
-    $config['packages'][$package] = $packageMeta['version'];
+    $package = array_reduce(
+        $config->packages,
+        function ($carry, Package $package) {
+            return $package->is($carry) ? $package : $carry;
+        },
+        Package::fromUrl($givenPackageUrl)
+    );
 
-    $configFile = $projectRoot . DEFAULT_CONFIG_FILENAME;
-    file_put_contents($configFile, json_encode($config, JSON_PRETTY_PRINT));
+    if (! isset($package->version)) {
+        error("Package $givenPackageUrl does not found in your project!");
+        return;
+    }
 
-    success("Package $package has been updated.");
+    $version ? $package->version($version) : $package->latestVersion();
+
+    $packageUrl = $givenPackageUrl;
+
+    foreach ($config->packages as $installedPackageUrl => $configPackage) {
+        if ($configPackage->is($package)) {
+            $packageUrl = $installedPackageUrl;
+            break;
+        }
+    }
+
+    remove($project, $config, $package, $packageUrl);
+    add($project, $config, $package, $packageUrl);
+
+    $config->packages[$packageUrl] = $package;
+    json_put($project->configFilePath, $config->toArray());
+
+    success("Package $givenPackageUrl has been updated.");
 }
