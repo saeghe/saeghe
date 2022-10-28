@@ -17,7 +17,7 @@ function run(Project $project)
     $givenPackageUrl = argument(2);
     $version = parameter('version');
 
-    $config = Config::fromArray(json_to_array($project->configFilePath));
+    $config = Config::fromArray(json_to_array($project->configFilePath->toString()));
 
     $package = array_reduce(
         $config->packages,
@@ -47,7 +47,7 @@ function run(Project $project)
     add($project, $config, $package, $packageUrl);
 
     $config->packages[$packageUrl] = $package;
-    json_put($project->configFilePath, $config->toArray());
+    json_put($project->configFilePath->toString(), $config->toArray());
 
     success("Package $givenPackageUrl has been updated.");
 }

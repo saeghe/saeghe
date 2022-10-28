@@ -9,7 +9,7 @@ function run(Project $project)
 {
     $seconds = (int) parameter('wait', 3);
 
-    chdir($project->root);
+    chdir($project->root->toString());
 
     while (true) {
         echo shell_exec('saeghe --command=build');
