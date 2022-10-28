@@ -73,7 +73,7 @@ class Repository
         return $this;
     }
 
-    public function download($destination): bool
+    public function download(string $destination): bool
     {
         if ($this->version === self::DEVELOPMENT_VERSION) {
             return clone_to($destination, $this->owner, $this->repo);

@@ -8,19 +8,19 @@ class Project
      * $buildRoot is readonly.
      *  DO NOT modify it!
      */
-    public string $buildRoot;
+    public Path $buildRoot;
 
     /**
      * $root, $environment, $configFilePath, $configLockFilePath, $credentialsPath are readonly.
      *  DO NOT modify them!
      */
     public function __construct(
-        public string $root,
+        public Path $root,
         public string $environment,
-        public string $configFilePath,
-        public string $configLockFilePath,
-        public string $credentialsPath,
+        public Path $configFilePath,
+        public Path $configLockFilePath,
+        public Path $credentialsPath,
     ) {
-        $this->buildRoot = $this->root . 'builds/' . $this->environment . '/';
+        $this->buildRoot = $this->root->append('builds/' . $this->environment);
     }
 }

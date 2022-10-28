@@ -11,9 +11,9 @@ function run(Project $project)
     $provider = argument(2);
     $token = argument(3);
 
-    $credentials = json_to_array($project->credentialsPath);
+    $credentials = json_to_array($project->credentialsPath->toString());
     $credentials[$provider] = ['token' => $token];
-    json_put($project->credentialsPath, $credentials);
+    json_put($project->credentialsPath->toString(), $credentials);
 
     success("Credential for $provider has been set successfully.");
 }

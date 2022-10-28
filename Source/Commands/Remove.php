@@ -14,7 +14,7 @@ function run(Project $project)
 {
     $givenPackageUrl = argument(2);
 
-    $config = Config::fromArray(json_to_array($project->configFilePath));
+    $config = Config::fromArray(json_to_array($project->configFilePath->toString()));
 
     $package = array_reduce(
         $config->packages,
@@ -42,14 +42,14 @@ function run(Project $project)
     remove($project, $config, $package, $packageUrl);
 
     unset($config->packages[$packageUrl]);
-    json_put($project->configFilePath, $config->toArray());
+    json_put($project->configFilePath->toString(), $config->toArray());
 
     success("Package $givenPackageUrl has been removed successfully.");
 }
 
 function remove(Project $project, Config $config, Package $package, $packageUrl)
 {
-    $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)));
+    $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)->toString()));
 
     foreach ($packageConfig->packages as $subPackageUrl => $subPackage) {
         $subPackageHasBeenUsed = false;
@@ -62,10 +62,10 @@ function remove(Project $project, Config $config, Package $package, $packageUrl)
         }
     }
 
-    shell_exec('rm -fR ' . $package->root($project, $config));
+    shell_exec('rm -fR ' . $package->root($project, $config)->toString());
 
-    $meta = Meta::fromArray(json_to_array($project->configLockFilePath));
+    $meta = Meta::fromArray(json_to_array($project->configLockFilePath->toString()));
 
     unset($meta->packages[$packageUrl]);
-    json_put($project->configLockFilePath, $meta->toArray());
+    json_put($project->configLockFilePath->toString(), $meta->toArray());
 }

@@ -6,18 +6,18 @@ use Saeghe\Saeghe\Git\Repository;
 
 class Package extends Repository
 {
-    public function configPath(Project $project, Config $config): string
+    public function configPath(Project $project, Config $config): Path
     {
-        return $this->root($project, $config) . 'saeghe.config.json';
+        return $this->root($project, $config)->append('saeghe.config.json');
     }
 
-    public function buildRoot(Project $project, Config $config): string
+    public function buildRoot(Project $project, Config $config): Path
     {
-        return $project->buildRoot . $config->packagesDirectory . '/' . $this->owner . '/' . $this->repo . '/';
+        return $project->buildRoot->append("{$config->packagesDirectory}/{$this->owner}/{$this->repo}");
     }
 
-    public function root($project, $config)
+    public function root(Project $project, Config $config): Path
     {
-        return $project->root . $config->packagesDirectory . '/' . $this->owner . '/' . $this->repo . '/';
+        return $project->root->append("{$config->packagesDirectory}/{$this->owner}/{$this->repo}");
     }
 }

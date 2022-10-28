@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Str;
 
-function between($string, $start, $end)
+function between(string $string, string $start, string $end): string
 {
     $startPosition = stripos($string, $start);
     $first = substr($string, $startPosition);
@@ -13,7 +13,7 @@ function between($string, $start, $end)
     return trim($final);
 }
 
-function after_last_occurrence($subject, $needle)
+function after_last_occurrence(string $subject, string $needle): string
 {
     if ($needle === '') {
         return '';
@@ -28,7 +28,7 @@ function after_last_occurrence($subject, $needle)
     return mb_substr(string: $subject, start: $pos + 1,  encoding: 'UTF-8');
 }
 
-function before_first_occurrence($subject, $needle)
+function before_first_occurrence(string $subject, string $needle): string
 {
     if ($needle === '') {
         return '';
@@ -43,7 +43,7 @@ function before_first_occurrence($subject, $needle)
     return mb_substr(string: $subject, start: 0, length: $pos,  encoding: 'UTF-8');
 }
 
-function before_last_occurrence($subject, $needle)
+function before_last_occurrence(string $subject, string $needle): string
 {
     if ($needle === '') {
         return $subject;
@@ -58,22 +58,22 @@ function before_last_occurrence($subject, $needle)
     return mb_substr(string: $subject, start: 0, length: $pos,  encoding: 'UTF-8');
 }
 
-function last_character($subject)
+function last_character(string $subject): string
 {
     return mb_substr($subject, -1);
 }
 
-function remove_first_character($subject)
+function remove_first_character(string $subject): array|string
 {
     return substr_replace($subject ,"",0, 1);
 }
 
-function remove_last_character($subject)
+function remove_last_character(string $subject): string
 {
     return substr_replace($subject ,"",-1);
 }
 
-function replace_first_occurrence($subject, $search, $replace)
+function replace_first_occurrence(string $subject, string $search, string $replace): string
 {
     $pos = strpos($subject, $search);
     if ($pos !== false) {

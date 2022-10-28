@@ -89,7 +89,7 @@ spl_autoload_register(function ($class) {
             if ($pos !== false) {
                 $realPath = substr_replace($class, $path, $pos, strlen($namespace));
             }
-            $realPath = str_replace("\\", "/", $realPath) . '.php';
+            $realPath = str_replace("\\", DIRECTORY_SEPARATOR, $realPath) . '.php';
             require $realPath;
             return ;
         }
