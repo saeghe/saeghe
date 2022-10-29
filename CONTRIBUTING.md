@@ -44,3 +44,11 @@ cd saeghe
 git submodule init
 git submodule update
 ```
+
+## Running tests
+
+In order to install Saeghe for contributing, run the following command:
+
+```shell
+./test-runner
+```
