@@ -2,6 +2,7 @@
 
 namespace Tests\GitTest\GitHubTest;
 
+use function Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\Providers\GitHub\clone_to;
 use function Saeghe\Saeghe\Providers\GitHub\download;
 use function Saeghe\Saeghe\Providers\GitHub\extract_owner;
@@ -121,7 +122,7 @@ test(
         github_token($credentials['github.com']['token']);
     },
     after: function () {
-        shell_exec('rm -fR ' . __DIR__ . '/../../TestRequirements/downloads');
+        delete_recursive(__DIR__ . '/../../TestRequirements/downloads');
     }
 );
 
@@ -138,6 +139,6 @@ test(
         );
     },
     after: function () {
-        shell_exec('rm -fR ' . __DIR__ . '/../../TestRequirements/downloads');
+        delete_recursive(__DIR__ . '/../../TestRequirements/downloads');
     }
 );

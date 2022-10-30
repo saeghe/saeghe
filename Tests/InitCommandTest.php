@@ -4,6 +4,7 @@ namespace Tests\InitCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;
+use function Saeghe\FileManager\Directory\flush;
 
 $initialContent = <<<EOD
 {
@@ -39,7 +40,8 @@ EOD;
 
 test(
     title: 'it makes a new default config file',
-    case: function ($packagesDirectory) use ($initialContent, $metaContent) {
+    case: function () use ($initialContent, $metaContent) {
+        $packagesDirectory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages';
         $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
         $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
 
@@ -50,18 +52,9 @@ test(
         File\assert_content($configPath, $initialContent, 'Config file content is not correct after running init!');
         File\assert_content($metaFilePath, $metaContent, 'Lock file content is not correct after running init!');
         assert_success('Project has been initialized.', $output);
-        return [$configPath, $metaFilePath, $packagesDirectory];
     },
-    before: function () {
-        $packagesDirectory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages';
-        shell_exec('rm -fR ' . $packagesDirectory);
-
-        return $packagesDirectory;
-    },
-    after: function ($configPath, $metaFilePath, $packagesDirectory) {
-        shell_exec('rm -f ' . $configPath);
-        shell_exec('rm -f ' . $metaFilePath);
-        shell_exec('rm -fR ' . $packagesDirectory);
+    after: function () {
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );
 
@@ -76,13 +69,10 @@ test(
 
         File\assert_exists($packagesDirectory, 'packages directory has not been created: ' . $output);
         File\assert_exists($configPath, 'Config file does not exists: ' . $output);
+        File\assert_exists($metaFilePath, 'Config lock file does not exists: ' . $output);
         File\assert_content($configPath, $initialContentWithPackagesDirectory, 'Config file content is not correct after running init!');
-
-        return [$configPath, $metaFilePath, $packagesDirectory];
     },
-    after: function ($configPath, $metaFilePath, $packagesDirectory) {
-        shell_exec('rm -f ' . $configPath);
-        shell_exec('rm -f ' . $metaFilePath);
-        shell_exec('rm -fR ' . $packagesDirectory);
+    after: function () {
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );

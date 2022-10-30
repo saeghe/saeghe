@@ -3,6 +3,7 @@
 namespace Tests\InstallCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
+use function Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should install packages from lock file',
@@ -18,10 +19,10 @@ test(
     before: function () {
         shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject");
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
     },
     after: function () {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     },
 );
 

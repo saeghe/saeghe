@@ -6,6 +6,9 @@ require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'Path.p
 
 use Saeghe\Saeghe\Path;
 
+require_once Path::fromString(__DIR__ . '/Source/FileManager/File.php')->toString();
+require_once Path::fromString(__DIR__ . '/Source/FileManager/Directory.php')->toString();
+
 require_once Path::fromString(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php')->toString();
 require_once Path::fromString(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php')->toString();
 require_once Path::fromString(__DIR__ . '/Packages/saeghe/test-runner/Source/Assertions/File.php')->toString();

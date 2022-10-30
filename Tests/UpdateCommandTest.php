@@ -4,6 +4,7 @@ namespace Tests\UpdateCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
+use function Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should update to the latest version',
@@ -19,7 +20,7 @@ test(
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );
 
@@ -35,7 +36,7 @@ test(
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );
 
@@ -51,7 +52,7 @@ test(
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.2 --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );
 

@@ -3,6 +3,7 @@
 namespace Tests\AddCommand\AddReleasedPackageWithSpecificVersionTest;
 
 use Saeghe\TestRunner\Assertions\File;
+use function Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should add released package to the project with the given version',
@@ -16,32 +17,12 @@ test(
         assert_meta_has_desired_data('Meta data is not what we want.' . $output);
     },
     before: function () {
-        delete_empty_project_config_file();
-        delete_empty_project_meta_file();
-        delete_empty_project_packages_directory();
         shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
-        delete_empty_project_packages_directory();
-        delete_empty_project_config_file();
-        delete_empty_project_meta_file();
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );
-
-function delete_empty_project_config_file()
-{
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json');
-}
-
-function delete_empty_project_meta_file()
-{
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json');
-}
-
-function delete_empty_project_packages_directory()
-{
-    shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
-}
 
 function assert_config_file_created_for_released_project($message)
 {

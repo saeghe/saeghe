@@ -9,6 +9,7 @@ use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\success;
+use function Saeghe\FileManager\Directory\delete_recursive;
 
 function run(Project $project)
 {
@@ -62,7 +63,7 @@ function remove(Project $project, Config $config, Package $package, $packageUrl)
         }
     }
 
-    shell_exec('rm -fR ' . $package->root($project, $config)->toString());
+    delete_recursive($package->root($project, $config)->toString());
 
     $meta = Meta::fromArray(json_to_array($project->configLockFilePath->toString()));
 

@@ -3,6 +3,7 @@
 namespace Tests\CredentialCommand\CredentialCommandTest;
 
 use Saeghe\Cli\IO\Write;
+use function Saeghe\FileManager\File\delete;
 
 test(
     title: 'it should set credential for github.com',
@@ -25,7 +26,7 @@ test(
         }
     },
     after: function () {
-        shell_exec('rm -f ' . $_SERVER['PWD'] . '/credentials.json');
+        delete($_SERVER['PWD'] . '/credentials.json');
         if (file_exists($_SERVER['PWD'] . '/credentials.json.back')) {
             shell_exec('mv ' . $_SERVER['PWD'] . '/credentials.json.back ' . $_SERVER['PWD'] . '/credentials.json');
         }
@@ -57,7 +58,7 @@ test(
         fclose($credential);
     },
     after: function () {
-        shell_exec('rm -f ' . $_SERVER['PWD'] . '/credentials.json');
+        delete($_SERVER['PWD'] . '/credentials.json');
         if (file_exists($_SERVER['PWD'] . '/credentials.json.back')) {
             shell_exec('mv ' . $_SERVER['PWD'] . '/credentials.json.back ' . $_SERVER['PWD'] . '/credentials.json');
         }

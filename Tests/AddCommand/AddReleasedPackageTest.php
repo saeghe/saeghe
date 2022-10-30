@@ -3,6 +3,7 @@
 namespace Tests\AddComand\AddReleasedPackageTest;
 
 use Saeghe\TestRunner\Assertions\File;
+use function Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should add released package to the project',
@@ -17,15 +18,10 @@ test(
         assert_zip_file_deleted('Zip file has not been deleted.' . $output);
     },
     before: function () {
-        delete_empty_project_config_file();
-        delete_empty_project_meta_file();
-        delete_empty_project_packages_directory();
         shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
-        delete_empty_project_packages_directory();
-        delete_empty_project_config_file();
-        delete_empty_project_meta_file();
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );
 
@@ -37,15 +33,10 @@ test(
         assert_development_branch_added('We expected to see development branch for the package! ' . $output);
     },
     before: function () {
-        delete_empty_project_config_file();
-        delete_empty_project_meta_file();
-        delete_empty_project_packages_directory();
         shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
-        delete_empty_project_packages_directory();
-        delete_empty_project_config_file();
-        delete_empty_project_meta_file();
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );
 
@@ -61,21 +52,6 @@ function assert_development_branch_added($message)
         && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/Tests'),
         $message
     );
-}
-
-function delete_empty_project_config_file()
-{
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json');
-}
-
-function delete_empty_project_meta_file()
-{
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json');
-}
-
-function delete_empty_project_packages_directory()
-{
-    shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages');
 }
 
 function assert_config_file_created_for_released_project($message)

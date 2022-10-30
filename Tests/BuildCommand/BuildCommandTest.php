@@ -2,7 +2,10 @@
 
 namespace Tests\BuildCommand\BuildCommandTest;
 
+use Saeghe\Saeghe\Path;
 use function Saeghe\Cli\IO\Write\assert_success;
+use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\FileManager\File\delete;
 
 test(
     title: 'it should build the project',
@@ -29,27 +32,28 @@ test(
         assert_success('Build finished successfully.', $output);
     },
     before: function () {
-        delete_build_directory();
-        delete_packages_directory();
-        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
+        copy(
+            $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json',
+            $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'
+        );
         shell_exec($_SERVER['PWD'] . '/saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/ProjectWithTests');
     },
     after: function () {
         delete_build_directory();
         delete_packages_directory();
-        shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
-        shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
+        delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
+        delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
     }
 );
 
 function delete_build_directory()
 {
-    shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
+    delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
 }
 
 function delete_packages_directory()
 {
-    shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
+    delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
 }
 
 function assert_build_directory_exists($message)
@@ -97,7 +101,13 @@ function assert_none_php_files_has_not_been_built($message)
 
     assert(
         file_exists($environmentBuildPath . '/Source/SubDirectory/FileDontNeedBuild.txt')
-        && file_get_contents($environmentBuildPath . '/Source/SubDirectory/FileDontNeedBuild.txt') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Source/SubDirectory/FileDontNeedBuild.txt')),
+        && file_get_contents($environmentBuildPath . '/Source/SubDirectory/FileDontNeedBuild.txt')
+            ===
+            str_replace(
+                '$environmentBuildPath',
+                $environmentBuildPath,
+                file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Source/SubDirectory/FileDontNeedBuild.txt')
+            ),
         $message
     );
 }
@@ -109,7 +119,13 @@ function assert_tests_has_been_built($message)
 
     assert(
         file_exists($environmentBuildPath . '/Tests/SampleTest.php')
-        && file_get_contents($environmentBuildPath . '/Tests/SampleTest.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Tests/SampleTest.stub')),
+        && file_get_contents($environmentBuildPath . '/Tests/SampleTest.php')
+            ===
+        str_replace(
+            '$environmentBuildPath',
+            $environmentBuildPath,
+            file_get_contents($stubsDirectory . '/Tests/SampleTest.stub')
+        ),
         $message
     );
 }
@@ -121,7 +137,13 @@ function assert_file_with_package_dependency_has_been_built($message)
 
     assert(
         file_exists($environmentBuildPath . '/Source/FileWithPackageDependency.php')
-        && file_get_contents($environmentBuildPath . '/Source/FileWithPackageDependency.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/FileWithPackageDependency.stub')),
+        && file_get_contents($environmentBuildPath . '/Source/FileWithPackageDependency.php')
+            ===
+            str_replace(
+                '$environmentBuildPath',
+                $environmentBuildPath,
+                file_get_contents($stubsDirectory . '/Source/FileWithPackageDependency.stub')
+            ),
         $message
     );
 }

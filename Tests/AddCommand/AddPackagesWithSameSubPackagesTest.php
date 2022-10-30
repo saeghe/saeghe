@@ -3,6 +3,7 @@
 namespace Tests\AddCommand\AddPackagesWithSameSubPackagesTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
+use function Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should not stuck if two packages using the same dependencies',
@@ -14,10 +15,9 @@ test(
         assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/test-runner'));
     },
     before: function () {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
         shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );

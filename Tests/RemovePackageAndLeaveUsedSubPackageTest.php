@@ -2,6 +2,8 @@
 
 namespace Tests\RemovePackageAndLeaveUsedSubPackageTest;
 
+use function Saeghe\FileManager\Directory\flush;
+
 test(
     title: 'it should remove the package but leave used subpackage',
     case: function () {
@@ -18,7 +20,7 @@ test(
     },
     after: function () {
         shell_exec($_SERVER['PWD'] . "/saeghe remove git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject");
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/*');
+        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
     }
 );
 

@@ -3,6 +3,7 @@
 namespace Tests\FlushCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
+use function Saeghe\FileManager\Directory\delete_recursive;
 
 test(
     title: 'it should flush builds',
@@ -18,7 +19,7 @@ test(
         shell_exec($_SERVER['PWD'] . '/saeghe build production --project=TestRequirements/Fixtures/ProjectWithTests');
     },
     after: function () {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
+        delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
     }
 );
 

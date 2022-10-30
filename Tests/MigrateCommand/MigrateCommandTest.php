@@ -3,6 +3,8 @@
 namespace Tests\MigrateCommand\MigrateCommandTest;
 
 use Saeghe\Cli\IO\Write;
+use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\FileManager\File\delete;
 
 test(
     title: 'it should migrate symfony package',
@@ -14,15 +16,10 @@ test(
         assert_package_directory_content('Package directory content is not what we want!' . $output);
         Write\assert_success('Project migrated successfully.', $output);
     },
-    before: function () {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/saeghe.config.json');
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/saeghe.config-lock.json');
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/Packages');
-    },
     after: function () {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/saeghe.config.json');
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/saeghe.config-lock.json');
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/Packages');
+        delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/saeghe.config.json');
+        delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/saeghe.config-lock.json');
+        delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/Packages');
     },
 );
 

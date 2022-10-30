@@ -3,6 +3,7 @@
 namespace Tests\MigrateCommand\MigrateCommandWithoutProjectTest;
 
 use Saeghe\Cli\IO\Write;
+use function Saeghe\FileManager\Directory\delete_recursive;
 
 test(
     title: 'it should show proper message when there is no composer.json file',
@@ -16,13 +17,12 @@ test(
     before: function () {
         $project = 'EmptyComposerProject';
 
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/' . $project);
-        shell_exec('mkdir ' . $_SERVER['PWD'] . '/TestRequirements/' . $project);
+        mkdir($_SERVER['PWD'] . '/TestRequirements/' . $project);
 
         return $project;
     },
     after: function ($project) {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/' . $project);
+        delete_recursive($_SERVER['PWD'] . '/TestRequirements/' . $project);
     },
 );
 
@@ -38,8 +38,7 @@ test(
     before: function () {
         $project = 'EmptyComposerProject';
 
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/' . $project);
-        shell_exec('mkdir ' . $_SERVER['PWD'] . '/TestRequirements/' . $project);
+        mkdir($_SERVER['PWD'] . '/TestRequirements/' . $project);
         shell_exec('cp '
             . $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/composer.json '
             . $_SERVER['PWD'] . '/TestRequirements/EmptyComposerProject/composer.json '
@@ -48,6 +47,6 @@ test(
         return $project;
     },
     after: function ($project) {
-        shell_exec('rm -fR ' . $_SERVER['PWD'] . '/TestRequirements/' . $project);
+        delete_recursive($_SERVER['PWD'] . '/TestRequirements/' . $project);
     },
 );

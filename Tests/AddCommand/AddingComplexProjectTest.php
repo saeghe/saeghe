@@ -2,6 +2,9 @@
 
 namespace Tests\AddCommand\AddingComplexProjectTest;
 
+use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\FileManager\File\delete;
+
 test(
     title: 'it should add a complex project',
     case: function () {
@@ -12,10 +15,10 @@ test(
         assert_meta_file_has_desired_data('Meta data for adding complex package does not have desired data!' . $output);
     },
     before: function () {
-        delete_config_file();
-        delete_meta_file();
-        delete_packages_directory();
-        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
+        copy(
+            $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json',
+            $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'
+        );
     },
     after: function () {
         delete_config_file();
@@ -32,10 +35,10 @@ test(
         assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
     },
     before: function () {
-        delete_config_file();
-        delete_meta_file();
-        delete_packages_directory();
-        copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
+        copy(
+            $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json',
+            $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'
+        );
     },
     after: function () {
         delete_config_file();
@@ -46,17 +49,17 @@ test(
 
 function delete_config_file()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
+    delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
 }
 
 function delete_meta_file()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
+    delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
 }
 
 function delete_packages_directory()
 {
-    shell_exec('rm -Rf ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
+    delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
 }
 
 function assert_pacakges_added_to_packages_directory($message)

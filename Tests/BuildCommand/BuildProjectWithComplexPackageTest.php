@@ -2,6 +2,9 @@
 
 namespace Tests\BuildCommand\BuildProjectWithComplexPackageTest;
 
+use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\FileManager\File\delete;
+
 test(
     title: 'it should build project with complex package',
     case: function () {
@@ -11,11 +14,6 @@ test(
         assert_executable_file_added('Complex executable file has not been created!' . $output);
     },
     before: function () {
-        delete_config_file();
-        delete_meta_file();
-        delete_build_directory();
-        delete_packages_directory();
-
         copy($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json', $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
         shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/ProjectWithTests");
     },
@@ -29,22 +27,22 @@ test(
 
 function delete_config_file()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
+    delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
 }
 
 function delete_meta_file()
 {
-    shell_exec('rm -f ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
+    delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
 }
 
 function delete_build_directory()
 {
-    shell_exec('rm -Rf ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
+    delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
 }
 
 function delete_packages_directory()
 {
-    shell_exec('rm -Rf ' . $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
+    delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
 }
 
 function assert_build_for_packages($message)
