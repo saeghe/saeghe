@@ -43,6 +43,7 @@ use Saeghe\Saeghe\Project;
 use function Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
+use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 $command = Read\command() ?? Read\parameter('command');
 
@@ -58,7 +59,7 @@ $project = makeProject(
 );
 
 $credential = json_to_array($project->credentialsPath->toString());
-github_token($credential['github.com']['token'] ?? '');
+github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
 
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run($project),

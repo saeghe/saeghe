@@ -4,6 +4,11 @@ namespace Saeghe\Saeghe\Providers\GitHub;
 
 use function Saeghe\FileManager\File\delete;
 
+const GITHUB_DOMAIN = 'github.com';
+const GITHUB_URL = 'https://github.com/';
+const GITHUB_API_URL = 'https://api.github.com/';
+const GITHUB_SSH_URL = 'git@github.com:';
+
 function isSsh(string $packageUrl): bool
 {
     return str_starts_with($packageUrl, 'git@');
@@ -12,9 +17,9 @@ function isSsh(string $packageUrl): bool
 function extract_owner($packageUrl): string
 {
     if (isSsh($packageUrl)) {
-        $ownerAndRepo = str_replace('git@github.com:', '', $packageUrl);
+        $ownerAndRepo = str_replace(GITHUB_SSH_URL, '', $packageUrl);
     } else {
-        $ownerAndRepo = str_replace('https://github.com/', '', $packageUrl);
+        $ownerAndRepo = str_replace(GITHUB_URL, '', $packageUrl);
     }
 
     if (str_ends_with($ownerAndRepo, '.git')) {
@@ -27,9 +32,9 @@ function extract_owner($packageUrl): string
 function extract_repo($packageUrl): string
 {
     if (isSsh($packageUrl)) {
-        $ownerAndRepo = str_replace('git@github.com:', '', $packageUrl);
+        $ownerAndRepo = str_replace(GITHUB_SSH_URL, '', $packageUrl);
     } else {
-        $ownerAndRepo = str_replace('https://github.com/', '', $packageUrl);
+        $ownerAndRepo = str_replace(GITHUB_URL, '', $packageUrl);
     }
 
     if (str_ends_with($ownerAndRepo, '.git')) {
@@ -48,44 +53,49 @@ function github_token(?string $token = null): string
     return getenv('GITHUB_TOKEN', true);
 }
 
+function get_json(string $apiSubUrl): array
+{
+    $token = github_token();
+
+    $ch = curl_init(GITHUB_API_URL . $apiSubUrl);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Saeghe');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Accept: application/vnd.github+json",
+        "Authorization: Bearer $token",
+    ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $output = curl_exec($ch);
+    curl_close($ch);
+
+    return json_decode($output, true);
+}
+
 function has_release($owner, $repo): bool
 {
-    $output = shell_exec(
-        'curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ' . github_token() . '" '
-        .  "https://api.github.com/repos/$owner/$repo/releases/latest"
-    );
+    $json = get_json("repos/$owner/$repo/releases/latest");
 
-    return isset(json_decode($output, true)['tag_name']);
+    return isset($json['tag_name']);
 }
 
 function find_latest_version($owner, $repo): string
 {
-    $output = shell_exec('curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer '
-        . github_token()
-        . '" '
-        .  "https://api.github.com/repos/$owner/$repo/releases/latest");
+    $json = get_json("repos/$owner/$repo/releases/latest");
 
-    return json_decode($output, true)['tag_name'];
+    return $json['tag_name'];
 }
 
 function find_version_hash($owner, $repo, $version): string
 {
-    $output = shell_exec('curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer '
-        . github_token()
-        . '" '
-        .  "https://api.github.com/repos/$owner/$repo/git/ref/tags/$version");
+    $json = get_json("repos/$owner/$repo/git/ref/tags/$version");
 
-    return json_decode($output, true)['object']['sha'];
+    return $json['object']['sha'];
 }
 
 function find_latest_commit_hash($owner, $repo): string
 {
-    $output = shell_exec('curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer '
-        . github_token()
-        . '" '
-        .  "https://api.github.com/repos/$owner/$repo/commits");
+    $json = get_json("repos/$owner/$repo/commits");
 
-    return json_decode($output, true)[0]['sha'];
+    return $json[0]['sha'];
 }
 
 function download($destination, $owner, $repo, $version): bool
@@ -102,7 +112,7 @@ function download($destination, $owner, $repo, $version): bool
     $zipFile = $parentDirectory . $repo . '.zip';
 
     $fp = fopen ($zipFile, 'w+');
-    $ch = curl_init("https://github.com/$owner/$repo/zipball/$version");
+    $ch = curl_init(GITHUB_URL . "$owner/$repo/zipball/$version");
     curl_setopt($ch, CURLOPT_TIMEOUT, 600);
     curl_setopt($ch, CURLOPT_FILE, $fp);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -134,7 +144,8 @@ function download($destination, $owner, $repo, $version): bool
 
 function clone_to($destination, $owner, $repo): bool
 {
-    $output = passthru("git clone git@github.com:$owner/$repo.git $destination");
+    $githubSshUrl = GITHUB_SSH_URL;
+    $output = passthru("git clone $githubSshUrl$owner/$repo.git $destination");
 
     return  $output === null;
 }

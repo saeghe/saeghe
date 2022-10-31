@@ -11,9 +11,11 @@ use function Saeghe\Saeghe\Providers\GitHub\extract_repo;
 use function Saeghe\Saeghe\Providers\GitHub\find_latest_commit_hash;
 use function Saeghe\Saeghe\Providers\GitHub\find_latest_version;
 use function Saeghe\Saeghe\Providers\GitHub\find_version_hash;
+use function Saeghe\Saeghe\Providers\GitHub\get_json;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use function Saeghe\Saeghe\Providers\GitHub\has_release;
 use function Saeghe\Saeghe\Providers\GitHub\isSsh;
+use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 require_once __DIR__ . '/../../Source/Git/GitHub.php';
 
@@ -59,6 +61,17 @@ test(
 );
 
 test(
+    title: 'it should get json response from github api',
+    case: function () {
+        assert('Saeghe package manager' === get_json('repos/saeghe/saeghe')['description']);
+    },
+    before: function () {
+        $credentials = json_decode(json: file_get_contents(__DIR__ . '/../../credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
+        github_token($credentials[GITHUB_DOMAIN]['token']);
+    }
+);
+
+test(
     title: 'it should detect if repository has release',
     case: function () {
         assert(has_release('saeghe', 'released-package'));
@@ -66,7 +79,7 @@ test(
     },
     before: function () {
         $credentials = json_decode(json: file_get_contents(__DIR__ . '/../../credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
-        github_token($credentials['github.com']['token']);
+        github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
 
@@ -77,7 +90,7 @@ test(
     },
     before: function () {
         $credentials = json_decode(json: file_get_contents(__DIR__ . '/../../credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
-        github_token($credentials['github.com']['token']);
+        github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
 
@@ -89,7 +102,7 @@ test(
     },
     before: function () {
         $credentials = json_decode(json: file_get_contents(__DIR__ . '/../../credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
-        github_token($credentials['github.com']['token']);
+        github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
 
@@ -101,7 +114,7 @@ test(
     },
     before: function () {
         $credentials = json_decode(json: file_get_contents(__DIR__ . '/../../credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
-        github_token($credentials['github.com']['token']);
+        github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
 
@@ -122,7 +135,7 @@ test(
     },
     before: function () {
         $credentials = json_decode(json: file_get_contents(__DIR__ . '/../../credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
-        github_token($credentials['github.com']['token']);
+        github_token($credentials[GITHUB_DOMAIN]['token']);
         $packagesDirectory = Path::fromString(__DIR__ . '/../PlayGround/downloads/package');
         mkdir($packagesDirectory->toString(), 0777, true);
 
