@@ -13,6 +13,7 @@ test(
     },
     before: function () {
         $directory = Path::fromString(__DIR__ . '/../../PlayGround/DeleteRecursive');
+        var_dump($directory->toString());
         mkdir($directory->toString());
 
         return $directory;
