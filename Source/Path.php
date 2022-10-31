@@ -42,12 +42,17 @@ class Path
 
         $parts = explode(DIRECTORY_SEPARATOR, $pathString);
 
-        foreach ($parts as $key => $part) {
-            if ($part === '..') {
-                unset($parts[$key - 1]);
-                unset($parts[$key]);
+        while (in_array('..', $parts)) {
+            foreach ($parts as $key => $part) {
+                if ($part === '..') {
+                    unset($parts[$key - 1]);
+                    unset($parts[$key]);
+                    $parts = array_values($parts);
+                    break;
+                }
             }
         }
+
 
         return implode(DIRECTORY_SEPARATOR, $parts);
     }

@@ -31,7 +31,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Path::fromString(__DIR__ . '/Temp');
+        $directory = Path::fromString(__DIR__ . '/../../PlayGround/IsEmpty');
         mkdir($directory->toString());
         file_put_contents($directory->append('file.txt')->toString(), 'content');
 
@@ -50,7 +50,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Path::fromString(__DIR__ . '/Temp');
+        $directory = Path::fromString(__DIR__ . '/../../PlayGround/IsEmpty');
         mkdir($directory->toString());
         mkdir($directory->append('sub_directory')->toString());
 

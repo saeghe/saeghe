@@ -12,7 +12,7 @@ test(
         assert(! file_exists($directory->toString()), 'delete_recursive is not working!');
     },
     before: function () {
-        $directory = Path::fromString(__DIR__ . '/Temp');
+        $directory = Path::fromString(__DIR__ . '/../../PlayGround/DeleteRecursive');
         mkdir($directory->toString());
 
         return $directory;
@@ -27,7 +27,7 @@ test(
         assert(! file_exists($directory->toString()), 'delete_recursive is not working!');
     },
     before: function () {
-        $directory = Path::fromString(__DIR__ . '/Temp');
+        $directory = Path::fromString(__DIR__ . '/../../PlayGround/DeleteRecursive');
         $subDirectory = $directory->append('SubDirectory');
         $anotherSubDirectory = $directory->append('SubDirectory/AnotherSubDirectory');
         mkdir($directory->toString());

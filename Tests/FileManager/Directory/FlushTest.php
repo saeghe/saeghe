@@ -19,7 +19,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Path::fromString(__DIR__ . '/Temp');
+        $directory = Path::fromString(__DIR__ . '/../../PlayGround/Flush');
         $subDirectory = $directory->append('SubDirectory');
         mkdir($directory->toString());
         mkdir($subDirectory->toString());
