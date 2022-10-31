@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\RemoveCommandTest;
+namespace Tests\System\RemoveCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;

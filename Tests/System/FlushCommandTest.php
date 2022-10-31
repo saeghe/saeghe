@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\FlushCommandTest;
+namespace Tests\System\FlushCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\FileManager\Directory\delete_recursive;

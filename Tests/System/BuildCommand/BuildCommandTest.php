@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\BuildCommand\BuildCommandTest;
+namespace Tests\System\BuildCommand\BuildCommandTest;
 
 use Saeghe\Saeghe\Path;
 use function Saeghe\Cli\IO\Write\assert_success;

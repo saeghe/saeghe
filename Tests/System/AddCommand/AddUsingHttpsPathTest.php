@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AddCommand\AddUsingHttpsPath;
+namespace Tests\System\AddCommand\AddUsingHttpsPath;
 
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\FileManager\Directory\flush;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\RemovePackageAndLeaveUsedSubPackageTest;
+namespace Tests\System\RemovePackageAndLeaveUsedSubPackageTest;
 
 use function Saeghe\FileManager\Directory\flush;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\InstallCommandTest;
+namespace Tests\System\InstallCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\FileManager\Directory\flush;

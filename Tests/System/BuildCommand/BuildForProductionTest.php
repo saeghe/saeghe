@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\BuildCommand\BuildForProductionTest;
+namespace Tests\System\BuildCommand\BuildForProductionTest;
 
 use Saeghe\Saeghe\Path;
 use function Saeghe\FileManager\Directory\delete_recursive;

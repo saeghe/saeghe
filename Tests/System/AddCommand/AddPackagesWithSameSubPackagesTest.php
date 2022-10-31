@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AddCommand\AddPackagesWithSameSubPackagesTest;
+namespace Tests\System\AddCommand\AddPackagesWithSameSubPackagesTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\FileManager\Directory\flush;

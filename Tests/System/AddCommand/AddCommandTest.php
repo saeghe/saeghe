@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AddCommand\AddCommandTest;
+namespace Tests\System\AddCommand\AddCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;

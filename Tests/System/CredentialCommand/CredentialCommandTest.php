@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\CredentialCommand\CredentialCommandTest;
+namespace Tests\System\CredentialCommand\CredentialCommandTest;
 
 use Saeghe\Cli\IO\Write;
 use function Saeghe\FileManager\File\delete;

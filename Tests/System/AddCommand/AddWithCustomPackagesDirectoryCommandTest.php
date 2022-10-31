@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AddCommand\AddWithCustomPackagesDirectoryCommandTest;
+namespace Tests\System\AddCommand\AddWithCustomPackagesDirectoryCommandTest;
 
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\FileManager\Directory\flush;

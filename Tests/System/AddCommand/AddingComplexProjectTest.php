@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AddCommand\AddingComplexProjectTest;
+namespace Tests\System\AddCommand\AddingComplexProjectTest;
 
 use function Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\FileManager\File\delete;

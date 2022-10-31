@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\HelpCommandTest;
+namespace Tests\System\HelpCommandTest;
 
 $helpContent = <<<'EOD'
 usage: saeghe [-h | --help] [--man]

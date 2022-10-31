@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\InitCommandTest;
+namespace Tests\System\InitCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;

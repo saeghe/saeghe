@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\AddCommand\AddReleasedPackageWithSpecificVersionTest;
+namespace Tests\System\AddCommand\AddReleasedPackageWithSpecificVersionTest;
 
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\FileManager\Directory\flush;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\MigrateCommand\MigrateCommandTest;
+namespace Tests\System\MigrateCommand\MigrateCommandTest;
 
 use Saeghe\Cli\IO\Write;
 use function Saeghe\FileManager\Directory\delete_recursive;

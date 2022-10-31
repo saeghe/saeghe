@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\WatchCommandTest;
+namespace Tests\System\WatchCommandTest;
 
 use function Saeghe\FileManager\Directory\flush;
 

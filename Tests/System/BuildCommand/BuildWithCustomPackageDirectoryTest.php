@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\BuildCommand\BuildWithCustomPackageDirectoryTest;
+namespace Tests\System\BuildCommand\BuildWithCustomPackageDirectoryTest;
 
 use function Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\FileManager\File\delete;

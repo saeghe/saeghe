@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\ManCommandTest;
+namespace Tests\System\ManCommandTest;
 
 $manContent = <<<EOD
 usage: saeghe [-h | --help] [--man]
