@@ -3,7 +3,7 @@
 namespace Tests\System\AddCommand\AddWithCustomPackagesDirectoryCommandTest;
 
 use Saeghe\TestRunner\Assertions\File;
-use function Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should add package to the given directory',

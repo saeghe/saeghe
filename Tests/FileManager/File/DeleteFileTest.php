@@ -2,17 +2,17 @@
 
 namespace Tests\FileManager\File\DeleteFileTest;
 
-use Saeghe\Saeghe\Path;
-use function Saeghe\FileManager\File\delete;
+use Saeghe\Saeghe\FileSystem\Address;
+use function Saeghe\Saeghe\FileManager\File\delete;
 
 test(
     title: 'it should delete file',
-    case: function (Path $file) {
+    case: function (Address $file) {
         assert(delete($file->toString()));
         assert(! file_exists($file->toString()), 'delete file is not working!');
     },
     before: function () {
-        $file = Path::fromString(__DIR__ . '/sample.txt');
+        $file = Address::fromString(__DIR__ . '/sample.txt');
         file_put_contents($file->toString(), 'sample text');
 
         return $file;

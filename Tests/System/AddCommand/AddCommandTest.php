@@ -5,7 +5,7 @@ namespace Tests\System\AddCommand\AddCommandTest;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;
-use function Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should show error message when project is not initialized',

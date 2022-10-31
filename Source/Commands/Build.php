@@ -6,7 +6,7 @@ use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
-use Saeghe\Saeghe\Path;
+use Saeghe\Saeghe\FileSystem\Address;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
 use Saeghe\Saeghe\Str;
@@ -85,7 +85,7 @@ function compile_project_files(Project $project, Config $config, array $replaceM
     }
 }
 
-function compile(Config $config, Path $origin, Path $destination, array $replaceMap): void
+function compile(Config $config, Address $origin, Address $destination, array $replaceMap): void
 {
     if (is_dir($origin->toString())) {
         dir_preserve_copy($origin->toString(), $destination->toString());
@@ -106,13 +106,13 @@ function compile(Config $config, Path $origin, Path $destination, array $replace
     intact_copy($origin->toString(), $destination->toString());
 }
 
-function compile_file(Path $origin, Path $destination, array $replaceMap): void
+function compile_file(Address $origin, Address $destination, array $replaceMap): void
 {
     $modifiedFile = apply_file_modifications($origin, $replaceMap);
     file_preserve_modify($origin->toString(), $destination->toString(), $modifiedFile);
 }
 
-function apply_file_modifications(Path $origin, array $replaceMap): string
+function apply_file_modifications(Address $origin, array $replaceMap): string
 {
     global $autoloads;
 
@@ -186,10 +186,10 @@ function path_finder(array $replaceMap, string $import, bool $absolute): ?string
         }
     }
 
-    return $realPath ? Path::fromString($realPath)->toString() : null;
+    return $realPath ? Address::fromString($realPath)->toString() : null;
 }
 
-function add_requires_and_autoload(array $requireStatements, Path $file): string
+function add_requires_and_autoload(array $requireStatements, Address $file): string
 {
     $content = '';
 
@@ -292,7 +292,7 @@ function should_compile_files_and_directories(Project $project, Config $config):
     );
 }
 
-function file_needs_modification(Path $file, Config $config): bool
+function file_needs_modification(Address $file, Config $config): bool
 {
     return array_reduce(
             array: array_merge(array_values($config->executables), $config->entryPoints),
@@ -302,7 +302,7 @@ function file_needs_modification(Path $file, Config $config): bool
         || str_ends_with($file->toString(), '.php');
 }
 
-function add_autoloads(Path $target, array $replaceMap, array $autoloads): void
+function add_autoloads(Address $target, array $replaceMap, array $autoloads): void
 {
     $autoloadLines = [];
 

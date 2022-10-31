@@ -2,8 +2,8 @@
 
 namespace Tests\GitTest\GitHubTest;
 
-use Saeghe\Saeghe\Path;
-use function Saeghe\FileManager\Directory\flush;
+use Saeghe\Saeghe\FileSystem\Address;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\Providers\GitHub\clone_to;
 use function Saeghe\Saeghe\Providers\GitHub\download;
 use function Saeghe\Saeghe\Providers\GitHub\extract_owner;
@@ -120,7 +120,7 @@ test(
 
 test(
     title: 'it should download given repository',
-    case: function (Path $packagesDirectory) {
+    case: function (Address $packagesDirectory) {
         assert(download($packagesDirectory->toString(), 'saeghe', 'released-package', 'v1.0.5'));
         // Assert latest changes on the latest commit
         assert(
@@ -136,19 +136,19 @@ test(
     before: function () {
         $credentials = json_decode(json: file_get_contents(__DIR__ . '/../../credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
         github_token($credentials[GITHUB_DOMAIN]['token']);
-        $packagesDirectory = Path::fromString(__DIR__ . '/../PlayGround/downloads/package');
+        $packagesDirectory = Address::fromString(__DIR__ . '/../PlayGround/downloads/package');
         mkdir($packagesDirectory->toString(), 0777, true);
 
         return $packagesDirectory;
     },
-    after: function (Path $packagesDirectory) {
+    after: function (Address $packagesDirectory) {
         flush($packagesDirectory->parent()->parent()->toString());
     }
 );
 
 test(
     title: 'it should clone given repository',
-    case: function (Path $packagesDirectory) {
+    case: function (Address $packagesDirectory) {
         assert(clone_to($packagesDirectory->toString(), 'saeghe', 'simple-package'));
         // Assert latest changes on the latest commit
         assert(
@@ -161,12 +161,12 @@ test(
         return $packagesDirectory;
     },
     before: function () {
-        $packagesDirectory = Path::fromString(__DIR__ . '/../PlayGround/downloads/package');
+        $packagesDirectory = Address::fromString(__DIR__ . '/../PlayGround/downloads/package');
         mkdir($packagesDirectory->toString(), 0777, true);
 
         return $packagesDirectory;
     },
-    after: function (Path $packagesDirectory) {
+    after: function (Address $packagesDirectory) {
         flush($packagesDirectory->parent()->parent()->toString());
     }
 );

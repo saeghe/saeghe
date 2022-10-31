@@ -2,12 +2,12 @@
 
 namespace Tests\FileManager\Directory\FlushTest;
 
-use Saeghe\Saeghe\Path;
-use function Saeghe\FileManager\Directory\flush;
+use Saeghe\Saeghe\FileSystem\Address;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should flush directory',
-    case: function (Path $directory) {
+    case: function (Address $directory) {
         flush($directory->toString());
 
         assert(file_exists($directory->toString()), 'flush is not working!');
@@ -19,7 +19,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Path::fromString(__DIR__ . '/../../PlayGround/Flush');
+        $directory = Address::fromString(__DIR__ . '/../../PlayGround/Flush');
         $subDirectory = $directory->append('SubDirectory');
         mkdir($directory->toString());
         mkdir($subDirectory->toString());
@@ -27,7 +27,7 @@ test(
 
         return $directory;
     },
-    after: function (Path $directory) {
+    after: function (Address $directory) {
         rmdir($directory->toString());
     }
 );

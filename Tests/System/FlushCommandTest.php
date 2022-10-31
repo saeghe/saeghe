@@ -3,7 +3,7 @@
 namespace Tests\System\FlushCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 
 test(
     title: 'it should flush builds',

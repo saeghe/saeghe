@@ -4,7 +4,7 @@ namespace Tests\System\InitCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;
-use function Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 $initialContent = <<<EOD
 {

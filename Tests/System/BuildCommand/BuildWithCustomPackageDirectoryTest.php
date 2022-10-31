@@ -2,8 +2,8 @@
 
 namespace Tests\System\BuildCommand\BuildWithCustomPackageDirectoryTest;
 
-use function Saeghe\FileManager\Directory\delete_recursive;
-use function Saeghe\FileManager\File\delete;
+use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\Saeghe\FileManager\File\delete;
 
 test(
     title: 'it should build the project with custom packages directory',

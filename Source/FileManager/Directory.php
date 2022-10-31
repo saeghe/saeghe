@@ -1,6 +1,6 @@
 <?php
 
-namespace Saeghe\FileManager\Directory;
+namespace Saeghe\Saeghe\FileManager\Directory;
 
 function delete_recursive(string $path): bool
 {

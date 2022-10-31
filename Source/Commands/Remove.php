@@ -9,7 +9,7 @@ use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\success;
-use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 
 function run(Project $project)
 {

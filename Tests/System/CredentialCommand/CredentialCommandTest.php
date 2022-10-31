@@ -3,7 +3,7 @@
 namespace Tests\System\CredentialCommand\CredentialCommandTest;
 
 use Saeghe\Cli\IO\Write;
-use function Saeghe\FileManager\File\delete;
+use function Saeghe\Saeghe\FileManager\File\delete;
 
 test(
     title: 'it should set credential for github.com',
