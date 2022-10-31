@@ -2,6 +2,8 @@
 
 namespace Saeghe\Saeghe\Providers\GitHub;
 
+use function Saeghe\FileManager\File\delete;
+
 function isSsh(string $packageUrl): bool
 {
     return str_starts_with($packageUrl, 'git@');
@@ -119,7 +121,7 @@ function download($destination, $owner, $repo, $version): bool
         var_dump($res);
     }
 
-    shell_exec('rm -f ' . $zipFile);
+    delete($zipFile);
 
     $files = scandir($parentDirectory);
 

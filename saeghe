@@ -21,6 +21,8 @@ spl_autoload_register(function ($class) {
 require Path::fromString(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php')->toString();
 require Path::fromString(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php')->toString();
 require Path::fromString(__DIR__ . '/Source/PhpFile.php')->toString();
+require Path::fromString(__DIR__ . '/Source/FileManager/File.php')->toString();
+require Path::fromString(__DIR__ . '/Source/FileManager/Directory.php')->toString();
 require Path::fromString(__DIR__ . '/Source/Git/GitHub.php')->toString();
 require Path::fromString(__DIR__ . '/Source/Commands/Add.php')->toString();
 require Path::fromString(__DIR__ . '/Source/Commands/Build.php')->toString();
@@ -37,6 +39,8 @@ require Path::fromString(__DIR__ . '/Source/Commands/Watch.php')->toString();
 
 use Saeghe\Cli\IO\Read;
 use Saeghe\Saeghe\Project;
+use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 
 $command = Read\command() ?? Read\parameter('command', 'help');
@@ -100,15 +104,10 @@ function dir_make_recursive(string $path, $permission = 0755): bool
     return mkdir($path, $permission, true);
 }
 
-function dir_delete_recursive(string $path): void
-{
-    shell_exec("rm -fR $path");
-}
-
 function dir_renew(string $path): string
 {
     if (file_exists($path)) {
-        dir_delete_recursive($path);
+        delete_recursive($path);
     }
 
     dir_make_recursive($path);
@@ -123,7 +122,7 @@ function dir_clean(string $path): string
     if (! file_exists($path)) {
         dir_make_recursive($path);
     } else {
-        dir_delete_recursive("$path*");
+        flush($path);
     }
 
     return $path;

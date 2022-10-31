@@ -2,8 +2,6 @@
 
 namespace Saeghe\Saeghe;
 
-require_once __DIR__ . '/Str.php';
-
 use Saeghe\Saeghe\Str;
 
 class PhpFile

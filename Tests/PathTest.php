@@ -201,6 +201,12 @@ test(
             ===
             Path::realPath('/user/home\\\\/./directory///another-directory//../filename.extension')
         );
+
+        assert(
+            DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'filename.extension'
+            ===
+            Path::realPath('/user/home/directory/../../filename.extension')
+        );
     }
 );
 

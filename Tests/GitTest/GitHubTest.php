@@ -2,6 +2,8 @@
 
 namespace Tests\GitTest\GitHubTest;
 
+use Saeghe\Saeghe\Path;
+use function Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\Providers\GitHub\clone_to;
 use function Saeghe\Saeghe\Providers\GitHub\download;
 use function Saeghe\Saeghe\Providers\GitHub\extract_owner;
@@ -105,39 +107,53 @@ test(
 
 test(
     title: 'it should download given repository',
-    case: function () {
-        assert(download(__DIR__ . '/../../TestRequirements/downloads/package', 'saeghe', 'released-package', 'v1.0.5'));
+    case: function (Path $packagesDirectory) {
+        assert(download($packagesDirectory->toString(), 'saeghe', 'released-package', 'v1.0.5'));
         // Assert latest changes on the latest commit
         assert(
             str_contains(
-                file_get_contents(__DIR__ . '/../../TestRequirements/downloads/package/saeghe.config-lock.json'),
+                file_get_contents($packagesDirectory->append('saeghe.config-lock.json')->toString()),
                 '080478442a9ef1d19f5966edc9bf3c1eccca4848'
             )
         );
-        assert(! file_exists(__DIR__ . '/../../TestRequirements/downloads/released-package.zip'));
+        assert(! file_exists($packagesDirectory->parent()->append('released-package.zip')->toString()));
+
+        return $packagesDirectory;
     },
     before: function () {
         $credentials = json_decode(json: file_get_contents(__DIR__ . '/../../credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
         github_token($credentials['github.com']['token']);
+        $packagesDirectory = Path::fromString(__DIR__ . '/../PlayGround/downloads/package');
+        mkdir($packagesDirectory->toString(), 0777, true);
+
+        return $packagesDirectory;
     },
-    after: function () {
-        shell_exec('rm -fR ' . __DIR__ . '/../../TestRequirements/downloads');
+    after: function (Path $packagesDirectory) {
+        flush($packagesDirectory->parent()->parent()->toString());
     }
 );
 
 test(
     title: 'it should clone given repository',
-    case: function () {
-        assert(clone_to(__DIR__ . '/../../TestRequirements/downloads/package', 'saeghe', 'simple-package'));
+    case: function (Path $packagesDirectory) {
+        assert(clone_to($packagesDirectory->toString(), 'saeghe', 'simple-package'));
         // Assert latest changes on the latest commit
         assert(
             str_contains(
-                file_get_contents(__DIR__ . '/../../TestRequirements/downloads/package/entry-point'),
+                file_get_contents($packagesDirectory->append('entry-point')->toString()),
                 'new ImaginaryClass();'
             )
         );
+
+        return $packagesDirectory;
     },
-    after: function () {
-        shell_exec('rm -fR ' . __DIR__ . '/../../TestRequirements/downloads');
+    before: function () {
+        $packagesDirectory = Path::fromString(__DIR__ . '/../PlayGround/downloads/package');
+        mkdir($packagesDirectory->toString(), 0777, true);
+
+        return $packagesDirectory;
+    },
+    after: function (Path $packagesDirectory) {
+        flush($packagesDirectory->parent()->parent()->toString());
     }
 );
