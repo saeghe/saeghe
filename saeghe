@@ -2,46 +2,47 @@
 <?php
 
 require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'Str.php';
-require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'Path.php';
+require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Path.php';
+require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Address.php';
 
-use Saeghe\Saeghe\Path;
+use Saeghe\Saeghe\FileSystem\Address;
 
 spl_autoload_register(function ($class) {
     $classMap = [
-        'Saeghe\Saeghe\Git\Repository' => Path::fromString(__DIR__ . '/Source/Git/Repository.php')->toString(),
-        'Saeghe\Saeghe\Config' => Path::fromString(__DIR__ . '/Source/Config.php')->toString(),
-        'Saeghe\Saeghe\Meta' => Path::fromString(__DIR__ . '/Source/Meta.php')->toString(),
-        'Saeghe\Saeghe\Package' => Path::fromString(__DIR__ . '/Source/Package.php')->toString(),
-        'Saeghe\Saeghe\Project' => Path::fromString(__DIR__ . '/Source/Project.php')->toString(),
+        'Saeghe\Saeghe\Git\Repository' => Address::fromString(__DIR__ . '/Source/Git/Repository.php')->toString(),
+        'Saeghe\Saeghe\Config' => Address::fromString(__DIR__ . '/Source/Config.php')->toString(),
+        'Saeghe\Saeghe\Meta' => Address::fromString(__DIR__ . '/Source/Meta.php')->toString(),
+        'Saeghe\Saeghe\Package' => Address::fromString(__DIR__ . '/Source/Package.php')->toString(),
+        'Saeghe\Saeghe\Project' => Address::fromString(__DIR__ . '/Source/Project.php')->toString(),
     ];
 
     require_once $classMap[$class];
 });
 
-require Path::fromString(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php')->toString();
-require Path::fromString(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php')->toString();
-require Path::fromString(__DIR__ . '/Source/PhpFile.php')->toString();
-require Path::fromString(__DIR__ . '/Source/FileManager/File.php')->toString();
-require Path::fromString(__DIR__ . '/Source/FileManager/Directory.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Git/GitHub.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Add.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Build.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Credential.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Flush.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Help.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Init.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Install.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Man.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Migrate.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Remove.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Update.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Version.php')->toString();
-require Path::fromString(__DIR__ . '/Source/Commands/Watch.php')->toString();
+require Address::fromString(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php')->toString();
+require Address::fromString(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php')->toString();
+require Address::fromString(__DIR__ . '/Source/PhpFile.php')->toString();
+require Address::fromString(__DIR__ . '/Source/FileManager/File.php')->toString();
+require Address::fromString(__DIR__ . '/Source/FileManager/Directory.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Git/GitHub.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Add.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Build.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Credential.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Flush.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Help.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Init.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Install.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Man.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Migrate.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Remove.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Update.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Version.php')->toString();
+require Address::fromString(__DIR__ . '/Source/Commands/Watch.php')->toString();
 
 use Saeghe\Cli\IO\Read;
 use Saeghe\Saeghe\Project;
-use function Saeghe\FileManager\Directory\delete_recursive;
-use function Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
@@ -80,11 +81,11 @@ match ($command) {
 function makeProject($projectRoot, $environment): Project
 {
     return new Project(
-        root: Path::fromString($projectRoot),
+        root: Address::fromString($projectRoot),
         environment: $environment,
-        configFilePath: Path::fromString($projectRoot . 'saeghe.config.json'),
-        configLockFilePath: Path::fromString($projectRoot . 'saeghe.config-lock.json'),
-        credentialsPath: Path::fromString(__DIR__ .'/credentials.json'),
+        configFilePath: Address::fromString($projectRoot . 'saeghe.config.json'),
+        configLockFilePath: Address::fromString($projectRoot . 'saeghe.config-lock.json'),
+        credentialsPath: Address::fromString(__DIR__ .'/credentials.json'),
     );
 }
 

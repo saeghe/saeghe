@@ -3,7 +3,7 @@
 namespace Tests\System\AddCommand\AddReleasedPackageWithSpecificVersionTest;
 
 use Saeghe\TestRunner\Assertions\File;
-use function Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should add released package to the project with the given version',

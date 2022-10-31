@@ -4,7 +4,7 @@ namespace Tests\System\RemoveCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should remove a package',

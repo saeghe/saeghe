@@ -1,6 +1,6 @@
 <?php
 
-namespace Saeghe\FileManager\File;
+namespace Saeghe\Saeghe\FileManager\File;
 
 function delete(string $path): bool
 {

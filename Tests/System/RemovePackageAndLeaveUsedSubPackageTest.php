@@ -2,7 +2,7 @@
 
 namespace Tests\System\RemovePackageAndLeaveUsedSubPackageTest;
 
-use function Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should remove the package but leave used subpackage',

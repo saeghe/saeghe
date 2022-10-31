@@ -5,7 +5,7 @@ namespace Saeghe\Saeghe\Commands\Migrate;
 use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
-use Saeghe\Saeghe\Path;
+use Saeghe\Saeghe\FileSystem\Address;
 use Saeghe\Saeghe\Project;
 
 function run(Project $project)
@@ -77,7 +77,7 @@ function run(Project $project)
     Write\success('Project migrated successfully.');
 }
 
-function migrate_package(Project $project, Path $packagesDirectory, $name, $package, $packageMeta)
+function migrate_package(Project $project, Address $packagesDirectory, $name, $package, $packageMeta)
 {
     $packageVendorDirectory = $project->root->append('vendor/' . $name)->toString();
 

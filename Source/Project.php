@@ -2,24 +2,26 @@
 
 namespace Saeghe\Saeghe;
 
+use Saeghe\Saeghe\FileSystem\Address;
+
 class Project
 {
     /**
      * $buildRoot is readonly.
      *  DO NOT modify it!
      */
-    public Path $buildRoot;
+    public Address $buildRoot;
 
     /**
      * $root, $environment, $configFilePath, $configLockFilePath, $credentialsPath are readonly.
      *  DO NOT modify them!
      */
     public function __construct(
-        public Path $root,
+        public Address $root,
         public string $environment,
-        public Path $configFilePath,
-        public Path $configLockFilePath,
-        public Path $credentialsPath,
+        public Address $configFilePath,
+        public Address $configLockFilePath,
+        public Address $credentialsPath,
     ) {
         $this->buildRoot = $this->root->append('builds/' . $this->environment);
     }

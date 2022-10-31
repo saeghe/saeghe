@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Providers\GitHub;
 
-use function Saeghe\FileManager\File\delete;
+use function Saeghe\Saeghe\FileManager\File\delete;
 
 const GITHUB_DOMAIN = 'github.com';
 const GITHUB_URL = 'https://github.com/';

@@ -2,7 +2,7 @@
 
 namespace Tests\System\WatchCommandTest;
 
-use function Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should watch for changes',

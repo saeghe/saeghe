@@ -2,10 +2,9 @@
 
 namespace Tests\System\BuildCommand\BuildCommandTest;
 
-use Saeghe\Saeghe\Path;
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\FileManager\Directory\delete_recursive;
-use function Saeghe\FileManager\File\delete;
+use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\Saeghe\FileManager\File\delete;
 
 test(
     title: 'it should build the project',

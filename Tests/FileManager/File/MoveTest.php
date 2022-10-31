@@ -2,13 +2,13 @@
 
 namespace Tests\FileManager\File\MoveTest;
 
-use Saeghe\Saeghe\Path;
-use function Saeghe\FileManager\Directory\delete_recursive;
-use function Saeghe\FileManager\File\move;
+use Saeghe\Saeghe\FileSystem\Address;
+use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\Saeghe\FileManager\File\move;
 
 test(
     title: 'it should delete file',
-    case: function (Path $first, Path $second) {
+    case: function (Address $first, Address $second) {
         $origin = $first->append('sample.txt');
         $destination = $second->append('sample.txt');
 
@@ -20,8 +20,8 @@ test(
         return [$first, $second];
     },
     before: function () {
-        $first = Path::fromString(__DIR__ . '/first');
-        $second = Path::fromString(__DIR__ . '/second');
+        $first = Address::fromString(__DIR__ . '/first');
+        $second = Address::fromString(__DIR__ . '/second');
         mkdir($first->toString());
         mkdir($second->toString());
         $file = $first->append('sample.txt');
@@ -29,7 +29,7 @@ test(
 
         return [$first, $second];
     },
-    after: function (Path $first, Path $second) {
+    after: function (Address $first, Address $second) {
         delete_recursive($first->toString());
         delete_recursive($second->toString());
     }

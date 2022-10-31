@@ -3,7 +3,7 @@
 namespace Tests\System\AddCommand\AddPackagesWithSameSubPackagesTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 test(
     title: 'it should not stuck if two packages using the same dependencies',

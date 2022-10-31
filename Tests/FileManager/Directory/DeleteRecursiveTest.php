@@ -2,17 +2,17 @@
 
 namespace Tests\FileManager\Directory\DeleteRecursiveTest;
 
-use Saeghe\Saeghe\Path;
-use function Saeghe\FileManager\Directory\delete_recursive;
+use Saeghe\Saeghe\FileSystem\Address;
+use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 
 test(
     title: 'it should delete directory when it is empty',
-    case: function (Path $directory) {
+    case: function (Address $directory) {
         assert(delete_recursive($directory->toString()));
         assert(! file_exists($directory->toString()), 'delete_recursive is not working!');
     },
     before: function () {
-        $directory = Path::fromString(__DIR__ . '/../../PlayGround/DeleteRecursive');
+        $directory = Address::fromString(__DIR__ . '/../../PlayGround/DeleteRecursive');
         mkdir($directory->toString());
 
         return $directory;
@@ -21,13 +21,13 @@ test(
 
 test(
     title: 'it should delete directory recursively',
-    case: function (Path $directory) {
+    case: function (Address $directory) {
         assert(delete_recursive($directory->toString()));
 
         assert(! file_exists($directory->toString()), 'delete_recursive is not working!');
     },
     before: function () {
-        $directory = Path::fromString(__DIR__ . '/../../PlayGround/DeleteRecursive');
+        $directory = Address::fromString(__DIR__ . '/../../PlayGround/DeleteRecursive');
         $subDirectory = $directory->append('SubDirectory');
         $anotherSubDirectory = $directory->append('SubDirectory/AnotherSubDirectory');
         mkdir($directory->toString());
