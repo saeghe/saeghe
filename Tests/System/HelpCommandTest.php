@@ -2,7 +2,7 @@
 
 namespace Tests\System\HelpCommandTest;
 
-$helpContent = <<<'EOD'
+$help_content = <<<'EOD'
 usage: saeghe [-v | --version] [-h | --help] [--man]
            <command> [<args>]
 
@@ -27,27 +27,27 @@ EOD;
 
 test(
     title: 'it should show help output',
-    case: function () use ($helpContent) {
+    case: function () use ($help_content) {
         $output = shell_exec($_SERVER['PWD'] . '/saeghe -h');
 
-        assert(str_contains($output, $helpContent), 'Help output is not what we want!' . $output);
+        assert(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
     }
 );
 
 test(
     title: 'it should show help output when help option passed',
-    case: function () use ($helpContent) {
+    case: function () use ($help_content) {
         $output = shell_exec($_SERVER['PWD'] . '/saeghe --help');
 
-        assert(str_contains($output, $helpContent), 'Help output is not what we want!' . $output);
+        assert(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
     }
 );
 
 test(
     title: 'it should show help output when no command passed',
-    case: function () use ($helpContent) {
+    case: function () use ($help_content) {
         $output = shell_exec($_SERVER['PWD'] . '/saeghe');
 
-        assert(str_contains($output, $helpContent), 'Help output is not what we want!' . $output);
+        assert(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
     }
 );

@@ -9,17 +9,17 @@ class Address
 {
     private string $string;
 
-    public function __construct(string $pathString)
+    public function __construct(string $path_string)
     {
-        $this->string = Path\realpath($pathString);
+        $this->string = Path\realpath($path_string);
     }
 
-    public static function fromString(string $pathString): static
+    public static function from_string(string $path_string): static
     {
-        return new static($pathString);
+        return new static($path_string);
     }
 
-    public function toString(): string
+    public function to_string(): string
     {
         return $this->string;
     }
@@ -29,9 +29,9 @@ class Address
         return new static(Str\before_last_occurrence($this->string, DIRECTORY_SEPARATOR));
     }
 
-    public function append(string $pathString): static
+    public function append(string $path_string): static
     {
-        return static::fromString($this->string . DIRECTORY_SEPARATOR . $pathString);
+        return static::from_string($this->string . DIRECTORY_SEPARATOR . $path_string);
     }
 
     public function directory(): string

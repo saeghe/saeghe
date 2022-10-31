@@ -14,16 +14,14 @@ use function Saeghe\Saeghe\Providers\GitHub\find_version_hash;
 use function Saeghe\Saeghe\Providers\GitHub\get_json;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use function Saeghe\Saeghe\Providers\GitHub\has_release;
-use function Saeghe\Saeghe\Providers\GitHub\isSsh;
+use function Saeghe\Saeghe\Providers\GitHub\is_ssh;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
-
-require_once __DIR__ . '/../../Source/Git/GitHub.php';
 
 test(
     title: 'it should detect if url is ssh',
     case: function () {
-        assert(isSsh('git@github.com:owner/repo'));
-        assert(! isSsh('https://github.com/owner/repo'));
+        assert(is_ssh('git@github.com:owner/repo'));
+        assert(! is_ssh('https://github.com/owner/repo'));
     }
 );
 
@@ -120,53 +118,53 @@ test(
 
 test(
     title: 'it should download given repository',
-    case: function (Address $packagesDirectory) {
-        assert(download($packagesDirectory->toString(), 'saeghe', 'released-package', 'v1.0.5'));
+    case: function (Address $packages_directory) {
+        assert(download($packages_directory->to_string(), 'saeghe', 'released-package', 'v1.0.5'));
         // Assert latest changes on the latest commit
         assert(
             str_contains(
-                file_get_contents($packagesDirectory->append('saeghe.config-lock.json')->toString()),
+                file_get_contents($packages_directory->append('saeghe.config-lock.json')->to_string()),
                 '080478442a9ef1d19f5966edc9bf3c1eccca4848'
             )
         );
-        assert(! file_exists($packagesDirectory->parent()->append('released-package.zip')->toString()));
+        assert(! file_exists($packages_directory->parent()->append('released-package.zip')->to_string()));
 
-        return $packagesDirectory;
+        return $packages_directory;
     },
     before: function () {
         $credentials = json_decode(json: file_get_contents(__DIR__ . '/../../credentials.json'), associative: true, flags: JSON_THROW_ON_ERROR);
         github_token($credentials[GITHUB_DOMAIN]['token']);
-        $packagesDirectory = Address::fromString(__DIR__ . '/../PlayGround/downloads/package');
-        mkdir($packagesDirectory->toString(), 0777, true);
+        $packages_directory = Address::from_string(__DIR__ . '/../PlayGround/downloads/package');
+        mkdir($packages_directory->to_string(), 0777, true);
 
-        return $packagesDirectory;
+        return $packages_directory;
     },
-    after: function (Address $packagesDirectory) {
-        flush($packagesDirectory->parent()->parent()->toString());
+    after: function (Address $packages_directory) {
+        flush($packages_directory->parent()->parent()->to_string());
     }
 );
 
 test(
     title: 'it should clone given repository',
-    case: function (Address $packagesDirectory) {
-        assert(clone_to($packagesDirectory->toString(), 'saeghe', 'simple-package'));
+    case: function (Address $packages_directory) {
+        assert(clone_to($packages_directory->to_string(), 'saeghe', 'simple-package'));
         // Assert latest changes on the latest commit
         assert(
             str_contains(
-                file_get_contents($packagesDirectory->append('entry-point')->toString()),
+                file_get_contents($packages_directory->append('entry-point')->to_string()),
                 'new ImaginaryClass();'
             )
         );
 
-        return $packagesDirectory;
+        return $packages_directory;
     },
     before: function () {
-        $packagesDirectory = Address::fromString(__DIR__ . '/../PlayGround/downloads/package');
-        mkdir($packagesDirectory->toString(), 0777, true);
+        $packages_directory = Address::from_string(__DIR__ . '/../PlayGround/downloads/package');
+        mkdir($packages_directory->to_string(), 0777, true);
 
-        return $packagesDirectory;
+        return $packages_directory;
     },
-    after: function (Address $packagesDirectory) {
-        flush($packagesDirectory->parent()->parent()->toString());
+    after: function (Address $packages_directory) {
+        flush($packages_directory->parent()->parent()->to_string());
     }
 );

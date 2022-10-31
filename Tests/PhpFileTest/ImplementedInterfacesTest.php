@@ -2,9 +2,6 @@
 
 namespace Tests\PhpFileTest\ImplementedInterfacesTest;
 
-require_once __DIR__ . '/../../Source/Str.php';
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -20,9 +17,9 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert([] === $phpFile->implementedInterfaces());
+        assert([] === $php_file->implemented_interfaces());
     }
 );
 
@@ -41,9 +38,9 @@ class MyClass implements MyInterface
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\MyInterface'] === $phpFile->implementedInterfaces());
+        assert(['MyApp\MyInterface'] === $php_file->implemented_interfaces());
     }
 );
 
@@ -62,9 +59,9 @@ class MyClass extends ParentClass implements FirstInterface, SecondInterface, Th
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\FirstInterface', 'MyApp\SecondInterface', 'MyApp\ThirdInterface'] === $phpFile->implementedInterfaces());
+        assert(['MyApp\FirstInterface', 'MyApp\SecondInterface', 'MyApp\ThirdInterface'] === $php_file->implemented_interfaces());
     }
 );
 
@@ -89,7 +86,7 @@ class MyClass extends ParentClass implements FirstInterface, SecondInterface, Th
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'Application\FirstInterface',
@@ -99,7 +96,7 @@ EOD;
                 'Application\CompoundNamespace\AnyNamespace',
                 '\Iterator',
                 '\ArrayAccess',
-            ] === $phpFile->implementedInterfaces()
+            ] === $php_file->implemented_interfaces()
         );
     }
 );

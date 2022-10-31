@@ -2,8 +2,6 @@
 
 namespace Tests\StrTests\BeforeFirstOccurrenceTest;
 
-require_once __DIR__ . '/../../Source/Str.php';
-
 use Saeghe\Saeghe\Str;
 
 test(

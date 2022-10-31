@@ -37,12 +37,12 @@ function delete_packages_directory()
 
 function assert_file_with_package_dependency_has_been_built($message)
 {
-    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
-    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
+    $environment_build_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
 
     assert(
-        file_exists($environmentBuildPath . '/Source/FileUsingVendor.php')
-        && file_get_contents($environmentBuildPath . '/Source/FileUsingVendor.php') === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/Source/FileUsingVendor.stub')),
+        file_exists($environment_build_path . '/Source/FileUsingVendor.php')
+        && file_get_contents($environment_build_path . '/Source/FileUsingVendor.php') === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/Source/FileUsingVendor.stub')),
         $message
     );
 }

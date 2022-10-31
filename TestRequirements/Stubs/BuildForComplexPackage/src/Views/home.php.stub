@@ -1,6 +1,6 @@
 <?php
 
-require_once '$environmentBuildPath/Packages/saeghe/complex-package/src/Helpers.php';
+require_once '$environment_build_path/Packages/saeghe/complex-package/src/Helpers.php';
 
 use Saeghe\ComplexPackage\Models\User;
 use Saeghe\SimplePackage\SimpleClass;

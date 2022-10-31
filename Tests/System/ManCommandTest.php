@@ -2,7 +2,7 @@
 
 namespace Tests\System\ManCommandTest;
 
-$manContent = <<<EOD
+$man_content = <<<EOD
 usage: saeghe [-v | --version] [-h | --help] [--man]
            <command> [<args>]
 
@@ -53,9 +53,9 @@ EOD;
 
 test(
     title: 'it should return desired man output',
-    case: function () use ($manContent) {
+    case: function () use ($man_content) {
         $output = shell_exec($_SERVER['PWD'] . '/saeghe --man');
 
-        assert(str_contains($output, $manContent), 'Manual output is not what we want!' . $output);
+        assert(str_contains($output, $man_content), 'Manual output is not what we want!' . $output);
     }
 );

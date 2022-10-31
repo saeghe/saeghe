@@ -2,8 +2,6 @@
 
 namespace Tests\UsedConstantsTest;
 
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -71,7 +69,7 @@ EOD;
                 'Application\Constants\CONST_H',
                 'PHP_BINARY',
                 '\PHP_BINARY_READ',
-            ] === (new PhpFile($content))->usedConstants(),
+            ] === (new PhpFile($content))->used_constants(),
             'Class constants are not detected!'
         );
     }

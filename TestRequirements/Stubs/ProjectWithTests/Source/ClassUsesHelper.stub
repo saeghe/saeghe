@@ -2,8 +2,8 @@
 
 namespace ProjectWithTests\SampleFile;
 
-require_once '$environmentBuildPath/Services/Constants.php';
-require_once '$environmentBuildPath/Services/Functions.php';
+require_once '$environment_build_path/Services/Constants.php';
+require_once '$environment_build_path/Services/Functions.php';
 
 use function ProjectWithTests\Service\helper;
 use const ProjectWithTests\Service\HELPER_CONST;

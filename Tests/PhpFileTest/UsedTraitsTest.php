@@ -2,9 +2,6 @@
 
 namespace Tests\PhpFileTest\UsedTraitsTest;
 
-require_once __DIR__ . '/../../Source/Str.php';
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -20,9 +17,9 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert([] === $phpFile->usedTraits());
+        assert([] === $php_file->used_traits());
     }
 );
 
@@ -41,9 +38,9 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\MyTrait'] === $phpFile->usedTraits());
+        assert(['MyApp\MyTrait'] === $php_file->used_traits());
     }
 );
 
@@ -65,9 +62,9 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\MyTrait', 'Application\OtherNamespace\MyOtherTrait'] === $phpFile->usedTraits());
+        assert(['MyApp\MyTrait', 'Application\OtherNamespace\MyOtherTrait'] === $php_file->used_traits());
     }
 );
 
@@ -94,7 +91,7 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
             'MyApp\MyTrait',
@@ -103,7 +100,7 @@ EOD;
             'Application\Traits\HelloWorld',
             'Application\CompoundNamespace\ATrait',
             '\BuiltInTrait',
-            ] === $phpFile->usedTraits()
+            ] === $php_file->used_traits()
         );
     }
 );

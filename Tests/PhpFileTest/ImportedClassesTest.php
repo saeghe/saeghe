@@ -2,8 +2,6 @@
 
 namespace Tests\PhpFileTest\ImportedClassesTest;
 
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -18,11 +16,11 @@ use MyApp\OtherNamespace\MyClass;
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
             'MyApp\OtherNamespace\MyClass' => 'MyClass'
-        ] === $phpFile->importedClasses());
+        ] === $php_file->imported_classes());
     }
 );
 
@@ -43,9 +41,9 @@ class MyClass extends ParentClass implements MyInterface
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherNamespace\ClassA' => 'ClassA'] === $phpFile->importedClasses());
+        assert(['MyApp\OtherNamespace\ClassA' => 'ClassA'] === $php_file->imported_classes());
     }
 );
 
@@ -66,9 +64,9 @@ final class MyClass extends ParentClass implements MyInterface
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherNamespace\ClassA' => 'ClassA'] === $phpFile->importedClasses());
+        assert(['MyApp\OtherNamespace\ClassA' => 'ClassA'] === $php_file->imported_classes());
     }
 );
 
@@ -84,12 +82,12 @@ use MyApp\OtherNamespace\{ClassA, ClassB};
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'MyApp\OtherNamespace\ClassA' => 'ClassA',
                 'MyApp\OtherNamespace\ClassB' => 'ClassB',
-            ] === $phpFile->importedClasses()
+            ] === $php_file->imported_classes()
         );
     }
 );
@@ -108,7 +106,7 @@ use MyApp\OtherNamespace\ClassE as ClassF;
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'MyApp\OtherNamespace\ClassA' => 'ClassA',
@@ -116,7 +114,7 @@ EOD;
                 'MyApp\OtherNamespace\ClassC' => 'C',
                 'MyApp\OtherNamespace\ClassD' => 'ClassD',
                 'MyApp\OtherNamespace\ClassE' => 'ClassF',
-            ] === $phpFile->importedClasses()
+            ] === $php_file->imported_classes()
         );
     }
 );
@@ -136,7 +134,7 @@ use MyApp\FirstClass, MyApp\AnotherNamespace\SecondClass;
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'MyApp\AnotherNamespace\SecondClass' => 'SecondClass',
@@ -147,7 +145,7 @@ EOD;
                 'MyApp\OtherNamespace\ClassE' => 'ClassF',
                 'MyApp\OtherNamespace\ClassG' => 'ClassG',
                 'MyApp\FirstClass' => 'FirstClass',
-            ] === $phpFile->importedClasses()
+            ] === $php_file->imported_classes()
         );
     }
 );

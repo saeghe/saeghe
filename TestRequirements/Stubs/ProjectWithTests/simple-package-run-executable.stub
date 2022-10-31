@@ -2,60 +2,60 @@
 
 spl_autoload_register(function ($class) {
     $classes = [
-        'Saeghe\SimplePackage\ImaginaryClass' => '$environmentBuildPath/Packages/saeghe/simple-package/Source/ImaginaryClass.php',
-        'ProjectWithTests\CompoundNamespace\Foo\ClassBaz' => '$environmentBuildPath/Source/CompoundNamespace/Foo/ClassBaz.php',
-        'ProjectWithTests\CompoundNamespace\Foo\ClassFoo' => '$environmentBuildPath/Source/CompoundNamespace/Foo/ClassFoo.php',
-        'ProjectWithTests\CompoundNamespace\Foo' => '$environmentBuildPath/Source/CompoundNamespace/Foo.php',
-        'ProjectWithTests\ExtendExamples\ParentAbstractClass' => '$environmentBuildPath/Source/ExtendExamples/ParentAbstractClass.php',
-        'ProjectWithTests\ExtendExamples\ParentClass' => '$environmentBuildPath/Source/ExtendExamples/ParentClass.php',
-        'ProjectWithTests\SubDirectory\SimpleClass' => '$environmentBuildPath/Source/SubDirectory/SimpleClass.php',
-        'ProjectWithTests\ExtendExamples\AbstractClass' => '$environmentBuildPath/Source/ExtendExamples/AbstractClass.php',
-        'Saeghe\SimplePackage\AUsefulClass' => '$environmentBuildPath/Packages/saeghe/simple-package/Source/AUsefulClass.php',
-        'ProjectWithTests\SubDirectory\ClassUseAnotherClass' => '$environmentBuildPath/Source/SubDirectory/ClassUseAnotherClass.php',
-        'ProjectWithTests\Classes\StaticClassA' => '$environmentBuildPath/Source/Classes/StaticClassA.php',
-        'ProjectWithTests\Classes\StaticClassB' => '$environmentBuildPath/Source/Classes/StaticClassB.php',
-        'ProjectWithTests\Classes\StaticClassC' => '$environmentBuildPath/Source/Classes/StaticClassC.php',
-        'ProjectWithTests\AnyNamespace\StaticClass' => '$environmentBuildPath/Source/AnyNamespace/StaticClass.php',
-        'ProjectWithTests\Classes\NewInstanceClassA' => '$environmentBuildPath/Source/Classes/NewInstanceClassA.php',
-        'Saeghe\SimplePackage\Classes\PackageClass' => '$environmentBuildPath/Packages/saeghe/simple-package/Source/Classes/PackageClass.php',
-        'ProjectWithTests\Classes\NewInstanceClassB' => '$environmentBuildPath/Source/Classes/NewInstanceClassB.php',
-        'ProjectWithTests\Classes\NewInstanceClassC' => '$environmentBuildPath/Source/Classes/NewInstanceClassC.php',
-        'ProjectWithTests\SampleFile\InstanceFromClassInSameNamespace' => '$environmentBuildPath/Source/SampleFile/InstanceFromClassInSameNamespace.php',
-        'ProjectWithTests\AnyNamespace\ClassA' => '$environmentBuildPath/Source/AnyNamespace/ClassA.php',
-        'Saeghe\SimplePackage\TypeClasses\InjectedClassFromPackageToConstructor' => '$environmentBuildPath/Packages/saeghe/simple-package/Source/TypeClasses/InjectedClassFromPackageToConstructor.php',
-        'ProjectWithTests\TypeClasses\InjectedPublicClassInConstructor' => '$environmentBuildPath/Source/TypeClasses/InjectedPublicClassInConstructor.php',
-        'ProjectWithTests\TypeClasses\OtherInjectedParameterClass' => '$environmentBuildPath/Source/TypeClasses/OtherInjectedParameterClass.php',
-        'ProjectWithTests\TypeClasses\InjectedClassInConstructor' => '$environmentBuildPath/Source/TypeClasses/InjectedClassInConstructor.php',
-        'ProjectWithTests\TypeClasses\InjectedParameterClass' => '$environmentBuildPath/Source/TypeClasses/InjectedParameterClass.php',
-        'ProjectWithTests\TypeClasses\ReturnTypeClassA' => '$environmentBuildPath/Source/TypeClasses/ReturnTypeClassA.php',
-        'ProjectWithTests\TypeClasses\ReturnTypeClassB' => '$environmentBuildPath/Source/TypeClasses/ReturnTypeClassB.php',
-        'ProjectWithTests\TypeClasses\ReturnTypeClassC' => '$environmentBuildPath/Source/TypeClasses/ReturnTypeClassC.php',
-        'ProjectWithTests\TypeClasses\MultipleTypeA' => '$environmentBuildPath/Source/TypeClasses/MultipleTypeA.php',
-        'ProjectWithTests\TypeClasses\MultipleTypeB' => '$environmentBuildPath/Source/TypeClasses/MultipleTypeB.php',
-        'ProjectWithTests\Classes\ClassWithConstant' => '$environmentBuildPath/Source/Classes/ClassWithConstant.php',
-        'Saeghe\SimplePackage\Classes\PackageConst' => '$environmentBuildPath/Packages/saeghe/simple-package/Source/Classes/PackageConst.php',
-        'ProjectWithTests\ClassName\ClassA' => '$environmentBuildPath/Source/ClassName/ClassA.php',
-        'ProjectWithTests\ClassName\ClassB' => '$environmentBuildPath/Source/ClassName/ClassB.php',
-        'ProjectWithTests\Attributes\SetUp' => '$environmentBuildPath/Source/Attributes/SetUp.php',
-        'ProjectWithTests\AnyNamespace' => '$environmentBuildPath/Source/AnyNamespace.php',
-        'ProjectWithTests\Helper' => '$environmentBuildPath/Source/Helper.php',
-        'ProjectWithTests\Parents\ParentClass' => '$environmentBuildPath/Source/Parents/ParentClass.php',
-        'ProjectWithTests\Interfaces\ClassInterface' => '$environmentBuildPath/Source/Interfaces/ClassInterface.php',
-        'ProjectWithTests\SampleFile\TraitInSameNamespace' => '$environmentBuildPath/Source/SampleFile/TraitInSameNamespace.php',
-        'ProjectWithTests\ClassWithConstants' => '$environmentBuildPath/Source/ClassWithConstants.php',
-        'ProjectWithTests\SampleFile' => '$environmentBuildPath/Source/SampleFile.php',
-        'ProjectWithTests\InterfaceExamples\SecondInterface' => '$environmentBuildPath/Source/InterfaceExamples/SecondInterface.php',
-        'ProjectWithTests\InterfaceExamples\InnerInterfaces\InnerInterface' => '$environmentBuildPath/Source/InterfaceExamples/InnerInterfaces/InnerInterface.php',
-        'ProjectWithTests\InterfaceExamples\FirstInterface' => '$environmentBuildPath/Source/InterfaceExamples/FirstInterface.php',
-        'ProjectWithTests\InterfaceExamples\ThirdInterface' => '$environmentBuildPath/Source/InterfaceExamples/ThirdInterface.php',
-        'ProjectWithTests\InterfaceExamples\InnerInterfaces\OtherInnerInterface' => '$environmentBuildPath/Source/InterfaceExamples/InnerInterfaces/OtherInnerInterface.php',
-        'ProjectWithTests\InterfaceExamples\InnerInterfaces\ExtendableInterface' => '$environmentBuildPath/Source/InterfaceExamples/InnerInterfaces/ExtendableInterface.php',
-        'ProjectWithTests\ProjectWithTests\ProjectWithTests' => '$environmentBuildPath/Source/ProjectWithTests/ProjectWithTests.php',
-        'ProjectWithTests\UsedTraits\FirstTrait' => '$environmentBuildPath/Source/UsedTraits/FirstTrait.php',
-        'ProjectWithTests\UsedTraits\ThirdTrait' => '$environmentBuildPath/Source/UsedTraits/ThirdTrait.php',
-        'ProjectWithTests\UsedTraits\SecondTrait' => '$environmentBuildPath/Source/UsedTraits/SecondTrait.php',
-        'ProjectWithTests\SimpleTrait' => '$environmentBuildPath/Source/SimpleTrait.php',
-        'Tests\Helper' => '$environmentBuildPath/Tests/Helper.php',
+        'Saeghe\SimplePackage\ImaginaryClass' => '$environment_build_path/Packages/saeghe/simple-package/Source/ImaginaryClass.php',
+        'ProjectWithTests\CompoundNamespace\Foo\ClassBaz' => '$environment_build_path/Source/CompoundNamespace/Foo/ClassBaz.php',
+        'ProjectWithTests\CompoundNamespace\Foo\ClassFoo' => '$environment_build_path/Source/CompoundNamespace/Foo/ClassFoo.php',
+        'ProjectWithTests\CompoundNamespace\Foo' => '$environment_build_path/Source/CompoundNamespace/Foo.php',
+        'ProjectWithTests\ExtendExamples\ParentAbstractClass' => '$environment_build_path/Source/ExtendExamples/ParentAbstractClass.php',
+        'ProjectWithTests\ExtendExamples\ParentClass' => '$environment_build_path/Source/ExtendExamples/ParentClass.php',
+        'ProjectWithTests\SubDirectory\SimpleClass' => '$environment_build_path/Source/SubDirectory/SimpleClass.php',
+        'ProjectWithTests\ExtendExamples\AbstractClass' => '$environment_build_path/Source/ExtendExamples/AbstractClass.php',
+        'Saeghe\SimplePackage\AUsefulClass' => '$environment_build_path/Packages/saeghe/simple-package/Source/AUsefulClass.php',
+        'ProjectWithTests\SubDirectory\ClassUseAnotherClass' => '$environment_build_path/Source/SubDirectory/ClassUseAnotherClass.php',
+        'ProjectWithTests\Classes\StaticClassA' => '$environment_build_path/Source/Classes/StaticClassA.php',
+        'ProjectWithTests\Classes\StaticClassB' => '$environment_build_path/Source/Classes/StaticClassB.php',
+        'ProjectWithTests\Classes\StaticClassC' => '$environment_build_path/Source/Classes/StaticClassC.php',
+        'ProjectWithTests\AnyNamespace\StaticClass' => '$environment_build_path/Source/AnyNamespace/StaticClass.php',
+        'ProjectWithTests\Classes\NewInstanceClassA' => '$environment_build_path/Source/Classes/NewInstanceClassA.php',
+        'Saeghe\SimplePackage\Classes\PackageClass' => '$environment_build_path/Packages/saeghe/simple-package/Source/Classes/PackageClass.php',
+        'ProjectWithTests\Classes\NewInstanceClassB' => '$environment_build_path/Source/Classes/NewInstanceClassB.php',
+        'ProjectWithTests\Classes\NewInstanceClassC' => '$environment_build_path/Source/Classes/NewInstanceClassC.php',
+        'ProjectWithTests\SampleFile\InstanceFromClassInSameNamespace' => '$environment_build_path/Source/SampleFile/InstanceFromClassInSameNamespace.php',
+        'ProjectWithTests\AnyNamespace\ClassA' => '$environment_build_path/Source/AnyNamespace/ClassA.php',
+        'Saeghe\SimplePackage\TypeClasses\InjectedClassFromPackageToConstructor' => '$environment_build_path/Packages/saeghe/simple-package/Source/TypeClasses/InjectedClassFromPackageToConstructor.php',
+        'ProjectWithTests\TypeClasses\InjectedPublicClassInConstructor' => '$environment_build_path/Source/TypeClasses/InjectedPublicClassInConstructor.php',
+        'ProjectWithTests\TypeClasses\OtherInjectedParameterClass' => '$environment_build_path/Source/TypeClasses/OtherInjectedParameterClass.php',
+        'ProjectWithTests\TypeClasses\InjectedClassInConstructor' => '$environment_build_path/Source/TypeClasses/InjectedClassInConstructor.php',
+        'ProjectWithTests\TypeClasses\InjectedParameterClass' => '$environment_build_path/Source/TypeClasses/InjectedParameterClass.php',
+        'ProjectWithTests\TypeClasses\ReturnTypeClassA' => '$environment_build_path/Source/TypeClasses/ReturnTypeClassA.php',
+        'ProjectWithTests\TypeClasses\ReturnTypeClassB' => '$environment_build_path/Source/TypeClasses/ReturnTypeClassB.php',
+        'ProjectWithTests\TypeClasses\ReturnTypeClassC' => '$environment_build_path/Source/TypeClasses/ReturnTypeClassC.php',
+        'ProjectWithTests\TypeClasses\MultipleTypeA' => '$environment_build_path/Source/TypeClasses/MultipleTypeA.php',
+        'ProjectWithTests\TypeClasses\MultipleTypeB' => '$environment_build_path/Source/TypeClasses/MultipleTypeB.php',
+        'ProjectWithTests\Classes\ClassWithConstant' => '$environment_build_path/Source/Classes/ClassWithConstant.php',
+        'Saeghe\SimplePackage\Classes\PackageConst' => '$environment_build_path/Packages/saeghe/simple-package/Source/Classes/PackageConst.php',
+        'ProjectWithTests\ClassName\ClassA' => '$environment_build_path/Source/ClassName/ClassA.php',
+        'ProjectWithTests\ClassName\ClassB' => '$environment_build_path/Source/ClassName/ClassB.php',
+        'ProjectWithTests\Attributes\SetUp' => '$environment_build_path/Source/Attributes/SetUp.php',
+        'ProjectWithTests\AnyNamespace' => '$environment_build_path/Source/AnyNamespace.php',
+        'ProjectWithTests\Helper' => '$environment_build_path/Source/Helper.php',
+        'ProjectWithTests\Parents\ParentClass' => '$environment_build_path/Source/Parents/ParentClass.php',
+        'ProjectWithTests\Interfaces\ClassInterface' => '$environment_build_path/Source/Interfaces/ClassInterface.php',
+        'ProjectWithTests\SampleFile\TraitInSameNamespace' => '$environment_build_path/Source/SampleFile/TraitInSameNamespace.php',
+        'ProjectWithTests\ClassWithConstants' => '$environment_build_path/Source/ClassWithConstants.php',
+        'ProjectWithTests\SampleFile' => '$environment_build_path/Source/SampleFile.php',
+        'ProjectWithTests\InterfaceExamples\SecondInterface' => '$environment_build_path/Source/InterfaceExamples/SecondInterface.php',
+        'ProjectWithTests\InterfaceExamples\InnerInterfaces\InnerInterface' => '$environment_build_path/Source/InterfaceExamples/InnerInterfaces/InnerInterface.php',
+        'ProjectWithTests\InterfaceExamples\FirstInterface' => '$environment_build_path/Source/InterfaceExamples/FirstInterface.php',
+        'ProjectWithTests\InterfaceExamples\ThirdInterface' => '$environment_build_path/Source/InterfaceExamples/ThirdInterface.php',
+        'ProjectWithTests\InterfaceExamples\InnerInterfaces\OtherInnerInterface' => '$environment_build_path/Source/InterfaceExamples/InnerInterfaces/OtherInnerInterface.php',
+        'ProjectWithTests\InterfaceExamples\InnerInterfaces\ExtendableInterface' => '$environment_build_path/Source/InterfaceExamples/InnerInterfaces/ExtendableInterface.php',
+        'ProjectWithTests\ProjectWithTests\ProjectWithTests' => '$environment_build_path/Source/ProjectWithTests/ProjectWithTests.php',
+        'ProjectWithTests\UsedTraits\FirstTrait' => '$environment_build_path/Source/UsedTraits/FirstTrait.php',
+        'ProjectWithTests\UsedTraits\ThirdTrait' => '$environment_build_path/Source/UsedTraits/ThirdTrait.php',
+        'ProjectWithTests\UsedTraits\SecondTrait' => '$environment_build_path/Source/UsedTraits/SecondTrait.php',
+        'ProjectWithTests\SimpleTrait' => '$environment_build_path/Source/SimpleTrait.php',
+        'Tests\Helper' => '$environment_build_path/Tests/Helper.php',
     ];
 
     if (array_key_exists($class, $classes)) {
@@ -66,23 +66,23 @@ spl_autoload_register(function ($class) {
 
 spl_autoload_register(function ($class) {
     $namespaces = [
-        'Saeghe\SimplePackage' => '$environmentBuildPath/Packages/saeghe/simple-package/Source',
-        'ProjectWithTests' => '$environmentBuildPath/Source',
-        'Tests' => '$environmentBuildPath/Tests',
-        'ProjectWithTests\Service\helper' => '$environmentBuildPath/Services/Functions.php',
-        'ProjectWithTests\Service\HELPER_CONST' => '$environmentBuildPath/Services/Constants.php',
+        'Saeghe\SimplePackage' => '$environment_build_path/Packages/saeghe/simple-package/Source',
+        'ProjectWithTests' => '$environment_build_path/Source',
+        'Tests' => '$environment_build_path/Tests',
+        'ProjectWithTests\Service\helper' => '$environment_build_path/Services/Functions.php',
+        'ProjectWithTests\Service\HELPER_CONST' => '$environment_build_path/Services/Constants.php',
     ];
 
-    $realPath = null;
+    $realpath = null;
 
     foreach ($namespaces as $namespace => $path) {
         if (str_starts_with($class, $namespace)) {
             $pos = strpos($class, $namespace);
             if ($pos !== false) {
-                $realPath = substr_replace($class, $path, $pos, strlen($namespace));
+                $realpath = substr_replace($class, $path, $pos, strlen($namespace));
             }
-            $realPath = str_replace("\\", DIRECTORY_SEPARATOR, $realPath) . '.php';
-            require $realPath;
+            $realpath = str_replace("\\", DIRECTORY_SEPARATOR, $realpath) . '.php';
+            require $realpath;
             return ;
         }
     }

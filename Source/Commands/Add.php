@@ -13,64 +13,64 @@ use function Saeghe\Cli\IO\Write\success;
 
 function run(Project $project)
 {
-    $packageUrl = argument(2);
+    $package_url = argument(2);
     $version = parameter('version');
 
-    if (! file_exists($project->configFilePath->toString())) {
+    if (! file_exists($project->config_file_path->to_string())) {
         error('Project is not initialized. Please try to initialize using the init command.');
         return;
     }
 
-    $config = Config::fromArray(json_to_array($project->configFilePath->toString()));
+    $config = Config::from_array(json_to_array($project->config_file_path->to_string()));
 
     $package = array_reduce(
         $config->packages,
         function ($carry, Package $package) {
             return $package->is($carry) ? $package : $carry;
         },
-        Package::fromUrl($packageUrl)
+        Package::from_url($package_url)
     );
 
     if (isset($package->version)) {
-        error("Package $packageUrl is already exists");
+        error("Package $package_url is already exists");
         return;
     }
 
-    $version ? $package->version($version) : $package->latestVersion();
+    $version ? $package->version($version) : $package->latest_version();
 
-    if (! file_exists($project->root->append($config->packagesDirectory)->toString())) {
-        dir_make_recursive($project->root->append($config->packagesDirectory)->toString());
+    if (! file_exists($project->root->append($config->packages_directory)->to_string())) {
+        dir_make_recursive($project->root->append($config->packages_directory)->to_string());
     }
 
-    add($project, $config, $package, $packageUrl);
+    add($project, $config, $package, $package_url);
 
-    $config->packages[$packageUrl] = $package;
-    json_put($project->configFilePath->toString(), $config->toArray());
+    $config->packages[$package_url] = $package;
+    json_put($project->config_file_path->to_string(), $config->to_array());
 
-    success("Package $packageUrl has been added successfully.");
+    success("Package $package_url has been added successfully.");
 }
 
-function add(Project $project, Config $config, Package $package, $packageUrl)
+function add(Project $project, Config $config, Package $package, $package_url)
 {
-    $package->detectHash()->download($package->root($project, $config)->toString());
+    $package->detect_hash()->download($package->root($project, $config)->to_string());
 
-    $meta = Meta::fromArray(json_to_array($project->configLockFilePath->toString()));
-    $meta->packages[$packageUrl] = $package;
-    json_put($project->configLockFilePath->toString(), $meta->toArray());
+    $meta = Meta::from_array(json_to_array($project->config_lock_file_path->to_string()));
+    $meta->packages[$package_url] = $package;
+    json_put($project->config_lock_file_path->to_string(), $meta->to_array());
 
-    $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)->toString()));
+    $package_config = Config::from_array(json_to_array($package->config_path($project, $config)->to_string()));
 
-    foreach ($packageConfig->packages as $subPackageUrl => $subPackage) {
-        $subPackageExists = false;
-        foreach ($meta->packages as $installedPackageUrl => $installedPackage) {
-            if ($installedPackage->is($subPackage)) {
-                $subPackageExists = true;
+    foreach ($package_config->packages as $sub_package_url => $sub_package) {
+        $is_sub_package_exists = false;
+        foreach ($meta->packages as $installed_package_url => $installed_package) {
+            if ($installed_package->is($sub_package)) {
+                $is_sub_package_exists = true;
                 break;
             }
         }
 
-        if (! $subPackageExists) {
-            add($project, $config, $subPackage, $subPackageUrl);
+        if (! $is_sub_package_exists) {
+            add($project, $config, $sub_package, $sub_package_url);
         }
     }
 }

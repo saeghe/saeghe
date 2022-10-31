@@ -2,8 +2,8 @@
 
 namespace Tests\SampleTest;
 
-require_once '$environmentBuildPath/Source/SampleFile.php';
-require_once '$environmentBuildPath/Tests/Helper.php';
+require_once '$environment_build_path/Source/SampleFile.php';
+require_once '$environment_build_path/Tests/Helper.php';
 
 use ProjectWithTests\SampleFile;
 use Tests\Helper;

@@ -26,15 +26,15 @@ class Repository
         public string $repo,
     ) {}
 
-    public static function fromUrl(string $packageUrl): static
+    public static function from_url(string $package_url): static
     {
-        $owner = extract_owner($packageUrl);
-        $repo = extract_repo($packageUrl);
+        $owner = extract_owner($package_url);
+        $repo = extract_repo($package_url);
 
         return new static($owner, $repo);
     }
 
-    public static function fromMeta($meta): static
+    public static function from_meta($meta): static
     {
         return (new static($meta['owner'], $meta['repo']))
             ->version($meta['version'])
@@ -55,7 +55,7 @@ class Repository
         return $this;
     }
 
-    public function latestVersion(): static
+    public function latest_version(): static
     {
         $this->version = has_release($this->owner, $this->repo)
             ? find_latest_version($this->owner, $this->repo)
@@ -64,7 +64,7 @@ class Repository
         return $this;
     }
 
-    public function detectHash(): static
+    public function detect_hash(): static
     {
         $this->hash = $this->version !== self::DEVELOPMENT_VERSION
             ? find_version_hash($this->owner, $this->repo, $this->version)

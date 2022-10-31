@@ -9,44 +9,44 @@ use function Saeghe\Saeghe\FileManager\Directory\exists;
 test(
     title: 'it should return false when directory is not exists',
     case: function () {
-        $directory = Address::fromString(__DIR__ . '/../../PlayGround/IsExists');
-        assert(! exists($directory->toString()), 'Directory/exists is not working!');
+        $directory = Address::from_string(__DIR__ . '/../../PlayGround/IsExists');
+        assert(! exists($directory->to_string()), 'Directory/exists is not working!');
     }
 );
 
 test(
     title: 'it should return false when given path is a file',
     case: function (Address $directory) {
-        assert(! exists($directory->toString()), 'Directory/exists is not working!');
+        assert(! exists($directory->to_string()), 'Directory/exists is not working!');
 
         return $directory;
     },
     before: function () {
-        $directory = Address::fromString(__DIR__ . '/../../PlayGround/IsExists');
+        $directory = Address::from_string(__DIR__ . '/../../PlayGround/IsExists');
 
-        file_put_contents($directory->toString(), 'A file with directory name');
+        file_put_contents($directory->to_string(), 'A file with directory name');
 
         return $directory;
     },
     after: function (Address $directory) {
-        unlink($directory->toString());
+        unlink($directory->to_string());
     }
 );
 
 test(
     title: 'it should return false when directory is not exists',
     case: function (Address $directory) {
-        assert(exists($directory->toString()), 'Directory/exists is not working!');
+        assert(exists($directory->to_string()), 'Directory/exists is not working!');
 
         return $directory;
     },
     before: function () {
-        $directory = Address::fromString(__DIR__ . '/../../PlayGround/IsExists');
-        mkdir($directory->toString());
+        $directory = Address::from_string(__DIR__ . '/../../PlayGround/IsExists');
+        mkdir($directory->to_string());
 
         return $directory;
     },
     after: function (Address $directory) {
-        delete_recursive($directory->toString());
+        delete_recursive($directory->to_string());
     }
 );

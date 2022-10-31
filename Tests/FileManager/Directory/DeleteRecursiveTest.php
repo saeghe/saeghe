@@ -8,12 +8,12 @@ use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 test(
     title: 'it should delete directory when it is empty',
     case: function (Address $directory) {
-        assert(delete_recursive($directory->toString()));
-        assert(! file_exists($directory->toString()), 'delete_recursive is not working!');
+        assert(delete_recursive($directory->to_string()));
+        assert(! file_exists($directory->to_string()), 'delete_recursive is not working!');
     },
     before: function () {
-        $directory = Address::fromString(__DIR__ . '/../../PlayGround/DeleteRecursive');
-        mkdir($directory->toString());
+        $directory = Address::from_string(__DIR__ . '/../../PlayGround/DeleteRecursive');
+        mkdir($directory->to_string());
 
         return $directory;
     }
@@ -22,20 +22,20 @@ test(
 test(
     title: 'it should delete directory recursively',
     case: function (Address $directory) {
-        assert(delete_recursive($directory->toString()));
+        assert(delete_recursive($directory->to_string()));
 
-        assert(! file_exists($directory->toString()), 'delete_recursive is not working!');
+        assert(! file_exists($directory->to_string()), 'delete_recursive is not working!');
     },
     before: function () {
-        $directory = Address::fromString(__DIR__ . '/../../PlayGround/DeleteRecursive');
-        $subDirectory = $directory->append('SubDirectory');
-        $anotherSubDirectory = $directory->append('SubDirectory/AnotherSubDirectory');
-        mkdir($directory->toString());
-        mkdir($subDirectory->toString());
-        mkdir($anotherSubDirectory->toString());
-        file_put_contents($directory->append('FileInDirectory.php')->toString(), '<?php');
-        file_put_contents($subDirectory->append('FileInSubDirectory.txt')->toString(), 'content');
-        file_put_contents($anotherSubDirectory->append('FileInAnotherSubDirectory.json')->toString(), '');
+        $directory = Address::from_string(__DIR__ . '/../../PlayGround/DeleteRecursive');
+        $sub_directory = $directory->append('SubDirectory');
+        $another_sub_directory = $directory->append('SubDirectory/AnotherSubDirectory');
+        mkdir($directory->to_string());
+        mkdir($sub_directory->to_string());
+        mkdir($another_sub_directory->to_string());
+        file_put_contents($directory->append('FileInDirectory.php')->to_string(), '<?php');
+        file_put_contents($sub_directory->append('FileInSubDirectory.txt')->to_string(), 'content');
+        file_put_contents($another_sub_directory->append('FileInAnotherSubDirectory.json')->to_string(), '');
 
         return $directory;
     }

@@ -20,8 +20,8 @@ function flush(string $path): void
 
     while (false !== ($file = readdir($dir))) {
         if (! in_array($file, ['.', '..'])) {
-            $pathToFile = $path . DIRECTORY_SEPARATOR . $file;
-            is_dir($pathToFile) ? delete_recursive($pathToFile) : unlink($pathToFile);
+            $path_to_file = $path . DIRECTORY_SEPARATOR . $file;
+            is_dir($path_to_file) ? delete_recursive($path_to_file) : unlink($path_to_file);
         }
     }
 

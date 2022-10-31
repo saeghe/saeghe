@@ -2,8 +2,6 @@
 
 namespace Tests\UsedClassesTest;
 
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -125,7 +123,7 @@ EOD;
                 'Application\SameNamespaceClass',
                 'User',
                 'Application\SubDirectory\ClassUseAnotherClass'
-            ] === (new PhpFile($content))->usedClasses(),
+            ] === (new PhpFile($content))->used_classes(),
             'Used classes are not detected!'
         );
     }

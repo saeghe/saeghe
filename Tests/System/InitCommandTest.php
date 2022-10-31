@@ -6,7 +6,7 @@ use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
 
-$initialContent = <<<EOD
+$initial_content = <<<EOD
 {
     "map": [],
     "entry-points": [],
@@ -18,7 +18,7 @@ $initialContent = <<<EOD
 
 EOD;
 
-$initialContentWithPackagesDirectory = <<<EOD
+$initial_content_with_packages_directory = <<<EOD
 {
     "map": [],
     "entry-points": [],
@@ -30,7 +30,7 @@ $initialContentWithPackagesDirectory = <<<EOD
 
 EOD;
 
-$metaContent = <<<EOD
+$meta_content = <<<EOD
 {
     "packages": []
 }
@@ -40,17 +40,17 @@ EOD;
 
 test(
     title: 'it makes a new default config file',
-    case: function () use ($initialContent, $metaContent) {
-        $packagesDirectory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages';
-        $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
-        $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
+    case: function () use ($initial_content, $meta_content) {
+        $packages_directory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages';
+        $config_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
+        $meta_file_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
 
-        File\assert_exists($configPath, 'Config file does not exists: ' . $output);
-        File\assert_exists($packagesDirectory, 'Packages directory is not created: ' . $output);
-        File\assert_content($configPath, $initialContent, 'Config file content is not correct after running init!');
-        File\assert_content($metaFilePath, $metaContent, 'Lock file content is not correct after running init!');
+        File\assert_exists($config_path, 'Config file does not exists: ' . $output);
+        File\assert_exists($packages_directory, 'Packages directory is not created: ' . $output);
+        File\assert_content($config_path, $initial_content, 'Config file content is not correct after running init!');
+        File\assert_content($meta_file_path, $meta_content, 'Lock file content is not correct after running init!');
         assert_success('Project has been initialized.', $output);
     },
     after: function () {
@@ -60,17 +60,17 @@ test(
 
 test(
     title: 'it makes a new config file with given packages directory',
-    case: function () use ($initialContentWithPackagesDirectory) {
-        $configPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
-        $metaFilePath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
-        $packagesDirectory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor';
+    case: function () use ($initial_content_with_packages_directory) {
+        $config_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
+        $meta_file_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
+        $packages_directory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor';
 
         $output = shell_exec("{$_SERVER['PWD']}/saeghe init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
 
-        File\assert_exists($packagesDirectory, 'packages directory has not been created: ' . $output);
-        File\assert_exists($configPath, 'Config file does not exists: ' . $output);
-        File\assert_exists($metaFilePath, 'Config lock file does not exists: ' . $output);
-        File\assert_content($configPath, $initialContentWithPackagesDirectory, 'Config file content is not correct after running init!');
+        File\assert_exists($packages_directory, 'packages directory has not been created: ' . $output);
+        File\assert_exists($config_path, 'Config file does not exists: ' . $output);
+        File\assert_exists($meta_file_path, 'Config lock file does not exists: ' . $output);
+        File\assert_content($config_path, $initial_content_with_packages_directory, 'Config file content is not correct after running init!');
     },
     after: function () {
         flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');

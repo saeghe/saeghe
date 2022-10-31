@@ -2,12 +2,12 @@
 
 namespace ProjectWithTests\SampleFile;
 
-require_once '$environmentBuildPath/Source/SampleFile/ClassInSameNamespace.php';
-require_once '$environmentBuildPath/Source/Classes/ClassWithConstant.php';
-require_once '$environmentBuildPath/Source/AnyNamespace/ConstInCompoundNamespace.php';
-require_once '$environmentBuildPath/Packages/saeghe/simple-package/Source/Classes/PackageConst.php';
-require_once '$environmentBuildPath/Source/Helper.php';
-require_once '$environmentBuildPath/Source/AnotherHelper.php';
+require_once '$environment_build_path/Source/SampleFile/ClassInSameNamespace.php';
+require_once '$environment_build_path/Source/Classes/ClassWithConstant.php';
+require_once '$environment_build_path/Source/AnyNamespace/ConstInCompoundNamespace.php';
+require_once '$environment_build_path/Packages/saeghe/simple-package/Source/Classes/PackageConst.php';
+require_once '$environment_build_path/Source/Helper.php';
+require_once '$environment_build_path/Source/AnotherHelper.php';
 
 use ProjectWithTests\TypeClasses\InjectedClassInConstructor;
 use ProjectWithTests\TypeClasses\InjectedPublicClassInConstructor;
