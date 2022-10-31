@@ -1,0 +1,23 @@
+<?php
+
+namespace Tests\System\VersionCommandTest;
+
+use function Saeghe\Cli\IO\Write\assert_success;
+
+test(
+    title: 'it should show version in the output',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . '/saeghe -v');
+
+        assert_success('Saeghe version 1.2.0', $output);
+    }
+);
+
+test(
+    title: 'it should show version in the output with version option',
+    case: function () {
+        $output = shell_exec($_SERVER['PWD'] . '/saeghe --version');
+
+        assert_success('Saeghe version 1.2.0', $output);
+    }
+);
