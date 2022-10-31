@@ -2,9 +2,6 @@
 
 namespace Tests\PhpFileTest\NamespaceTest;
 
-require_once __DIR__ . '/../../Source/Str.php';
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -20,9 +17,9 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(null === $phpFile->namespace());
+        assert(null === $php_file->namespace());
     }
 );
 
@@ -41,9 +38,9 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert('MyApp' === $phpFile->namespace());
+        assert('MyApp' === $php_file->namespace());
     }
 );
 
@@ -62,8 +59,8 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert('MyApp\SubNamespace' === $phpFile->namespace());
+        assert('MyApp\SubNamespace' === $php_file->namespace());
     }
 );

@@ -2,8 +2,6 @@
 
 namespace Tests\StrTests\ReplaceFirstOccurrenceTest;
 
-require_once __DIR__ . '/../../Source/Str.php';
-
 use Saeghe\Saeghe\Str;
 
 test(

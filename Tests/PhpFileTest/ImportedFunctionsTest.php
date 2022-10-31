@@ -2,8 +2,6 @@
 
 namespace Tests\PhpFileTest\ImportedFunctionsTest;
 
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -18,11 +16,11 @@ use function MyApp\OtherNamespace\\functionA;
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
             'MyApp\OtherNamespace\functionA' => 'functionA'
-        ] === $phpFile->importedFunctions());
+        ] === $php_file->imported_functions());
     }
 );
 
@@ -38,12 +36,12 @@ use function MyApp\OtherNamespace\{functionA, functionB};
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'MyApp\OtherNamespace\functionA' => 'functionA',
                 'MyApp\OtherNamespace\functionB' => 'functionB',
-            ] === $phpFile->importedFunctions()
+            ] === $php_file->imported_functions()
         );
     }
 );
@@ -62,7 +60,7 @@ use function MyApp\OtherNamespace\\functionE as functionF;
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'MyApp\OtherNamespace\functionA' => 'functionA',
@@ -70,7 +68,7 @@ EOD;
                 'MyApp\OtherNamespace\functionC' => 'C',
                 'MyApp\OtherNamespace\functionD' => 'functionD',
                 'MyApp\OtherNamespace\functionE' => 'functionF',
-            ] === $phpFile->importedFunctions()
+            ] === $php_file->imported_functions()
         );
     }
 );
@@ -90,7 +88,7 @@ use function MyApp\\fistFunction, MyApp\AnotherNamespace\secondFunction;
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'MyApp\OtherNamespace\functionA' => 'functionA',
@@ -101,7 +99,7 @@ EOD;
                 'MyApp\OtherNamespace\functionG' => 'functionG',
                 'MyApp\\fistFunction' => 'fistFunction',
                 'MyApp\AnotherNamespace\secondFunction' => 'secondFunction',
-            ] === $phpFile->importedFunctions()
+            ] === $php_file->imported_functions()
         );
     }
 );

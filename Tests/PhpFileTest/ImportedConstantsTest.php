@@ -2,8 +2,6 @@
 
 namespace Tests\PhpFileTest\ImportedConstantsTest;
 
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -18,9 +16,9 @@ use const MyApp\OtherNamespace\ConstantA;
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherNamespace\ConstantA' => 'ConstantA'] === $phpFile->importedConstants());
+        assert(['MyApp\OtherNamespace\ConstantA' => 'ConstantA'] === $php_file->imported_constants());
     }
 );
 
@@ -36,12 +34,12 @@ use const MyApp\OtherNamespace\{ConstantA, ConstantB};
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'MyApp\OtherNamespace\ConstantA' => 'ConstantA',
                 'MyApp\OtherNamespace\ConstantB' => 'ConstantB',
-            ] === $phpFile->importedConstants()
+            ] === $php_file->imported_constants()
         );
     }
 );
@@ -60,7 +58,7 @@ use const MyApp\OtherNamespace\ConstantE as ConstantF;
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'MyApp\OtherNamespace\ConstantA' => 'ConstantA',
@@ -68,7 +66,7 @@ EOD;
                 'MyApp\OtherNamespace\ConstantC' => 'C',
                 'MyApp\OtherNamespace\ConstantD' => 'ConstantD',
                 'MyApp\OtherNamespace\ConstantE' => 'ConstantF',
-            ] === $phpFile->importedConstants()
+            ] === $php_file->imported_constants()
         );
     }
 );
@@ -89,7 +87,7 @@ use const \PHP_BINARY;
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
                 'MyApp\OtherNamespace\ConstantA' => 'ConstantA',
@@ -101,7 +99,7 @@ EOD;
                 'MyApp\FirstConst' => 'FirstConst',
                 'MyApp\AnotherNamespace\SecondConst' => 'SecondConst',
                 '\PHP_BINARY' => 'PHP_BINARY',
-            ] === $phpFile->importedConstants()
+            ] === $php_file->imported_constants()
         );
     }
 );

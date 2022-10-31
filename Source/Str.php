@@ -4,11 +4,11 @@ namespace Saeghe\Saeghe\Str;
 
 function between(string $string, string $start, string $end): string
 {
-    $startPosition = stripos($string, $start);
-    $first = substr($string, $startPosition);
+    $start_position = stripos($string, $start);
+    $first = substr($string, $start_position);
     $second = substr($first, strlen($start));
-    $positionEnd = stripos($second, $end);
-    $final = substr($second, 0, $positionEnd);
+    $position_end = stripos($second, $end);
+    $final = substr($second, 0, $position_end);
 
     return trim($final);
 }

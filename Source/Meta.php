@@ -13,21 +13,21 @@ class Meta
         return new static([]);
     }
 
-    public static function fromArray(array $meta): static
+    public static function from_array(array $meta): static
     {
         $packages = [];
-        foreach ($meta['packages'] ?? [] as $packageUrl => $meta) {
-            $packages[$packageUrl] = Package::fromMeta($meta);
+        foreach ($meta['packages'] ?? [] as $package_url => $meta) {
+            $packages[$package_url] = Package::from_meta($meta);
         }
 
         return new static($packages);
     }
 
-    public function toArray(): array
+    public function to_array(): array
     {
         $packages = [];
-        foreach ($this->packages as $packageUrl => $package) {
-            $packages[$packageUrl] = [
+        foreach ($this->packages as $package_url => $package) {
+            $packages[$package_url] = [
                 'owner' => $package->owner,
                 'repo' => $package->repo,
                 'version' => $package->version,

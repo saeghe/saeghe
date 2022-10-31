@@ -4,20 +4,20 @@ namespace Saeghe\Saeghe\FileManager\Path;
 
 use Saeghe\Saeghe\Str;
 
-function realpath(string $pathString): string
+function realpath(string $path_string): string
 {
-    $pathString = rtrim(ltrim($pathString));
+    $path_string = rtrim(ltrim($path_string));
     $needle = DIRECTORY_SEPARATOR === '/' ? '\\' : '/';
-    $pathString = str_replace($needle, DIRECTORY_SEPARATOR, $pathString);
+    $path_string = str_replace($needle, DIRECTORY_SEPARATOR, $path_string);
 
-    while (str_contains($pathString, DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR)) {
-        $pathString = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $pathString);
+    while (str_contains($path_string, DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR)) {
+        $path_string = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path_string);
     }
 
-    $pathString = str_replace(DIRECTORY_SEPARATOR . '.' . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $pathString);
-    $pathString = Str\last_character($pathString) === DIRECTORY_SEPARATOR ? Str\remove_last_character($pathString) : $pathString;
+    $path_string = str_replace(DIRECTORY_SEPARATOR . '.' . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path_string);
+    $path_string = Str\last_character($path_string) === DIRECTORY_SEPARATOR ? Str\remove_last_character($path_string) : $path_string;
 
-    $parts = explode(DIRECTORY_SEPARATOR, $pathString);
+    $parts = explode(DIRECTORY_SEPARATOR, $path_string);
 
     while (in_array('..', $parts)) {
         foreach ($parts as $key => $part) {

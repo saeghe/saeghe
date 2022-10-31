@@ -13,60 +13,60 @@ use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 
 function run(Project $project)
 {
-    $givenPackageUrl = argument(2);
+    $given_package_url = argument(2);
 
-    $config = Config::fromArray(json_to_array($project->configFilePath->toString()));
+    $config = Config::from_array(json_to_array($project->config_file_path->to_string()));
 
     $package = array_reduce(
         $config->packages,
         function ($carry, Package $package) {
             return $package->is($carry) ? $package : $carry;
         },
-        Package::fromUrl($givenPackageUrl)
+        Package::from_url($given_package_url)
     );
 
     if (! isset($package->version)) {
-        error("Package $givenPackageUrl does not found in your project!");
+        error("Package $given_package_url does not found in your project!");
 
         return;
     }
 
-    $packageUrl = $givenPackageUrl;
+    $package_url = $given_package_url;
 
-    foreach ($config->packages as $installedPackageUrl => $configPackage) {
-        if ($configPackage->is($package)) {
-            $packageUrl = $installedPackageUrl;
+    foreach ($config->packages as $installed_package_url => $config_package) {
+        if ($config_package->is($package)) {
+            $package_url = $installed_package_url;
             break;
         }
     }
 
-    remove($project, $config, $package, $packageUrl);
+    remove($project, $config, $package, $package_url);
 
-    unset($config->packages[$packageUrl]);
-    json_put($project->configFilePath->toString(), $config->toArray());
+    unset($config->packages[$package_url]);
+    json_put($project->config_file_path->to_string(), $config->to_array());
 
-    success("Package $givenPackageUrl has been removed successfully.");
+    success("Package $given_package_url has been removed successfully.");
 }
 
-function remove(Project $project, Config $config, Package $package, $packageUrl)
+function remove(Project $project, Config $config, Package $package, $package_url)
 {
-    $packageConfig = Config::fromArray(json_to_array($package->configPath($project, $config)->toString()));
+    $package_config = Config::from_array(json_to_array($package->config_path($project, $config)->to_string()));
 
-    foreach ($packageConfig->packages as $subPackageUrl => $subPackage) {
-        $subPackageHasBeenUsed = false;
-        foreach ($config->packages as $usedPackages) {
-            $subPackageHasBeenUsed = $subPackageHasBeenUsed || $usedPackages->is($subPackage);
+    foreach ($package_config->packages as $sub_package_url => $sub_package) {
+        $sub_package_has_been_used = false;
+        foreach ($config->packages as $used_packages) {
+            $sub_package_has_been_used = $sub_package_has_been_used || $used_packages->is($sub_package);
         }
 
-        if (! $subPackageHasBeenUsed) {
-            remove($project, $config, $subPackage, $subPackageUrl);
+        if (! $sub_package_has_been_used) {
+            remove($project, $config, $sub_package, $sub_package_url);
         }
     }
 
-    delete_recursive($package->root($project, $config)->toString());
+    delete_recursive($package->root($project, $config)->to_string());
 
-    $meta = Meta::fromArray(json_to_array($project->configLockFilePath->toString()));
+    $meta = Meta::from_array(json_to_array($project->config_lock_file_path->to_string()));
 
-    unset($meta->packages[$packageUrl]);
-    json_put($project->configLockFilePath->toString(), $meta->toArray());
+    unset($meta->packages[$package_url]);
+    json_put($project->config_lock_file_path->to_string(), $meta->to_array());
 }

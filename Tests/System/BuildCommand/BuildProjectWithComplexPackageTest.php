@@ -65,11 +65,11 @@ function assert_build_for_packages($message)
 
 function assert_build_for_dependency_packages($message)
 {
-    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
-    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/BuildForComplexPackage';
+    $environment_build_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/BuildForComplexPackage';
     assert(
-        file_get_contents($environmentBuildPath . '/Packages/saeghe/simple-package/run.php')
-        === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/' . 'simple-package.run.php.stub'))
+        file_get_contents($environment_build_path . '/Packages/saeghe/simple-package/run.php')
+        === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/' . 'simple-package.run.php.stub'))
         ,
         $message
     );
@@ -77,12 +77,12 @@ function assert_build_for_dependency_packages($message)
 
 function build_exists_and_same_as_stub($file)
 {
-    $environmentBuildPath = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
-    $stubsDirectory = $_SERVER['PWD'] . '/TestRequirements/Stubs/BuildForComplexPackage';
+    $environment_build_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/BuildForComplexPackage';
 
     return
-        file_exists($environmentBuildPath . '/Packages/saeghe/complex-package/' . $file)
-        && file_get_contents($environmentBuildPath . '/Packages/saeghe/complex-package/' . $file) === str_replace('$environmentBuildPath', $environmentBuildPath, file_get_contents($stubsDirectory . '/' . $file . '.stub'));
+        file_exists($environment_build_path . '/Packages/saeghe/complex-package/' . $file)
+        && file_get_contents($environment_build_path . '/Packages/saeghe/complex-package/' . $file) === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/' . $file . '.stub'));
 }
 
 function assert_executable_file_added($message)

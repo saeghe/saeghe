@@ -2,8 +2,6 @@
 
 namespace Tests\UsedFunctionsTest;
 
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -87,7 +85,7 @@ EOD;
                 'Application\Helpers\function_d',
                 'Application\Helpers\function_e',
                 '\str_pad',
-            ] === (new PhpFile($content))->usedFunctions(),
+            ] === (new PhpFile($content))->used_functions(),
             'Used functions are not detected!'
         );
     }

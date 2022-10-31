@@ -12,25 +12,25 @@ test(
         $origin = $first->append('sample.txt');
         $destination = $second->append('sample.txt');
 
-        assert(move($origin->toString(), $destination->toString()));
+        assert(move($origin->to_string(), $destination->to_string()));
 
-        assert(! file_exists($origin->toString()), 'origin file exists after move!');
-        assert(file_exists($destination->toString()), 'destination file does not exist after move!');
+        assert(! file_exists($origin->to_string()), 'origin file exists after move!');
+        assert(file_exists($destination->to_string()), 'destination file does not exist after move!');
 
         return [$first, $second];
     },
     before: function () {
-        $first = Address::fromString(__DIR__ . '/first');
-        $second = Address::fromString(__DIR__ . '/second');
-        mkdir($first->toString());
-        mkdir($second->toString());
+        $first = Address::from_string(__DIR__ . '/first');
+        $second = Address::from_string(__DIR__ . '/second');
+        mkdir($first->to_string());
+        mkdir($second->to_string());
         $file = $first->append('sample.txt');
-        file_put_contents($file->toString(), 'sample text');
+        file_put_contents($file->to_string(), 'sample text');
 
         return [$first, $second];
     },
     after: function (Address $first, Address $second) {
-        delete_recursive($first->toString());
-        delete_recursive($second->toString());
+        delete_recursive($first->to_string());
+        delete_recursive($second->to_string());
     }
 );

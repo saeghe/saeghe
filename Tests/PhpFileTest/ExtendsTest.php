@@ -2,9 +2,6 @@
 
 namespace Tests\PhpFileTest\ExtendsTest;
 
-require_once __DIR__ . '/../../Source/Str.php';
-require_once __DIR__ . '/../../Source/PhpFile.php';
-
 use Saeghe\Saeghe\PhpFile;
 
 test(
@@ -22,9 +19,9 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert([] === $phpFile->extendedClasses());
+        assert([] === $php_file->extended_classes());
     }
 );
 
@@ -43,9 +40,9 @@ class MyClass extends ParentClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\ParentClass'] === $phpFile->extendedClasses());
+        assert(['MyApp\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -66,9 +63,9 @@ class MyClass extends ArrayObject
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['\ArrayObject'] === $phpFile->extendedClasses());
+        assert(['\ArrayObject'] === $php_file->extended_classes());
     }
 );
 
@@ -87,9 +84,9 @@ class MyClass extends \ArrayObject
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['\ArrayObject'] === $phpFile->extendedClasses());
+        assert(['\ArrayObject'] === $php_file->extended_classes());
     }
 );
 
@@ -110,9 +107,9 @@ class MyClass extends ParentClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['Application\ParentClass'] === $phpFile->extendedClasses());
+        assert(['Application\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -133,9 +130,9 @@ class MyClass extends OtherNamespace\ParentClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['Application\SubNamespace\ParentClass'] === $phpFile->extendedClasses());
+        assert(['Application\SubNamespace\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -156,9 +153,9 @@ class MyClass extends NormalClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['Application\SubNamespace\ParentClass'] === $phpFile->extendedClasses());
+        assert(['Application\SubNamespace\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -179,9 +176,9 @@ class MyClass extends NormalClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['Application\SubNamespace\ParentClass'] === $phpFile->extendedClasses());
+        assert(['Application\SubNamespace\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -201,9 +198,9 @@ class MyClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\ParentClass'] === $phpFile->extendedClasses());
+        assert(['MyApp\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -221,9 +218,9 @@ class MyClass extends ParentClass implements AnInterface, OtherInterface
 }
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\ParentClass'] === $phpFile->extendedClasses());
+        assert(['MyApp\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -239,9 +236,9 @@ abstract class MyAbstractClass extends ParentAbstractClass
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\ParentAbstractClass'] === $phpFile->extendedClasses());
+        assert(['MyApp\ParentAbstractClass'] === $php_file->extended_classes());
     }
 );
 
@@ -259,9 +256,9 @@ interface MyInterface extends OtherInterface
 }
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherInterface'] === $phpFile->extendedClasses());
+        assert(['MyApp\OtherInterface'] === $php_file->extended_classes());
     }
 );
 
@@ -279,9 +276,9 @@ trait MyTrait extends OtherTrait {
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherTrait'] === $phpFile->extendedClasses());
+        assert(['MyApp\OtherTrait'] === $php_file->extended_classes());
     }
 );
 
@@ -302,7 +299,7 @@ interface FirstInterface extends SecondInterface,ThirdInterface, ForthInterface,
 
 EOD;
 
-        $phpFile = new PhpFile($content);
+        $php_file = new PhpFile($content);
 
         assert([
             'MyApp\SecondInterface',
@@ -310,6 +307,6 @@ EOD;
             'MyApp\ForthInterface',
             '\Iterator',
             '\ArrayAccess',
-        ] === $phpFile->extendedClasses());
+        ] === $php_file->extended_classes());
     }
 );

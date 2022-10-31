@@ -8,26 +8,26 @@ use function Saeghe\Saeghe\FileManager\Directory\flush;
 test(
     title: 'it should flush directory',
     case: function (Address $directory) {
-        flush($directory->toString());
+        flush($directory->to_string());
 
-        assert(file_exists($directory->toString()), 'flush is not working!');
+        assert(file_exists($directory->to_string()), 'flush is not working!');
         assert(
-            scandir($directory->toString()) === ['.', '..'],
+            scandir($directory->to_string()) === ['.', '..'],
             'flush is not working and there are some items in the directory!'
         );
 
         return $directory;
     },
     before: function () {
-        $directory = Address::fromString(__DIR__ . '/../../PlayGround/Flush');
+        $directory = Address::from_string(__DIR__ . '/../../PlayGround/Flush');
         $subDirectory = $directory->append('SubDirectory');
-        mkdir($directory->toString());
-        mkdir($subDirectory->toString());
-        file_put_contents($directory->append('FileInDirectory.php')->toString(), '<?php');
+        mkdir($directory->to_string());
+        mkdir($subDirectory->to_string());
+        file_put_contents($directory->append('FileInDirectory.php')->to_string(), '<?php');
 
         return $directory;
     },
     after: function (Address $directory) {
-        rmdir($directory->toString());
+        rmdir($directory->to_string());
     }
 );

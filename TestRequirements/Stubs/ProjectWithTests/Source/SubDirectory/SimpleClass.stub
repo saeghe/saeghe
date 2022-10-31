@@ -2,7 +2,7 @@
 
 namespace ProjectWithTests\SubDirectory;
 
-require_once '$environmentBuildPath/Source/SampleFile.php';
+require_once '$environment_build_path/Source/SampleFile.php';
 
 use function ProjectWithTests\SampleFile\anImportantFunction;
 
