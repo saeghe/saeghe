@@ -3,7 +3,7 @@
 namespace Tests\System\ManCommandTest;
 
 $manContent = <<<EOD
-usage: saeghe [-h | --help] [--man]
+usage: saeghe [-v | --version] [-h | --help] [--man]
            <command> [<args>]
 
 These are common Saeghe commands used in various situations:
@@ -17,6 +17,8 @@ start a working area
                     Migrate from a Composer project to a Saeghe project.
 
 work with packages
+    credential <provider> <token>
+                    Add given `token` for the given `provider` in credential file.
     add <package> {--version=}
                     Adds the given package to your project. This command needs a required `package` argument. You can 
                     pass an optional `version` option, then Saeghe will add the given version of the given package, 

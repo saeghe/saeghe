@@ -35,6 +35,7 @@ require Path::fromString(__DIR__ . '/Source/Commands/Man.php')->toString();
 require Path::fromString(__DIR__ . '/Source/Commands/Migrate.php')->toString();
 require Path::fromString(__DIR__ . '/Source/Commands/Remove.php')->toString();
 require Path::fromString(__DIR__ . '/Source/Commands/Update.php')->toString();
+require Path::fromString(__DIR__ . '/Source/Commands/Version.php')->toString();
 require Path::fromString(__DIR__ . '/Source/Commands/Watch.php')->toString();
 
 use Saeghe\Cli\IO\Read;
@@ -43,10 +44,10 @@ use function Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 
-$command = Read\command() ?? Read\parameter('command', 'help');
+$command = Read\command() ?? Read\parameter('command');
 
-if ($command === 'help' && Read\option('man')) {
-    $command = 'man';
+if (is_null($command)) {
+    $command = Read\option('v') || Read\option('version') ? 'version' : (Read\option('man') ? 'man' : 'help');
 }
 
 $project = Read\parameter('project', '');
@@ -70,6 +71,7 @@ match ($command) {
     'migrate' => \Saeghe\Saeghe\Commands\Migrate\run($project),
     'remove' => \Saeghe\Saeghe\Commands\Remove\run($project),
     'update' => \Saeghe\Saeghe\Commands\Update\run($project),
+    'version' => \Saeghe\Saeghe\Commands\Version\run($project),
     'watch' => \Saeghe\Saeghe\Commands\Watch\run($project),
     default => \Saeghe\Saeghe\Commands\Help\run($project),
 };
