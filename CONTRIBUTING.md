@@ -44,6 +44,9 @@ cd saeghe
 git submodule init
 git submodule update
 ```
+## Code Style
+
+Please use snake_case syntax for variables and functions to follow PHP's code style.
 
 ## Running tests
 
@@ -51,4 +54,10 @@ In order to install Saeghe for contributing, run the following command:
 
 ```shell
 ./test-runner
+```
+
+If you need to run tests on a specific file, you can use the `filter` argument on the test runner:
+
+```shell
+./test-runner --filter=YourTestFileTest
 ```
