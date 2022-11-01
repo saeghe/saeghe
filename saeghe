@@ -55,7 +55,7 @@ if (is_null($command)) {
 $project = Read\parameter('project', '');
 
 $project = makeProject(
-    strlen($project) ? $_SERVER['PWD'] . '/' . $project . '/' : $_SERVER['PWD'] . '/',
+    strlen($project) ? getcwd() . '/' . $project . '/' : getcwd() . '/',
     $command === 'build' ? Read\argument(2, 'development') : 'development'
 );
 

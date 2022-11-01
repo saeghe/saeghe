@@ -28,7 +28,7 @@ EOD;
 test(
     title: 'it should show help output',
     case: function () use ($help_content) {
-        $output = shell_exec($_SERVER['PWD'] . '/saeghe -h');
+        $output = shell_exec('php ' . root() . 'saeghe -h');
 
         assert(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
     }
@@ -37,7 +37,7 @@ test(
 test(
     title: 'it should show help output when help option passed',
     case: function () use ($help_content) {
-        $output = shell_exec($_SERVER['PWD'] . '/saeghe --help');
+        $output = shell_exec('php ' . root() . 'saeghe --help');
 
         assert(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
     }
@@ -46,7 +46,7 @@ test(
 test(
     title: 'it should show help output when no command passed',
     case: function () use ($help_content) {
-        $output = shell_exec($_SERVER['PWD'] . '/saeghe');
+        $output = shell_exec('php ' . root() . 'saeghe');
 
         assert(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
     }

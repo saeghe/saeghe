@@ -9,7 +9,7 @@ use function Saeghe\Saeghe\FileManager\Path\realpath;
 test(
     title: 'it should install packages from lock file',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe install --project=TestRequirements/Fixtures/EmptyProject");
+        $output = shell_exec('php ' . root() . 'saeghe install --project=TestRequirements/Fixtures/EmptyProject');
 
         assert_success('Packages has been installed successfully.', $output);
         assert_config_file_content_not_changed('Config file has been changed!' . $output);
@@ -18,18 +18,18 @@ test(
         assert_zip_file_deleted('Zip file has not been deleted.' . $output);
     },
     before: function () {
-        shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
-        shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject");
-        flush(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages'));
+        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
+        shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
+        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
     },
     after: function () {
-        flush(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject'));
+        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     },
 );
 
 function assert_config_file_content_not_changed($message)
 {
-    $config = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($config['packages']['git@github.com:saeghe/released-package.git'])
@@ -40,7 +40,7 @@ function assert_config_file_content_not_changed($message)
 
 function assert_meta_file_content_not_changed($message)
 {
-    $meta = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
+    $meta = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/released-package.git'])
@@ -55,10 +55,10 @@ function assert_meta_file_content_not_changed($message)
 function assert_package_exists_in_packages_directory($message)
 {
     assert(
-        file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package'))
-        && file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/saeghe.config.json'))
-        && file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/saeghe.config-lock.json'))
-        && ! file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/Tests')),
+        file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package'))
+        && file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/saeghe.config.json'))
+        && file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/saeghe.config-lock.json'))
+        && ! file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/Tests')),
         $message
     );
 }
@@ -66,7 +66,7 @@ function assert_package_exists_in_packages_directory($message)
 function assert_zip_file_deleted($message)
 {
     assert(
-        ! file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package.zip')),
+        ! file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package.zip')),
         $message
     );
 }

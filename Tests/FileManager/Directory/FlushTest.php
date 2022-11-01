@@ -19,7 +19,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(__DIR__ . '/../../PlayGround/Flush');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/Flush');
         $subDirectory = $directory->append('SubDirectory');
         mkdir($directory->to_string());
         mkdir($subDirectory->to_string());
