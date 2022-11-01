@@ -12,6 +12,7 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe build --project=TestRequirements/Fixtures/ProjectWithTests');
 
+        assert_success('Build finished successfully.', $output);
         assert_build_directory_exists('Build directory has not been created!' . $output);
         assert_environment_build_directory_exists('Environment build directory has not been created!' . $output);
         assert_source_has_been_built('Source files has not been built properly!' . $output);
@@ -29,7 +30,7 @@ test(
         assert_build_for_traits('Traits has not been built properly!' . $output);
         assert_build_for_specified_file('Specified file has not been built properly!' . $output);
         assert_build_for_compound_namespaces('Compounded namespaces has not been built properly!' . $output);
-        assert_success('Build finished successfully.', $output);
+        assert_symlinks_are_linked_properly('Symlinks not linked properly.');
     },
     before: function () {
         copy(
@@ -315,4 +316,12 @@ function assert_build_for_compound_namespaces($message)
         ,
         $message
     );
+}
+
+function assert_symlinks_are_linked_properly($message)
+{
+    $link_file = root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/development/PublicDirectory/Symlink';
+    $link_source = root() . 'TestRequirements/Fixtures/SymlinkSource';
+
+    assert(is_link(realpath($link_file)) && readlink(realpath($link_file)) === realpath($link_source), $message);
 }

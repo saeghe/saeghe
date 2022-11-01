@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe;
 
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 use Saeghe\Saeghe\Git\Repository;
 
 class Package extends Repository

@@ -2,7 +2,7 @@
 
 namespace Tests\FileManager\AddressTest;
 
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 
 test(
     title: 'it should create path from string',

@@ -5,7 +5,7 @@ namespace Saeghe\Saeghe\Commands\Migrate;
 use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 use Saeghe\Saeghe\Project;
 
 function run(Project $project)

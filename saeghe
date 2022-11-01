@@ -5,7 +5,7 @@ require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'Str.ph
 require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Path.php';
 require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Address.php';
 
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 
 spl_autoload_register(function ($class) {
     $classMap = [

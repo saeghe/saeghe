@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe;
 
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 
 class Project
 {

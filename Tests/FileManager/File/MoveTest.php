@@ -2,7 +2,7 @@
 
 namespace Tests\FileManager\File\MoveTest;
 
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\FileManager\File\move;
 

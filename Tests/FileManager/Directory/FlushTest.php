@@ -2,7 +2,7 @@
 
 namespace Tests\FileManager\Directory\FlushTest;
 
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 test(

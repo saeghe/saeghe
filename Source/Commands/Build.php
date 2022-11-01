@@ -6,7 +6,7 @@ use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
 use Saeghe\Saeghe\Str;
@@ -99,6 +99,11 @@ function compile(Config $config, Address $origin, Address $destination, array $r
 
     if (file_needs_modification($origin, $config)) {
         compile_file($origin, $destination, $replace_map);
+
+        return;
+    } else if (is_link($origin->to_string())) {
+        $source_link = $origin->parent()->append(readlink($origin->to_string()));
+        symlink($source_link->to_string(), $destination->to_string());
 
         return;
     }
