@@ -2,7 +2,7 @@
 
 namespace Tests\FileManager\File\DeleteFileTest;
 
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 use function Saeghe\Saeghe\FileManager\File\delete;
 
 test(

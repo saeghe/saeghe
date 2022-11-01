@@ -2,7 +2,7 @@
 
 namespace Tests\FileManager\Directory\IsExistsTest;
 
-use Saeghe\Saeghe\FileSystem\Address;
+use Saeghe\Saeghe\FileManager\Address;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\FileManager\Directory\exists;
 

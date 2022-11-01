@@ -1,6 +1,6 @@
 <?php
 
-namespace Saeghe\Saeghe\FileSystem;
+namespace Saeghe\Saeghe\FileManager;
 
 use Saeghe\Saeghe\Str;
 use Saeghe\Saeghe\FileManager\Path;
