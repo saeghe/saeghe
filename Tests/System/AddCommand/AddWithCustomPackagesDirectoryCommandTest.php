@@ -4,6 +4,7 @@ namespace Tests\System\AddCommand\AddWithCustomPackagesDirectoryCommandTest;
 
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
     title: 'it should add package to the given directory',
@@ -21,13 +22,13 @@ test(
         shell_exec("{$_SERVER['PWD']}/saeghe init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
     },
     after: function () {
-        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
+        flush(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
 function assert_package_directory_added_to_config($message)
 {
-    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         $config['packages-directory'] === 'vendor',
@@ -37,27 +38,27 @@ function assert_package_directory_added_to_config($message)
 
 function assert_config_file_created_for_simple_project($message)
 {
-    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json', $message);
+    File\assert_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), $message);
 }
 
 function assert_packages_directory_created_for_empty_project($message)
 {
-    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor', $message);
+    File\assert_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor'), $message);
 }
 
 function assert_simple_package_cloned($message)
 {
     assert(
-        File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package')
-        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/saeghe.config.json')
-        && File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/README.md'),
+        File\assert_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package'))
+        && File\assert_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/saeghe.config.json'))
+        && File\assert_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/README.md')),
         $message
     );
 }
 
 function assert_simple_package_added_to_config($message)
 {
-    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         assert(isset($config['packages']['git@github.com:saeghe/simple-package.git']))
@@ -68,7 +69,7 @@ function assert_simple_package_added_to_config($message)
 
 function assert_meta_has_desired_data($message)
 {
-    $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'), true, JSON_THROW_ON_ERROR);
+    $meta = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/simple-package.git'])

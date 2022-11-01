@@ -4,6 +4,7 @@ namespace Tests\System\BuildCommand\BuildForProductionTest;
 
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\FileManager\File\delete;
+use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
     title: 'it should build the project',
@@ -24,37 +25,37 @@ test(
     },
     before: function () {
         copy(
-            $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json',
-            $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'
+            realpath($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json'),
+            realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json')
         );
         shell_exec($_SERVER['PWD'] . '/saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/ProjectWithTests');
     },
     after: function () {
         delete_build_directory();
         delete_packages_directory();
-        delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
-        delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
+        delete(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'));
+        delete(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'));
     }
 );
 
 function delete_build_directory()
 {
-    delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
+    delete_recursive(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds'));
 }
 
 function delete_packages_directory()
 {
-    delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
+    delete_recursive(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages'));
 }
 
 function assert_build_directory_exists($message)
 {
-    assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds'), $message);
+    assert(file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds')), $message);
 }
 
 function assert_environment_build_directory_exists($message)
 {
-    assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production'), $message);
+    assert(file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production')), $message);
 }
 
 function assert_source_has_been_built($message)
@@ -63,12 +64,12 @@ function assert_source_has_been_built($message)
     $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
 
     assert(
-        file_exists($environment_build_path . '/Source/SubDirectory/ClassUseAnotherClass.php')
-        && file_exists($environment_build_path . '/Source/SubDirectory/SimpleClass.php')
-        && file_exists($environment_build_path . '/Source/SampleFile.php')
-        && file_get_contents($environment_build_path . '/Source/SubDirectory/ClassUseAnotherClass.php') === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/Source/SubDirectory/ClassUseAnotherClass.stub'))
-        && file_get_contents($environment_build_path . '/Source/SubDirectory/SimpleClass.php') === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/Source/SubDirectory/SimpleClass.stub'))
-        && file_get_contents($environment_build_path . '/Source/SampleFile.php') === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/Source/SampleFile.stub'))
+        file_exists(realpath($environment_build_path . '/Source/SubDirectory/ClassUseAnotherClass.php'))
+        && file_exists(realpath($environment_build_path . '/Source/SubDirectory/SimpleClass.php'))
+        && file_exists(realpath($environment_build_path . '/Source/SampleFile.php'))
+        && file_get_contents(realpath($environment_build_path . '/Source/SubDirectory/ClassUseAnotherClass.php')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/Source/SubDirectory/ClassUseAnotherClass.stub')))
+        && file_get_contents(realpath($environment_build_path . '/Source/SubDirectory/SimpleClass.php')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/Source/SubDirectory/SimpleClass.stub')))
+        && file_get_contents(realpath($environment_build_path . '/Source/SampleFile.php')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/Source/SampleFile.stub')))
         ,
         $message
     );
@@ -79,8 +80,8 @@ function assert_none_php_files_has_not_been_built($message)
     $environment_build_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production';
 
     assert(
-        file_exists($environment_build_path . '/Source/SubDirectory/FileDontNeedBuild.txt')
-        && file_get_contents($environment_build_path . '/Source/SubDirectory/FileDontNeedBuild.txt') === str_replace('$environment_build_path', $environment_build_path, file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Source/SubDirectory/FileDontNeedBuild.txt')),
+        file_exists(realpath($environment_build_path . '/Source/SubDirectory/FileDontNeedBuild.txt'))
+        && file_get_contents(realpath($environment_build_path . '/Source/SubDirectory/FileDontNeedBuild.txt')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Source/SubDirectory/FileDontNeedBuild.txt'))),
         $message
     );
 }
@@ -91,8 +92,8 @@ function assert_tests_has_been_built($message)
     $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
 
     assert(
-        file_exists($environment_build_path . '/Tests/SampleTest.php')
-        && file_get_contents($environment_build_path . '/Tests/SampleTest.php') === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/Tests/SampleTest.stub')),
+        file_exists(realpath($environment_build_path . '/Tests/SampleTest.php'))
+        && file_get_contents(realpath($environment_build_path . '/Tests/SampleTest.php')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/Tests/SampleTest.stub'))),
         $message
     );
 }
@@ -103,8 +104,8 @@ function assert_file_with_package_dependency_has_been_built($message)
     $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
 
     assert(
-        file_exists($environment_build_path . '/Source/FileWithPackageDependency.php')
-        && file_get_contents($environment_build_path . '/Source/FileWithPackageDependency.php') === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/Source/FileWithPackageDependency.stub')),
+        file_exists(realpath($environment_build_path . '/Source/FileWithPackageDependency.php'))
+        && file_get_contents(realpath($environment_build_path . '/Source/FileWithPackageDependency.php')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/Source/FileWithPackageDependency.stub'))),
         $message
     );
 }
@@ -114,21 +115,21 @@ function assert_file_permissions_are_same($message)
     $environment_build_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production';
 
     assert(
-        fileperms($environment_build_path . '/PublicDirectory')
+        fileperms(realpath($environment_build_path . '/PublicDirectory'))
         ===
-        fileperms($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/PublicDirectory'),
+        fileperms(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/PublicDirectory')),
         'Directory permission is not set properly!' . $message
     );
     assert(
-        fileperms($environment_build_path . '/PublicDirectory/ExecutableFile.php')
+        fileperms(realpath($environment_build_path . '/PublicDirectory/ExecutableFile.php'))
         ===
-        fileperms($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/PublicDirectory/ExecutableFile.php'),
+        fileperms(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/PublicDirectory/ExecutableFile.php')),
         'PHP file permission is not set properly!' . $message
     );
     assert(
-        fileperms($environment_build_path . '/PublicDirectory/AnotherExecutableFile')
+        fileperms(realpath($environment_build_path . '/PublicDirectory/AnotherExecutableFile'))
         ===
-        fileperms($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/PublicDirectory/AnotherExecutableFile'),
+        fileperms(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/PublicDirectory/AnotherExecutableFile')),
         'Other file permission is not set properly!' . $message
     );
 }
@@ -136,9 +137,9 @@ function assert_file_permissions_are_same($message)
 function assert_git_directory_excluded($message)
 {
     assert(
-        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production/.git')
+        ! file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production/.git'))
         &&
-        ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production/Packages/saeghe/simple-package/.git'),
+        ! file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production/Packages/saeghe/simple-package/.git')),
         $message
     );
 }
@@ -149,8 +150,8 @@ function assert_executables_are_linked($message)
     $link_source = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production/Packages/saeghe/simple-package/run.php';
 
     assert(
-        is_link($link_file)
-        && readlink($link_file) === $link_source
+        is_link(realpath($link_file))
+        && readlink(realpath($link_file)) === realpath($link_source)
         ,
         $message
     );
@@ -162,8 +163,8 @@ function assert_build_for_project_entry_points($message)
     $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests';
 
     assert(
-        file_exists($environment_build_path . '/entry-point')
-        && file_get_contents($environment_build_path . '/entry-point') === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/entry-point.stub')),
+        file_exists(realpath($environment_build_path . '/entry-point'))
+        && file_get_contents(realpath($environment_build_path . '/entry-point')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/entry-point.stub'))),
         $message
     );
 }
@@ -174,8 +175,8 @@ function assert_build_for_packages_entry_points($message)
     $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/SimplePackage';
 
     assert(
-        file_exists($environment_build_path . '/Packages/saeghe/simple-package/entry-point')
-        && file_get_contents($environment_build_path . '/Packages/saeghe/simple-package/entry-point') === str_replace('$environment_build_path', $environment_build_path, file_get_contents($stubs_directory . '/entry-point.stub')),
+        file_exists(realpath($environment_build_path . '/Packages/saeghe/simple-package/entry-point'))
+        && file_get_contents(realpath($environment_build_path . '/Packages/saeghe/simple-package/entry-point')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/entry-point.stub'))),
         $message
     );
 }

@@ -4,6 +4,7 @@ namespace Tests\System\FlushCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
     title: 'it should flush builds',
@@ -19,16 +20,16 @@ test(
         shell_exec($_SERVER['PWD'] . '/saeghe build production --project=TestRequirements/Fixtures/ProjectWithTests');
     },
     after: function () {
-        delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds');
+        delete_recursive(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds'));
     }
 );
 
 function assert_development_build_is_empty($message)
 {
-    assert(['.', '..'] === scandir($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development'), $message);
+    assert(['.', '..'] === scandir(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development')), $message);
 }
 
 function assert_production_build_is_empty($message)
 {
-    assert(['.', '..'] === scandir($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production'), $message);
+    assert(['.', '..'] === scandir(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/production')), $message);
 }

@@ -3,6 +3,7 @@
 namespace Tests\System\RemovePackageAndLeaveUsedSubPackageTest;
 
 use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
     title: 'it should remove the package but leave used subpackage',
@@ -20,15 +21,15 @@ test(
     },
     after: function () {
         shell_exec($_SERVER['PWD'] . "/saeghe remove git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject");
-        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
+        flush(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
 function assert_desired_data_in_packages_directory($message)
 {
     clearstatcache();
-    assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/simple-package')
-        && ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/complex-package')
+    assert(file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/simple-package'))
+        && ! file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/complex-package'))
     ,
         $message
     );
@@ -36,7 +37,7 @@ function assert_desired_data_in_packages_directory($message)
 
 function assert_config_file_is_clean($message)
 {
-    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($config['packages']['git@github.com:saeghe/simple-package.git'])
@@ -47,7 +48,7 @@ function assert_config_file_is_clean($message)
 
 function assert_meta_is_clean($message)
 {
-    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
 
     assert(isset($config['packages']['git@github.com:saeghe/simple-package.git']), $message);
 }

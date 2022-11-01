@@ -3,6 +3,7 @@
 namespace Tests\System\WatchCommandTest;
 
 use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
     title: 'it should watch for changes',
@@ -11,24 +12,24 @@ test(
         $pid = exec($command, $output);
 
         copy(
-            $_SERVER['PWD'] . '/TestRequirements/Stubs/EmptyProjectSource/SimpleClassForEmptyProject.php',
-            $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Source/SimpleClassForEmptyProject.php'
+            realpath($_SERVER['PWD'] . '/TestRequirements/Stubs/EmptyProjectSource/SimpleClassForEmptyProject.php'),
+            realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Source/SimpleClassForEmptyProject.php')
         );
 
         sleep(2);
 
         $output = implode(PHP_EOL, $output);
 
-        assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/builds'), 'builds directory does not exists! ' . $output);
-        assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/builds/development'), 'development directory does not exists! ' . $output);
-        assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/builds/development/Source'), 'Source directory does not exists! ' . $output);
-        assert(file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/builds/development/Source/SimpleClassForEmptyProject.php'), 'File has not been built! ' . $output);
+        assert(file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/builds')), 'builds directory does not exists! ' . $output);
+        assert(file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/builds/development')), 'development directory does not exists! ' . $output);
+        assert(file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/builds/development/Source')), 'Source directory does not exists! ' . $output);
+        assert(file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/builds/development/Source/SimpleClassForEmptyProject.php')), 'File has not been built! ' . $output);
         posix_kill($pid, SIGKILL);
     },
     before: function () {
-        mkdir($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Source');
+        mkdir(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Source'));
     },
     after: function () {
-        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
+        flush(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject'));
     }
 );
