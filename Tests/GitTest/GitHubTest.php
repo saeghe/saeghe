@@ -65,7 +65,7 @@ test(
         assert('Saeghe package manager' === get_json('repos/saeghe/saeghe')['description']);
     },
     before: function () {
-        $credentials = json_decode(json: file_get_contents(realpath(__DIR__ . '/../../credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
+        $credentials = json_decode(json: file_get_contents(realpath(root() . 'credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
         github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
@@ -77,7 +77,7 @@ test(
         assert(! has_release('saeghe', 'simple-package'));
     },
     before: function () {
-        $credentials = json_decode(json: file_get_contents(realpath(__DIR__ . '/../../credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
+        $credentials = json_decode(json: file_get_contents(realpath(root() . 'credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
         github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
@@ -88,7 +88,7 @@ test(
         assert('v1.0.5' === find_latest_version('saeghe', 'released-package'));
     },
     before: function () {
-        $credentials = json_decode(json: file_get_contents(realpath(__DIR__ . '/../../credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
+        $credentials = json_decode(json: file_get_contents(realpath(root() . 'credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
         github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
@@ -100,7 +100,7 @@ test(
         assert('5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === find_version_hash('saeghe', 'released-package', 'v1.0.5'));
     },
     before: function () {
-        $credentials = json_decode(json: file_get_contents(realpath(__DIR__ . '/../../credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
+        $credentials = json_decode(json: file_get_contents(realpath(root() . 'credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
         github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
@@ -112,7 +112,7 @@ test(
         assert('5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === find_latest_commit_hash('saeghe', 'released-package'));
     },
     before: function () {
-        $credentials = json_decode(json: file_get_contents(realpath(__DIR__ . '/../../credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
+        $credentials = json_decode(json: file_get_contents(realpath(root() . 'credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
         github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
@@ -133,9 +133,9 @@ test(
         return $packages_directory;
     },
     before: function () {
-        $credentials = json_decode(json: file_get_contents(realpath(__DIR__ . '/../../credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
+        $credentials = json_decode(json: file_get_contents(realpath(root() . 'credentials.json')), associative: true, flags: JSON_THROW_ON_ERROR);
         github_token($credentials[GITHUB_DOMAIN]['token']);
-        $packages_directory = Address::from_string(__DIR__ . '/../PlayGround/downloads/package');
+        $packages_directory = Address::from_string(root() . 'Tests/PlayGround/downloads/package');
         mkdir($packages_directory->to_string(), 0777, true);
 
         return $packages_directory;
@@ -160,7 +160,7 @@ test(
         return $packages_directory;
     },
     before: function () {
-        $packages_directory = Address::from_string(__DIR__ . '/../PlayGround/downloads/package');
+        $packages_directory = Address::from_string(root() . 'Tests/PlayGround/downloads/package');
         mkdir($packages_directory->to_string(), 0777, true);
 
         return $packages_directory;

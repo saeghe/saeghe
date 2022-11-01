@@ -9,7 +9,7 @@ use function Saeghe\Saeghe\FileManager\Directory\exists;
 test(
     title: 'it should return false when directory is not exists',
     case: function () {
-        $directory = Address::from_string(__DIR__ . '/../../PlayGround/IsExists');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/IsExists');
         assert(! exists($directory->to_string()), 'Directory/exists is not working!');
     }
 );
@@ -22,7 +22,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(__DIR__ . '/../../PlayGround/IsExists');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/IsExists');
 
         file_put_contents($directory->to_string(), 'A file with directory name');
 
@@ -41,7 +41,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(__DIR__ . '/../../PlayGround/IsExists');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/IsExists');
         mkdir($directory->to_string());
 
         return $directory;

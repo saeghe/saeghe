@@ -20,8 +20,8 @@ test(
         return [$first, $second];
     },
     before: function () {
-        $first = Address::from_string(__DIR__ . '/first');
-        $second = Address::from_string(__DIR__ . '/second');
+        $first = Address::from_string(root() . 'Tests/PlayGround/first');
+        $second = Address::from_string(root() . 'Tests/PlayGround/second');
         mkdir($first->to_string());
         mkdir($second->to_string());
         $file = $first->append('sample.txt');

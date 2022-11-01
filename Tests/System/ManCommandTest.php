@@ -54,7 +54,7 @@ EOD;
 test(
     title: 'it should return desired man output',
     case: function () use ($man_content) {
-        $output = shell_exec($_SERVER['PWD'] . '/saeghe --man');
+        $output = shell_exec('php ' . root() . 'saeghe --man');
 
         assert(str_contains($output, $man_content), 'Manual output is not what we want!' . $output);
     }

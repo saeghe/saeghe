@@ -9,17 +9,17 @@ use function Saeghe\Saeghe\FileManager\Path\realpath;
 test(
     title: 'it should build project with complex package',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe build --project=TestRequirements/Fixtures/ProjectWithTests");
+        $output = shell_exec('php ' . root() . 'saeghe build --project=TestRequirements/Fixtures/ProjectWithTests');
         assert_build_for_packages('Packages file does not built properly!' . $output);
         assert_build_for_dependency_packages('Dependency Packages file does not built properly!' . $output);
         assert_executable_file_added('Complex executable file has not been created!' . $output);
     },
     before: function () {
         copy(
-            realpath($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json'),
-            realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json')
+            realpath(root() . 'TestRequirements/Stubs/ProjectWithTests/saeghe.config.json'),
+            realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json')
         );
-        shell_exec($_SERVER['PWD'] . "/saeghe add git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/ProjectWithTests");
+        shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/ProjectWithTests');
     },
     after: function () {
         delete_config_file();
@@ -31,22 +31,22 @@ test(
 
 function delete_config_file()
 {
-    delete(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'));
+    delete(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'));
 }
 
 function delete_meta_file()
 {
-    delete(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'));
+    delete(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'));
 }
 
 function delete_build_directory()
 {
-    delete_recursive(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds'));
+    delete_recursive(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/builds'));
 }
 
 function delete_packages_directory()
 {
-    delete_recursive(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages'));
+    delete_recursive(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages'));
 }
 
 function assert_build_for_packages($message)
@@ -69,8 +69,8 @@ function assert_build_for_packages($message)
 
 function assert_build_for_dependency_packages($message)
 {
-    $environment_build_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
-    $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/BuildForComplexPackage';
+    $environment_build_path = root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubs_directory = root() . 'TestRequirements/Stubs/BuildForComplexPackage';
     assert(
         file_get_contents(realpath($environment_build_path . '/Packages/saeghe/simple-package/run.php'))
         === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/' . 'simple-package.run.php.stub')))
@@ -81,8 +81,8 @@ function assert_build_for_dependency_packages($message)
 
 function build_exists_and_same_as_stub($file)
 {
-    $environment_build_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development';
-    $stubs_directory = $_SERVER['PWD'] . '/TestRequirements/Stubs/BuildForComplexPackage';
+    $environment_build_path = root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/development';
+    $stubs_directory = root() . 'TestRequirements/Stubs/BuildForComplexPackage';
 
     return
         file_exists(realpath($environment_build_path . '/Packages/saeghe/complex-package/' . $file))
@@ -92,9 +92,9 @@ function build_exists_and_same_as_stub($file)
 function assert_executable_file_added($message)
 {
     assert(
-        is_link(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/complex'))
-        && readlink(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/complex'))
-             === realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/complex-package/cli-command')
+        is_link(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/development/complex'))
+        && readlink(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/development/complex'))
+             === realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/development/Packages/saeghe/complex-package/cli-command')
         ,
         $message
     );

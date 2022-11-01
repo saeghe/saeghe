@@ -14,7 +14,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(__DIR__ . '/Temp');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/Temp');
         mkdir($directory->to_string());
         return $directory;
     },
@@ -31,7 +31,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(__DIR__ . '/../../PlayGround/IsEmpty');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/IsEmpty');
         mkdir($directory->to_string());
         file_put_contents($directory->append('file.txt')->to_string(), 'content');
 
@@ -50,7 +50,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(__DIR__ . '/../../PlayGround/IsEmpty');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/IsEmpty');
         mkdir($directory->to_string());
         mkdir($directory->append('sub_directory')->to_string());
 

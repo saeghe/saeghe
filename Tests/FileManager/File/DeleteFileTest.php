@@ -12,7 +12,7 @@ test(
         assert(! file_exists($file->to_string()), 'delete file is not working!');
     },
     before: function () {
-        $file = Address::from_string(__DIR__ . '/sample.txt');
+        $file = Address::from_string(root() . 'Tests/PlayGround/sample.txt');
         file_put_contents($file->to_string(), 'sample text');
 
         return $file;

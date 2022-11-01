@@ -42,11 +42,11 @@ EOD;
 test(
     title: 'it makes a new default config file',
     case: function () use ($initial_content, $meta_content) {
-        $packages_directory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages';
-        $config_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
-        $meta_file_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
+        $packages_directory = root() . 'TestRequirements/Fixtures/EmptyProject/Packages';
+        $config_path = root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
+        $meta_file_path = root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
 
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
+        $output = shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
 
         File\assert_exists($config_path, 'Config file does not exists: ' . $output);
         File\assert_exists($packages_directory, 'Packages directory is not created: ' . $output);
@@ -55,18 +55,18 @@ test(
         assert_success('Project has been initialized.', $output);
     },
     after: function () {
-        flush(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject'));
+        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
 test(
     title: 'it makes a new config file with given packages directory',
     case: function () use ($initial_content_with_packages_directory) {
-        $config_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
-        $meta_file_path = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
-        $packages_directory = $_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/vendor';
+        $config_path = root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json';
+        $meta_file_path = root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json';
+        $packages_directory = root() . 'TestRequirements/Fixtures/EmptyProject/vendor';
 
-        $output = shell_exec("{$_SERVER['PWD']}/saeghe init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor");
+        $output = shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor');
 
         File\assert_exists($packages_directory, 'packages directory has not been created: ' . $output);
         File\assert_exists($config_path, 'Config file does not exists: ' . $output);
@@ -74,6 +74,6 @@ test(
         File\assert_content($config_path, $initial_content_with_packages_directory, 'Config file content is not correct after running init!');
     },
     after: function () {
-        flush(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject'));
+        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );

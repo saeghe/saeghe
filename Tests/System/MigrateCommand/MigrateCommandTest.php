@@ -10,7 +10,7 @@ use function Saeghe\Saeghe\FileManager\Path\realpath;
 test(
     title: 'it should migrate symfony package',
     case: function () {
-        $output = shell_exec($_SERVER['PWD'] . "/saeghe migrate --project=TestRequirements/Fixtures/composer-package");
+        $output = shell_exec('php ' . root() . 'saeghe migrate --project=TestRequirements/Fixtures/composer-package');
 
         assert_correct_config_file('Config file is not correct!' . $output);
         assert_correct_meta_file('Meta file data is not correct!' . $output);
@@ -18,16 +18,16 @@ test(
         Write\assert_success('Project migrated successfully.', $output);
     },
     after: function () {
-        delete(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/saeghe.config.json'));
-        delete(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/saeghe.config-lock.json'));
-        delete_recursive(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/Packages'));
+        delete(realpath(root() . 'TestRequirements/Fixtures/composer-package/saeghe.config.json'));
+        delete(realpath(root() . 'TestRequirements/Fixtures/composer-package/saeghe.config-lock.json'));
+        delete_recursive(realpath(root() . 'TestRequirements/Fixtures/composer-package/Packages'));
     },
 );
 
 function assert_correct_config_file($message)
 {
-    $root = $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/';
-    $stub = $_SERVER['PWD'] . '/TestRequirements/Stubs/composer-package/';
+    $root = root() . 'TestRequirements/Fixtures/composer-package/';
+    $stub = root() . 'TestRequirements/Stubs/composer-package/';
 
     assert(
         file_exists(realpath($root . 'saeghe.config.json'))
@@ -38,8 +38,8 @@ function assert_correct_config_file($message)
 
 function assert_correct_meta_file($message)
 {
-    $root = $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/';
-    $stub = $_SERVER['PWD'] . '/TestRequirements/Stubs/composer-package/';
+    $root = root() . 'TestRequirements/Fixtures/composer-package/';
+    $stub = root() . 'TestRequirements/Stubs/composer-package/';
 
     assert(
         file_exists(realpath($root . 'saeghe.config-lock.json'))
@@ -50,8 +50,8 @@ function assert_correct_meta_file($message)
 
 function assert_package_directory_content($message)
 {
-    $root = $_SERVER['PWD'] . '/TestRequirements/Fixtures/composer-package/';
-    $stub = $_SERVER['PWD'] . '/TestRequirements/Stubs/composer-package/';
+    $root = root() . 'TestRequirements/Fixtures/composer-package/';
+    $stub = root() . 'TestRequirements/Stubs/composer-package/';
 
     assert(
         file_exists(realpath($root . 'Packages'))

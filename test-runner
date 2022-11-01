@@ -19,3 +19,8 @@ require_once Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Writ
 require_once Address::from_string(__DIR__ . '/Packages/saeghe/test-runner/Source/Assertions/File.php')->to_string();
 
 require_once Address::from_string(__DIR__ . '/Packages/saeghe/test-runner/run')->to_string();
+
+function root(): string
+{
+    return getcwd() . DIRECTORY_SEPARATOR;
+}
