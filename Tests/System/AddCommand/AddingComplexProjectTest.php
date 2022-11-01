@@ -4,6 +4,7 @@ namespace Tests\System\AddCommand\AddingComplexProjectTest;
 
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\FileManager\File\delete;
+use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
     title: 'it should add a complex project',
@@ -16,8 +17,8 @@ test(
     },
     before: function () {
         copy(
-            $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json',
-            $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'
+            realpath($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json'),
+            realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json')
         );
     },
     after: function () {
@@ -36,8 +37,8 @@ test(
     },
     before: function () {
         copy(
-            $_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json',
-            $_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'
+            realpath($_SERVER['PWD'] . '/TestRequirements/Stubs/ProjectWithTests/saeghe.config.json'),
+            realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json')
         );
     },
     after: function () {
@@ -49,17 +50,17 @@ test(
 
 function delete_config_file()
 {
-    delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json');
+    delete(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'));
 }
 
 function delete_meta_file()
 {
-    delete($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json');
+    delete(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'));
 }
 
 function delete_packages_directory()
 {
-    delete_recursive($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages');
+    delete_recursive(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/Packages'));
 }
 
 function assert_pacakges_added_to_packages_directory($message)
@@ -77,7 +78,7 @@ function assert_pacakges_added_to_packages_directory($message)
 
 function assert_config_file_has_desired_data($message)
 {
-    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         assert(! isset($config['packages']['git@github.com:saeghe/simple-package.git']))
@@ -90,7 +91,7 @@ function assert_config_file_has_desired_data($message)
 
 function assert_meta_file_has_desired_data($message)
 {
-    $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'), true, JSON_THROW_ON_ERROR);
+    $meta = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/simple-package.git'])

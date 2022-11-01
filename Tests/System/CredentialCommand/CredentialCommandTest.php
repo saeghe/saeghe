@@ -4,6 +4,8 @@ namespace Tests\System\CredentialCommand\CredentialCommandTest;
 
 use Saeghe\Cli\IO\Write;
 use function Saeghe\Saeghe\FileManager\File\delete;
+use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\File\move;
 
 test(
     title: 'it should set credential for github.com',
@@ -16,19 +18,19 @@ test(
         assert(
             ['github.com' => ['token' => $token]]
             ===
-            json_decode(file_get_contents($_SERVER['PWD'] . '/credentials.json'), true, JSON_THROW_ON_ERROR),
+            json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/credentials.json')), true, JSON_THROW_ON_ERROR),
             'Credential content is not set properly!'
         );
     },
     before: function () {
-        if (file_exists($_SERVER['PWD'] . '/credentials.json')) {
-            shell_exec('mv ' . $_SERVER['PWD'] . '/credentials.json ' . $_SERVER['PWD'] . '/credentials.json.back');
+        if (file_exists(realpath($_SERVER['PWD'] . '/credentials.json'))) {
+            move(realpath($_SERVER['PWD'] . '/credentials.json'), realpath($_SERVER['PWD'] . '/credentials.json.back'));
         }
     },
     after: function () {
-        delete($_SERVER['PWD'] . '/credentials.json');
-        if (file_exists($_SERVER['PWD'] . '/credentials.json.back')) {
-            shell_exec('mv ' . $_SERVER['PWD'] . '/credentials.json.back ' . $_SERVER['PWD'] . '/credentials.json');
+        delete(realpath($_SERVER['PWD'] . '/credentials.json'));
+        if (file_exists(realpath($_SERVER['PWD'] . '/credentials.json.back'))) {
+            move(realpath($_SERVER['PWD'] . '/credentials.json.back'), realpath($_SERVER['PWD'] . '/credentials.json'));
         }
     },
 );
@@ -44,23 +46,23 @@ test(
         assert(
             ['gitlab.com' => ['token' => 'gitlab-token'], 'github.com' => ['token' => $token]]
             ===
-            json_decode(file_get_contents($_SERVER['PWD'] . '/credentials.json'), true, JSON_THROW_ON_ERROR),
+            json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/credentials.json')), true, JSON_THROW_ON_ERROR),
             'Credential content is not set properly!'
         );
     },
     before: function () {
-        if (file_exists($_SERVER['PWD'] . '/credentials.json')) {
-            shell_exec('mv ' . $_SERVER['PWD'] . '/credentials.json ' . $_SERVER['PWD'] . '/credentials.json.back');
+        if (file_exists(realpath($_SERVER['PWD'] . '/credentials.json'))) {
+            move(realpath($_SERVER['PWD'] . '/credentials.json'), realpath($_SERVER['PWD'] . '/credentials.json.back'));
         }
 
-        $credential = fopen($_SERVER['PWD'] . '/credentials.json', "w");
+        $credential = fopen(realpath($_SERVER['PWD'] . '/credentials.json'), "w");
         fwrite($credential, json_encode(['gitlab.com' => ['token' => 'gitlab-token']], JSON_PRETTY_PRINT));
         fclose($credential);
     },
     after: function () {
-        delete($_SERVER['PWD'] . '/credentials.json');
-        if (file_exists($_SERVER['PWD'] . '/credentials.json.back')) {
-            shell_exec('mv ' . $_SERVER['PWD'] . '/credentials.json.back ' . $_SERVER['PWD'] . '/credentials.json');
+        delete(realpath($_SERVER['PWD'] . '/credentials.json'));
+        if (file_exists(realpath($_SERVER['PWD'] . '/credentials.json.back'))) {
+            move(realpath($_SERVER['PWD'] . '/credentials.json.back'), realpath($_SERVER['PWD'] . '/credentials.json'));
         }
     },
 );

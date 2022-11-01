@@ -4,6 +4,7 @@ namespace Tests\System\AddCommand\AddReleasedPackageWithSpecificVersionTest;
 
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
     title: 'it should add released package to the project with the given version',
@@ -20,34 +21,34 @@ test(
         shell_exec($_SERVER['PWD'] . "/saeghe init --project=TestRequirements/Fixtures/EmptyProject");
     },
     after: function () {
-        flush($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject');
+        flush(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
 function assert_config_file_created_for_released_project($message)
 {
-    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json', $message);
+    File\assert_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), $message);
 }
 
 function assert_packages_directory_created_for_empty_project($message)
 {
-    File\assert_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages', $message);
+    File\assert_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages'), $message);
 }
 
 function assert_released_package_cloned($message)
 {
     assert(
-        file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package')
-        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/saeghe.config.json')
-        && file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/saeghe.config-lock.json')
-        && ! file_exists($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/Tests'),
+        file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package'))
+        && file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/saeghe.config.json'))
+        && file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/saeghe.config-lock.json'))
+        && ! file_exists(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/Packages/saeghe/released-package/Tests')),
         $message
     );
 }
 
 function assert_released_package_added_to_config($message)
 {
-    $config = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
+    $config = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($config['packages']['git@github.com:saeghe/released-package.git'])
@@ -58,7 +59,7 @@ function assert_released_package_added_to_config($message)
 
 function assert_meta_has_desired_data($message)
 {
-    $meta = json_decode(file_get_contents($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'), true, JSON_THROW_ON_ERROR);
+    $meta = json_decode(file_get_contents(realpath($_SERVER['PWD'] . '/TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/released-package.git'])
