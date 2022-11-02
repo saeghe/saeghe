@@ -10,9 +10,14 @@ use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\success;
+use function Saeghe\Saeghe\Providers\GitHub\github_token;
+use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 function run(Project $project)
 {
+    $credential = json_to_array($project->credentials_path->to_string());
+    github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
+
     $package_url = argument(2);
     $version = parameter('version');
 
