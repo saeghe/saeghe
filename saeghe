@@ -143,11 +143,6 @@ function array_insert_after($array, $key, array $additional): array
     return array_merge(array_slice($array, 0, $pos), $additional, array_slice($array, $pos));
 }
 
-function array_merge_json($array, string $path): array
-{
-    return array_merge($array, json_to_array($path));
-}
-
 function json_put(string $path, array $content): bool
 {
     return file_put_contents($path, json_encode($content, JSON_PRETTY_PRINT) . PHP_EOL) !== false;

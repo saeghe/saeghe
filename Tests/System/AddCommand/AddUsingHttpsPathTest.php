@@ -2,6 +2,7 @@
 
 namespace Tests\System\AddCommand\AddUsingHttpsPath;
 
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
@@ -63,7 +64,7 @@ function assert_http_package_cloned($message)
 
 function assert_http_package_added_to_config($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
     assert(
         assert(isset($config['packages']['https://github.com/symfony/thanks.git']))
@@ -74,7 +75,7 @@ function assert_http_package_added_to_config($message)
 
 function assert_meta_has_desired_data($message)
 {
-    $meta = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
+    $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
     assert(
         isset($meta['packages']['https://github.com/symfony/thanks.git'])

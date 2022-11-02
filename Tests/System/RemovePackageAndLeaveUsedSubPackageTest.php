@@ -2,6 +2,7 @@
 
 namespace Tests\System\RemovePackageAndLeaveUsedSubPackageTest;
 
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 
@@ -37,7 +38,7 @@ function assert_desired_data_in_packages_directory($message)
 
 function assert_config_file_is_clean($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
     assert(
         isset($config['packages']['git@github.com:saeghe/simple-package.git'])
@@ -48,7 +49,7 @@ function assert_config_file_is_clean($message)
 
 function assert_meta_is_clean($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
     assert(isset($config['packages']['git@github.com:saeghe/simple-package.git']), $message);
 }

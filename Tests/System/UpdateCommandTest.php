@@ -2,6 +2,7 @@
 
 namespace Tests\System\UpdateCommandTest;
 
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
@@ -59,7 +60,7 @@ test(
 
 function assert_version_upgraded_in_config_file($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
     assert(
         isset($config['packages']['git@github.com:saeghe/released-package.git'])
@@ -70,7 +71,7 @@ function assert_version_upgraded_in_config_file($message)
 
 function assert_meta_updated($message)
 {
-    $meta = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
+    $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/released-package.git'])
@@ -84,8 +85,8 @@ function assert_meta_updated($message)
 
 function assert_given_version_added($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
-    $meta = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
+    $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
     assert(
         isset($config['packages']['git@github.com:saeghe/released-package.git'])

@@ -3,6 +3,7 @@
 namespace Tests\System\CredentialCommand\CredentialCommandTest;
 
 use Saeghe\Cli\IO\Write;
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\FileManager\File\delete;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 use function Saeghe\Saeghe\FileManager\File\move;
@@ -18,7 +19,7 @@ test(
         assert(
             ['github.com' => ['token' => $token]]
             ===
-            json_decode(file_get_contents(realpath(root() . 'credentials.json')), true, JSON_THROW_ON_ERROR),
+            Json\to_array(realpath(root() . 'credentials.json')),
             'Credential content is not set properly!'
         );
     },
@@ -46,7 +47,7 @@ test(
         assert(
             ['gitlab.com' => ['token' => 'gitlab-token'], 'github.com' => ['token' => $token]]
             ===
-            json_decode(file_get_contents(realpath(root() . 'credentials.json')), true, JSON_THROW_ON_ERROR),
+            Json\to_array(realpath(root() . 'credentials.json')),
             'Credential content is not set properly!'
         );
     },

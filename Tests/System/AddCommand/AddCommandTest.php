@@ -2,9 +2,10 @@
 
 namespace Tests\System\AddCommand\AddCommandTest;
 
+use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
-use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 
@@ -57,8 +58,8 @@ test(
         $output = shell_exec('php ' . root() . 'saeghe add https://github.com/saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
 
         assert_error('Package https://github.com/saeghe/simple-package.git is already exists', $output);
-        $config = json_decode(file_get_contents(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), true, JSON_THROW_ON_ERROR);
-        $meta = json_decode(file_get_contents(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'), true, JSON_THROW_ON_ERROR);
+        $config = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json');
+        $meta = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json');
         assert(count($config['packages']) === 1);
         assert(count($meta['packages']) === 1);
     },
@@ -93,7 +94,7 @@ function assert_simple_package_cloned($message)
 
 function assert_simple_package_added_to_config($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
     assert(
         assert(isset($config['packages']['git@github.com:saeghe/simple-package.git']))
@@ -104,7 +105,7 @@ function assert_simple_package_added_to_config($message)
 
 function assert_meta_has_desired_data($message)
 {
-    $meta = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
+    $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/simple-package.git'])

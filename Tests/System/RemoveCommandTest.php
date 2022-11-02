@@ -2,6 +2,7 @@
 
 namespace Tests\System\RemoveCommandTest;
 
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
@@ -42,14 +43,14 @@ function assert_desired_data_in_packages_directory($message)
 
 function assert_config_file_is_clean($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
     assert($config['packages'] === [], $message);
 }
 
 function assert_meta_is_clean($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
     assert($config['packages'] === [], $message);
 }
