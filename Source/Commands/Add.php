@@ -49,11 +49,14 @@ function run(Project $project)
         dir_make_recursive($project->root->append($config->packages_directory)->to_string());
     }
 
-    if (! add($project, $config, $package, $package_url)) {
+    $package->detect_hash();
+    if (! $package->file_exists('saeghe.config.json')) {
         error("Given $package_url URL is not a Saeghe package.");
 
         return;
     }
+
+    add($project, $config, $package, $package_url);
 
     $config->packages[$package_url] = $package;
     json_put($project->config_file_path->to_string(), $config->to_array());
@@ -61,14 +64,8 @@ function run(Project $project)
     success("Package $package_url has been added successfully.");
 }
 
-function add(Project $project, Config $config, Package $package, $package_url): bool
+function add(Project $project, Config $config, Package $package, $package_url)
 {
-    $package->detect_hash();
-
-    if (! $package->file_exists('saeghe.config.json')) {
-        return false;
-    }
-
     if (! $package->is_downloaded($project, $config)) {
         $package->download($package->root($project, $config)->to_string());
     }
@@ -90,9 +87,8 @@ function add(Project $project, Config $config, Package $package, $package_url): 
         $is_sub_package_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($sub_package), false);
 
         if (! $is_sub_package_in_meta) {
-            return add($project, $config, $sub_package, $sub_package_url);
+            $sub_package->detect_hash();
+            add($project, $config, $sub_package, $sub_package_url);
         }
     }
-
-    return true;
 }

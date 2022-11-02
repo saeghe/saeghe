@@ -50,6 +50,7 @@ function run(Project $project)
     }
 
     remove($project, $config, $package, $package_url);
+    $package->detect_hash();
     add($project, $config, $package, $package_url);
 
     $config->packages[$package_url] = $package;
