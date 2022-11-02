@@ -2,6 +2,7 @@
 
 namespace Tests\System\AddCommand\AddingComplexProjectTest;
 
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\FileManager\File\delete;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
@@ -78,7 +79,7 @@ function assert_pacakges_added_to_packages_directory($message)
 
 function assert_config_file_has_desired_data($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'));
 
     assert(
         assert(! isset($config['packages']['git@github.com:saeghe/simple-package.git']))
@@ -91,7 +92,7 @@ function assert_config_file_has_desired_data($message)
 
 function assert_meta_file_has_desired_data($message)
 {
-    $meta = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
+    $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'));
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/simple-package.git'])

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\FileManager\Directory\IsExistsTest;
+namespace Tests\FileManager\Directory\ExistsTest;
 
 use Saeghe\Saeghe\FileManager\Address;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
@@ -9,7 +9,7 @@ use function Saeghe\Saeghe\FileManager\Directory\exists;
 test(
     title: 'it should return false when directory is not exists',
     case: function () {
-        $directory = Address::from_string(root() . 'Tests/PlayGround/IsExists');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/Exists');
         assert(! exists($directory->to_string()), 'Directory/exists is not working!');
     }
 );
@@ -22,7 +22,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(root() . 'Tests/PlayGround/IsExists');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/Exists');
 
         file_put_contents($directory->to_string(), 'A file with directory name');
 
@@ -34,14 +34,14 @@ test(
 );
 
 test(
-    title: 'it should return false when directory is not exists',
+    title: 'it should return true when directory is exist and is a directory',
     case: function (Address $directory) {
         assert(exists($directory->to_string()), 'Directory/exists is not working!');
 
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(root() . 'Tests/PlayGround/IsExists');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/Exists');
         mkdir($directory->to_string());
 
         return $directory;

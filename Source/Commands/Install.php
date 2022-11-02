@@ -6,12 +6,18 @@ use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\success;
+use function Saeghe\Saeghe\Providers\GitHub\github_token;
+use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 function run(Project $project)
 {
-    $config = Config::from_array(json_to_array($project->config_file_path->to_string()));
-    $meta = Meta::from_array(json_to_array($project->config_lock_file_path->to_string()));
+    $credential = Json\to_array($project->credentials_path->to_string());
+    github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
+
+    $config = Config::from_array(Json\to_array($project->config_file_path->to_string()));
+    $meta = Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()));
 
     array_walk(
         $meta->packages,

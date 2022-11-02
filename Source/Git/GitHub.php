@@ -103,7 +103,7 @@ function download($destination, $owner, $repo, $version): bool
     $token = github_token();
     $parent_directory = dirname($destination);
 
-    if (! file_exists($parent_directory)) {
+    if (! \file_exists($parent_directory)) {
         mkdir($parent_directory, 0755, true);
     }
 
@@ -148,4 +148,9 @@ function clone_to($destination, $owner, $repo): bool
     $output = passthru("git clone $github_ssh_url$owner/$repo.git $destination");
 
     return  $output === null;
+}
+
+function file_exists(string $owner, string $repo, string $hash, string $path): bool
+{
+    return false !== @file_get_contents("https://raw.githubusercontent.com/$owner/$repo/$hash/$path");
 }

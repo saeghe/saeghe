@@ -6,6 +6,7 @@ use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\success;
@@ -15,7 +16,7 @@ function run(Project $project)
 {
     $given_package_url = argument(2);
 
-    $config = Config::from_array(json_to_array($project->config_file_path->to_string()));
+    $config = Config::from_array(Json\to_array($project->config_file_path->to_string()));
 
     $package = array_reduce(
         $config->packages,
@@ -50,7 +51,7 @@ function run(Project $project)
 
 function remove(Project $project, Config $config, Package $package, $package_url)
 {
-    $package_config = Config::from_array(json_to_array($package->config_path($project, $config)->to_string()));
+    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
 
     foreach ($package_config->packages as $sub_package_url => $sub_package) {
         $sub_package_has_been_used = false;
@@ -65,7 +66,7 @@ function remove(Project $project, Config $config, Package $package, $package_url
 
     delete_recursive($package->root($project, $config)->to_string());
 
-    $meta = Meta::from_array(json_to_array($project->config_lock_file_path->to_string()));
+    $meta = Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()));
 
     unset($meta->packages[$package_url]);
     json_put($project->config_lock_file_path->to_string(), $meta->to_array());

@@ -6,6 +6,7 @@ use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\Project;
 
 function run(Project $project)
@@ -27,8 +28,8 @@ function run(Project $project)
         return;
     }
 
-    $composer_setting = json_to_array($composer_file);
-    $composer_lock_setting = json_to_array($composer_lock_file);
+    $composer_setting = Json\to_array($composer_file);
+    $composer_lock_setting = Json\to_array($composer_lock_file);
 
     if (isset($composer_setting['autoload']['psr-4'])) {
         $config['map'] = [];

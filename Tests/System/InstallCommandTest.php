@@ -2,6 +2,7 @@
 
 namespace Tests\System\InstallCommandTest;
 
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
@@ -29,7 +30,7 @@ test(
 
 function assert_config_file_content_not_changed($message)
 {
-    $config = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json')), true, JSON_THROW_ON_ERROR);
+    $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
     assert(
         isset($config['packages']['git@github.com:saeghe/released-package.git'])
@@ -40,7 +41,7 @@ function assert_config_file_content_not_changed($message)
 
 function assert_meta_file_content_not_changed($message)
 {
-    $meta = json_decode(file_get_contents(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json')), true, JSON_THROW_ON_ERROR);
+    $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/released-package.git'])

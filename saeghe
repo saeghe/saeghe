@@ -24,6 +24,7 @@ require Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php
 require Address::from_string(__DIR__ . '/Source/PhpFile.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/FileManager/File.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/FileManager/Directory.php')->to_string();
+require Address::from_string(__DIR__ . '/Source/FileManager/FileType/Json.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/Git/GitHub.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/Commands/Add.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/Commands/Build.php')->to_string();
@@ -43,8 +44,6 @@ use Saeghe\Cli\IO\Read;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
-use function Saeghe\Saeghe\Providers\GitHub\github_token;
-use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 $command = Read\command() ?? Read\parameter('command');
 
@@ -58,9 +57,6 @@ $project = makeProject(
     strlen($project) ? getcwd() . '/' . $project . '/' : getcwd() . '/',
     $command === 'build' ? Read\argument(2, 'development') : 'development'
 );
-
-$credential = json_to_array($project->credentials_path->to_string());
-github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
 
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run($project),
@@ -147,23 +143,9 @@ function array_insert_after($array, $key, array $additional): array
     return array_merge(array_slice($array, 0, $pos), $additional, array_slice($array, $pos));
 }
 
-function array_merge_json($array, string $path): array
-{
-    return array_merge($array, json_to_array($path));
-}
-
 function json_put(string $path, array $content): bool
 {
     return file_put_contents($path, json_encode($content, JSON_PRETTY_PRINT) . PHP_EOL) !== false;
-}
-
-function json_to_array(string $path, $default = []): array
-{
-    if (file_exists($path)) {
-        return json_decode(json: file_get_contents($path), associative: true, flags: JSON_THROW_ON_ERROR);
-    }
-
-    return $default;
 }
 
 function all_files_and_directories(string $origin): array
