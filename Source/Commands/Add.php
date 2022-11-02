@@ -6,6 +6,8 @@ use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
+use Saeghe\Saeghe\FileManager\File;
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
@@ -15,7 +17,7 @@ use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 function run(Project $project)
 {
-    $credential = json_to_array($project->credentials_path->to_string());
+    $credential = Json\to_array($project->credentials_path->to_string());
     github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
 
     $package_url = argument(2);
@@ -26,7 +28,7 @@ function run(Project $project)
         return;
     }
 
-    $config = Config::from_array(json_to_array($project->config_file_path->to_string()));
+    $config = Config::from_array(Json\to_array($project->config_file_path->to_string()));
 
     $package = array_reduce(
         $config->packages,
@@ -47,7 +49,11 @@ function run(Project $project)
         dir_make_recursive($project->root->append($config->packages_directory)->to_string());
     }
 
-    add($project, $config, $package, $package_url);
+    if (! add($project, $config, $package, $package_url)) {
+        error("Given $package_url URL is not a Saeghe package.");
+
+        return;
+    }
 
     $config->packages[$package_url] = $package;
     json_put($project->config_file_path->to_string(), $config->to_array());
@@ -55,15 +61,22 @@ function run(Project $project)
     success("Package $package_url has been added successfully.");
 }
 
-function add(Project $project, Config $config, Package $package, $package_url)
+function add(Project $project, Config $config, Package $package, $package_url): bool
 {
     $package->detect_hash();
+
+    if (! $package->file_exists('saeghe.config.json')) {
+        return false;
+    }
 
     if (! $package->is_downloaded($project, $config)) {
         $package->download($package->root($project, $config)->to_string());
     }
 
-    $meta = Meta::from_array(json_to_array($project->config_lock_file_path->to_string()));
+    $meta = File\exists($project->config_lock_file_path->to_string())
+        ? Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()))
+        : Meta::init();
+
     $is_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($package), false);
 
     if (! $is_in_meta) {
@@ -71,13 +84,15 @@ function add(Project $project, Config $config, Package $package, $package_url)
         json_put($project->config_lock_file_path->to_string(), $meta->to_array());
     }
 
-    $package_config = Config::from_array(json_to_array($package->config_path($project, $config)->to_string()));
+    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
 
     foreach ($package_config->packages as $sub_package_url => $sub_package) {
         $is_sub_package_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($sub_package), false);
 
         if (! $is_sub_package_in_meta) {
-            add($project, $config, $sub_package, $sub_package_url);
+            return add($project, $config, $sub_package, $sub_package_url);
         }
     }
+
+    return true;
 }

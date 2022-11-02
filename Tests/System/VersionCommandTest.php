@@ -9,7 +9,7 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe -v');
 
-        assert_success('Saeghe version 1.4.0', $output);
+        assert_success('Saeghe version 1.5.0', $output);
     }
 );
 
@@ -18,6 +18,6 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe --version');
 
-        assert_success('Saeghe version 1.4.0', $output);
+        assert_success('Saeghe version 1.5.0', $output);
     }
 );

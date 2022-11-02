@@ -18,16 +18,11 @@ test(
 );
 
 test(
-    title: 'it should add package to the project',
+    title: 'it should return error when given url is not a Saeghe package',
     case: function () {
-        $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
+        $output = shell_exec('php ' . root() . 'saeghe add https://github.com/symfony/thanks.git --project=TestRequirements/Fixtures/EmptyProject');
 
-        assert_success('Package git@github.com:saeghe/simple-package.git has been added successfully.', $output);
-        assert_config_file_created_for_simple_project('Config file is not created!' . $output);
-        assert_simple_package_added_to_config('Simple Package does not added to config file properly! ' . $output);
-        assert_packages_directory_created_for_empty_project('Package directory does not created.' . $output);
-        assert_simple_package_cloned('Simple package does not cloned!' . $output);
-        assert_meta_has_desired_data('Meta data is not what we want.' . $output);
+        assert_error('Given https://github.com/symfony/thanks.git URL is not a Saeghe package.', $output);
     },
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
@@ -36,41 +31,61 @@ test(
         flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
-
-test(
-    title: 'it should add package to the project without trailing .git',
-    case: function () {
-        $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package --project=TestRequirements/Fixtures/EmptyProject');
-
-        assert_simple_package_cloned('Simple package does not cloned!' . $output);
-    },
-    before: function () {
-        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
-    },
-    after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
-    }
-);
-
-test(
-    title: 'it should use same repo with git and https urls',
-    case: function () {
-        $output = shell_exec('php ' . root() . 'saeghe add https://github.com/saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
-
-        assert_error('Package https://github.com/saeghe/simple-package.git is already exists', $output);
-        $config = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json');
-        $meta = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json');
-        assert(count($config['packages']) === 1);
-        assert(count($meta['packages']) === 1);
-    },
-    before: function () {
-        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
-        shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
-    },
-    after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
-    }
-);
+//
+//test(
+//    title: 'it should add package to the project',
+//    case: function () {
+//        $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
+//
+//        assert_success('Package git@github.com:saeghe/simple-package.git has been added successfully.', $output);
+//        assert_config_file_created_for_simple_project('Config file is not created!' . $output);
+//        assert_simple_package_added_to_config('Simple Package does not added to config file properly! ' . $output);
+//        assert_packages_directory_created_for_empty_project('Package directory does not created.' . $output);
+//        assert_simple_package_cloned('Simple package does not cloned!' . $output);
+//        assert_meta_has_desired_data('Meta data is not what we want.' . $output);
+//    },
+//    before: function () {
+//        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
+//    },
+//    after: function () {
+//        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+//    }
+//);
+//
+//test(
+//    title: 'it should add package to the project without trailing .git',
+//    case: function () {
+//        $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package --project=TestRequirements/Fixtures/EmptyProject');
+//
+//        assert_simple_package_cloned('Simple package does not cloned!' . $output);
+//    },
+//    before: function () {
+//        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
+//    },
+//    after: function () {
+//        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+//    }
+//);
+//
+//test(
+//    title: 'it should use same repo with git and https urls',
+//    case: function () {
+//        $output = shell_exec('php ' . root() . 'saeghe add https://github.com/saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
+//
+//        assert_error('Package https://github.com/saeghe/simple-package.git is already exists', $output);
+//        $config = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json');
+//        $meta = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json');
+//        assert(count($config['packages']) === 1);
+//        assert(count($meta['packages']) === 1);
+//    },
+//    before: function () {
+//        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
+//        shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
+//    },
+//    after: function () {
+//        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+//    }
+//);
 
 function assert_config_file_created_for_simple_project($message)
 {

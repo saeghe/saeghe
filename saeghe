@@ -148,15 +148,6 @@ function json_put(string $path, array $content): bool
     return file_put_contents($path, json_encode($content, JSON_PRETTY_PRINT) . PHP_EOL) !== false;
 }
 
-function json_to_array(string $path, $default = []): array
-{
-    if (file_exists($path)) {
-        return json_decode(json: file_get_contents($path), associative: true, flags: JSON_THROW_ON_ERROR);
-    }
-
-    return $default;
-}
-
 function all_files_and_directories(string $origin): array
 {
     $filesAndDirectories = scandir($origin);

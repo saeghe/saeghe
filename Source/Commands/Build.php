@@ -7,6 +7,8 @@ use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\File;
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
 use Saeghe\Saeghe\Str;
@@ -17,8 +19,13 @@ function run(Project $project)
 {
     umask(0);
 
-    $config = Config::from_array(json_to_array($project->config_file_path->to_string()));
-    $meta = Meta::from_array(json_to_array($project->config_lock_file_path->to_string()));
+    $config = File\exists($project->config_file_path->to_string())
+        ? Config::from_array(Json\to_array($project->config_file_path->to_string()))
+        : Config::init();
+
+    $meta = File\exists($project->config_lock_file_path->to_string())
+        ? Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()))
+        : Meta::init();
 
     dir_clean($project->build_root->to_string());
     dir_find_or_create($project->build_root->append($config->packages_directory)->to_string());
@@ -52,7 +59,7 @@ function make_entry_points(Project $project, Config $config, array $replace_map,
 
 function add_executables(Project $project, Config $config, Package $package, array $replace_map, array $autoloads): void
 {
-    $package_config = Config::from_array(json_to_array($package->config_path($project, $config)->to_string()));
+    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
     foreach ($package_config->executables as $link_name => $source) {
         $target = $package->build_root($project, $config)->append($source);
         $link = $project->build_root->append($link_name);
@@ -67,7 +74,7 @@ function compile_packages(Project $project, Config $config, Package $package, ar
     dir_renew($project->build_root->append("{$config->packages_directory}/{$package->owner}/{$package->repo}")->to_string());
 
     $files_and_directories = should_compile_files_and_directories_for_package($project, $config, $package);
-    $package_config = Config::from_array(json_to_array($package->config_path($project, $config)->to_string()));
+    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
     $package_root = $package->root($project, $config);
     $package_build_root = $package->build_root($project, $config);
 
@@ -235,7 +242,7 @@ function make_replace_map(Project $project, Config $config, Meta $meta): array
     $replace_map = [];
 
     $map_package_namespaces = function (Package $package) use (&$replace_map, $project, $config) {
-        $package_config = Config::from_array(json_to_array($package->config_path($project, $config)->to_string()));
+        $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
         $package_root = $package->build_root($project, $config);
 
         foreach ($package_config->map as $namespace => $source) {
@@ -256,7 +263,7 @@ function make_replace_map(Project $project, Config $config, Meta $meta): array
 
 function should_compile_files_and_directories_for_package(Project $project, Config $config, Package $package): array
 {
-    $package_config = Config::from_array(json_to_array($package->config_path($project, $config)->to_string()));
+    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
     $package_root = $package->root($project, $config);
 
     $excluded_paths = array_map(

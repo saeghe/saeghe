@@ -45,13 +45,13 @@ test(
 test(
     title: 'it should update to the given version',
     case: function () {
-        $output = shell_exec('php ' . root() . 'saeghe update git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
+        $output = shell_exec('php ' . root() . 'saeghe update git@github.com:saeghe/released-package.git --version=v1.0.5 --project=TestRequirements/Fixtures/EmptyProject');
 
         assert_given_version_added('Package did not updated to given package version. ' . $output);
     },
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
-        shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.2 --project=TestRequirements/Fixtures/EmptyProject');
+        shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
         flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
@@ -64,7 +64,7 @@ function assert_version_upgraded_in_config_file($message)
 
     assert(
         isset($config['packages']['git@github.com:saeghe/released-package.git'])
-        && 'v1.0.5' === $config['packages']['git@github.com:saeghe/released-package.git'],
+        && 'v1.0.6' === $config['packages']['git@github.com:saeghe/released-package.git'],
         $message
     );
 }
@@ -75,7 +75,7 @@ function assert_meta_updated($message)
 
     assert(
         isset($meta['packages']['git@github.com:saeghe/released-package.git'])
-        && 'v1.0.5' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
+        && 'v1.0.6' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
         && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
         && '5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
@@ -90,12 +90,12 @@ function assert_given_version_added($message)
 
     assert(
         isset($config['packages']['git@github.com:saeghe/released-package.git'])
-        && 'v1.0.3' === $config['packages']['git@github.com:saeghe/released-package.git']
+        && 'v1.0.5' === $config['packages']['git@github.com:saeghe/released-package.git']
         && isset($meta['packages']['git@github.com:saeghe/released-package.git'])
-        && 'v1.0.3' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
+        && 'v1.0.5' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
         && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
         && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
-        && '9e9b796915596f7c5e0b91d2f9fa5f916a9b5cc8' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
+        && '5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
         $message
     );
 }

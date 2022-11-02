@@ -5,6 +5,7 @@ namespace Saeghe\Saeghe\Commands\Update;
 use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
+use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
@@ -16,13 +17,13 @@ use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 function run(Project $project)
 {
-    $credential = json_to_array($project->credentials_path->to_string());
+    $credential = Json\to_array($project->credentials_path->to_string());
     github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
 
     $given_package_url = argument(2);
     $version = parameter('version');
 
-    $config = Config::from_array(json_to_array($project->config_file_path->to_string()));
+    $config = Config::from_array(Json\to_array($project->config_file_path->to_string()));
 
     $package = array_reduce(
         $config->packages,

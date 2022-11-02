@@ -60,7 +60,7 @@ function get_json(string $api_sub_url): array
     $ch = curl_init(GITHUB_API_URL . $api_sub_url);
     curl_setopt($ch, CURLOPT_USERAGENT, 'Saeghe');
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Accept: application/vnd.github+json",
+        "Accept: application/vnd.github+raw",
         "Authorization: Bearer $token",
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -103,7 +103,7 @@ function download($destination, $owner, $repo, $version): bool
     $token = github_token();
     $parent_directory = dirname($destination);
 
-    if (! file_exists($parent_directory)) {
+    if (! \file_exists($parent_directory)) {
         mkdir($parent_directory, 0755, true);
     }
 
@@ -148,4 +148,9 @@ function clone_to($destination, $owner, $repo): bool
     $output = passthru("git clone $github_ssh_url$owner/$repo.git $destination");
 
     return  $output === null;
+}
+
+function file_exists(string $owner, string $repo, string $hash, string $path): bool
+{
+    return false !== @file_get_contents("https://raw.githubusercontent.com/$owner/$repo/$hash/$path");
 }
