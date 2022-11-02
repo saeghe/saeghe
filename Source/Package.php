@@ -4,6 +4,7 @@ namespace Saeghe\Saeghe;
 
 use Saeghe\Saeghe\FileManager\Address;
 use Saeghe\Saeghe\Git\Repository;
+use Saeghe\Saeghe\FileManager\Directory;
 
 class Package extends Repository
 {
@@ -20,5 +21,10 @@ class Package extends Repository
     public function root(Project $project, Config $config): Address
     {
         return $project->root->append("{$config->packages_directory}/{$this->owner}/{$this->repo}");
+    }
+
+    public function is_downloaded(Project $project, Config $config): bool
+    {
+        return Directory\exists($this->root($project, $config)->to_string());
     }
 }

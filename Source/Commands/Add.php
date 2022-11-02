@@ -57,24 +57,26 @@ function run(Project $project)
 
 function add(Project $project, Config $config, Package $package, $package_url)
 {
-    $package->detect_hash()->download($package->root($project, $config)->to_string());
+    $package->detect_hash();
+
+    if (! $package->is_downloaded($project, $config)) {
+        $package->download($package->root($project, $config)->to_string());
+    }
 
     $meta = Meta::from_array(json_to_array($project->config_lock_file_path->to_string()));
-    $meta->packages[$package_url] = $package;
-    json_put($project->config_lock_file_path->to_string(), $meta->to_array());
+    $is_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($package), false);
+
+    if (! $is_in_meta) {
+        $meta->packages[$package_url] = $package;
+        json_put($project->config_lock_file_path->to_string(), $meta->to_array());
+    }
 
     $package_config = Config::from_array(json_to_array($package->config_path($project, $config)->to_string()));
 
     foreach ($package_config->packages as $sub_package_url => $sub_package) {
-        $is_sub_package_exists = false;
-        foreach ($meta->packages as $installed_package_url => $installed_package) {
-            if ($installed_package->is($sub_package)) {
-                $is_sub_package_exists = true;
-                break;
-            }
-        }
+        $is_sub_package_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($sub_package), false);
 
-        if (! $is_sub_package_exists) {
+        if (! $is_sub_package_in_meta) {
             add($project, $config, $sub_package, $sub_package_url);
         }
     }
