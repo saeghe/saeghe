@@ -60,7 +60,7 @@ function get_json(string $api_sub_url): array
     $ch = curl_init(GITHUB_API_URL . $api_sub_url);
     curl_setopt($ch, CURLOPT_USERAGENT, 'Saeghe');
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Accept: application/vnd.github+raw",
+        "Accept: application/vnd.github+json",
         "Authorization: Bearer $token",
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
