@@ -2,6 +2,7 @@
 
 namespace Saeghe\Saeghe\Providers\GitHub;
 
+use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use function Saeghe\Saeghe\FileManager\File\delete;
 
 const GITHUB_DOMAIN = 'github.com';
@@ -67,7 +68,13 @@ function get_json(string $api_sub_url): array
     $output = curl_exec($ch);
     curl_close($ch);
 
-    return json_decode($output, true);
+    $response = json_decode($output, true);
+
+    if (isset($response['message']) && $response['message'] === 'Bad credentials') {
+        throw new InvalidTokenException('GitHub token is not valid.');
+    }
+
+    return $response;
 }
 
 function has_release($owner, $repo): bool

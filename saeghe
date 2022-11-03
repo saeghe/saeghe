@@ -1,47 +1,13 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'Str.php';
-require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Path.php';
-require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Address.php';
-
-use Saeghe\Saeghe\FileManager\Address;
-
-spl_autoload_register(function ($class) {
-    $classMap = [
-        'Saeghe\Saeghe\Git\Repository' => Address::from_string(__DIR__ . '/Source/Git/Repository.php')->to_string(),
-        'Saeghe\Saeghe\Config' => Address::from_string(__DIR__ . '/Source/Config.php')->to_string(),
-        'Saeghe\Saeghe\Meta' => Address::from_string(__DIR__ . '/Source/Meta.php')->to_string(),
-        'Saeghe\Saeghe\Package' => Address::from_string(__DIR__ . '/Source/Package.php')->to_string(),
-        'Saeghe\Saeghe\Project' => Address::from_string(__DIR__ . '/Source/Project.php')->to_string(),
-    ];
-
-    require_once $classMap[$class];
-});
-
-require Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php')->to_string();
-require Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/PhpFile.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/FileManager/File.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/FileManager/Directory.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/FileManager/FileType/Json.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Git/GitHub.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Add.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Build.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Credential.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Flush.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Help.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Init.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Install.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Man.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Migrate.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Remove.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Update.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Version.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Watch.php')->to_string();
+require __DIR__ . DIRECTORY_SEPARATOR . 'Import.php';
 
 use Saeghe\Cli\IO\Read;
+use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use Saeghe\Saeghe\Project;
+use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
 
@@ -57,6 +23,12 @@ $project = makeProject(
     strlen($project) ? getcwd() . '/' . $project . '/' : getcwd() . '/',
     $command === 'build' ? Read\argument(2, 'development') : 'development'
 );
+
+set_exception_handler(function (\Throwable $exception) {
+    if ($exception instanceof InvalidTokenException) {
+        error('The GitHub token is not valid. Either, you didn\'t set one yet, or it is not valid. Please use the `credential` command to set a valid token.');
+    }
+});
 
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run($project),
