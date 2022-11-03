@@ -3,9 +3,29 @@
 namespace Tests\System\InstallCommandTest;
 
 use Saeghe\Saeghe\FileManager\FileType\Json;
+use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\flush;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
+
+test(
+    title: 'it should show error message when the credential file is not exists',
+    case: function () {
+        $output = shell_exec('php ' . root() . 'saeghe install --project=TestRequirements/Fixtures/EmptyProject');
+
+        assert_error('There is no credential file. Please use the `credential` command to add your token.', $output);
+    },
+    before: function () {
+        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
+        shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
+        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
+        rename(root() . 'credentials.json', root() . 'credentials.json.back');
+    },
+    after: function () {
+        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        rename(root() . 'credentials.json.back', root() . 'credentials.json');
+    },
+);
 
 test(
     title: 'it should install packages from lock file',

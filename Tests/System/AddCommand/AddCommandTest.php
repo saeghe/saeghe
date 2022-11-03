@@ -33,6 +33,23 @@ test(
 );
 
 test(
+    title: 'it should show error message when there is no credential files',
+    case: function () {
+        $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
+
+        assert_error('There is no credential file. Please use the `credential` command to add your token.', $output);
+    },
+    before: function () {
+        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
+        rename(root() . 'credentials.json', root() . 'credentials.json.back');
+    },
+    after: function () {
+        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        rename(root() . 'credentials.json.back', root() . 'credentials.json');
+    }
+);
+
+test(
     title: 'it should add package to the project',
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
