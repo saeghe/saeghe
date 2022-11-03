@@ -13,7 +13,6 @@ use function Saeghe\Saeghe\Providers\GitHub\file_exists;
 use function Saeghe\Saeghe\Providers\GitHub\find_latest_commit_hash;
 use function Saeghe\Saeghe\Providers\GitHub\find_latest_version;
 use function Saeghe\Saeghe\Providers\GitHub\find_version_hash;
-use function Saeghe\Saeghe\Providers\GitHub\get_json;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use function Saeghe\Saeghe\Providers\GitHub\has_release;
 use function Saeghe\Saeghe\Providers\GitHub\is_ssh;
@@ -58,17 +57,6 @@ test(
         $token = 'set another token';
         assert(github_token($token) === $token);
         assert(github_token() === $token);
-    }
-);
-
-test(
-    title: 'it should get json response from github api',
-    case: function () {
-        assert('Saeghe package manager' === get_json('repos/saeghe/saeghe')['description']);
-    },
-    before: function () {
-        $credentials = Json\to_array(realpath(root() . 'credentials.json'));
-        github_token($credentials[GITHUB_DOMAIN]['token']);
     }
 );
 

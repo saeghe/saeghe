@@ -34,8 +34,8 @@ test(
 
         assert_success('Packages has been installed successfully.', $output);
         assert_config_file_content_not_changed('Config file has been changed!' . $output);
-        assert_meta_file_content_not_changed('Released Package meta data does not added to meta file properly! ' . $output);
-        assert_package_exists_in_packages_directory('Package does not exist in the packages directory.' . $output);
+        assert_meta_file_content_not_changed('Released Package metadata does not added to meta file properly! ' . $output);
+        assert_package_exists_in_packages_directory('Package does not exist in the packages\' directory.' . $output);
         assert_zip_file_deleted('Zip file has not been deleted.' . $output);
     },
     before: function () {
