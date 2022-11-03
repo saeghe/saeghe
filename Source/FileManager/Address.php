@@ -42,4 +42,9 @@ class Address
 
         return $this->string;
     }
+
+    public function exists(): bool
+    {
+        return File\exists($this->to_string());
+    }
 }

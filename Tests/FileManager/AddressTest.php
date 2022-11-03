@@ -177,3 +177,11 @@ test(
         );
     }
 );
+
+test(
+    title: 'it should check if the given file exists',
+    case: function () {
+        assert(Address::from_string(__FILE__)->exists());
+        assert(! Address::from_string(__FILE__)->append('not_exists.txt')->exists());
+    }
+);

@@ -17,6 +17,12 @@ use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 function run(Project $project)
 {
+    if (! $project->credentials_path->exists()) {
+        error('There is no credential file. Please use the `credential` command to add your token.');
+
+        return;
+    }
+
     $credential = Json\to_array($project->credentials_path->to_string());
     github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
 
