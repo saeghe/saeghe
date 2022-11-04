@@ -12,19 +12,10 @@ use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\success;
-use function Saeghe\Saeghe\Providers\GitHub\github_token;
-use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 function run(Project $project)
 {
-    if (! $project->credentials_path->exists()) {
-        error('There is no credential file. Please use the `credential` command to add your token.');
-
-        return;
-    }
-
-    $credential = Json\to_array($project->credentials_path->to_string());
-    github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
+    $project->set_env_credentials();
 
     $package_url = argument(2);
     $version = parameter('version');
