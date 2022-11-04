@@ -38,11 +38,6 @@ jobs:
           git submodule init
           git submodule update
 
-      - name: Make required directories
-        run: |
-          mkdir /home/runner/work/saeghe/saeghe/TestRequirements\Fixtures\EmptyProject
-          mkdir /home/runner/work/saeghe/saeghe/Tests\PlayGround
-
       - name: Set Credentials
         run: php saeghe credential github.com ${{ secrets.GITHUB_TOKEN }}
 
