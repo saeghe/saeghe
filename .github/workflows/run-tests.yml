@@ -40,8 +40,8 @@ jobs:
 
       - name: Make required directories
         run: |
-          mkdir TestRequirements\Fixtures\EmptyProject
-          mkdir Tests\PlayGround
+          mkdir /home/runner/work/saeghe/saeghe/TestRequirements\Fixtures\EmptyProject
+          mkdir /home/runner/work/saeghe/saeghe/Tests\PlayGround
 
       - name: Set Credentials
         run: php saeghe credential github.com ${{ secrets.GITHUB_TOKEN }}
