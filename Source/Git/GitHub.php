@@ -47,7 +47,7 @@ function extract_repo($package_url): string
 
 function github_token(?string $token = null): string
 {
-    if ($token) {
+    if (! is_null($token)) {
         putenv('GITHUB_TOKEN=' . $token);
     }
 

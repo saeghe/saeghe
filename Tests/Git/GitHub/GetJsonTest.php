@@ -31,6 +31,6 @@ test(
         }
     },
     before: function () {
-        github_token('not valid');
+        github_token('');
     }
 );
