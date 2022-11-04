@@ -61,7 +61,7 @@ function make_entry_points(Project $project, Config $config, array $replace_map,
 
 function add_executables(Project $project, Config $config, Package $package, array $replace_map, array $autoloads): void
 {
-    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
+    $package_config = $package->config($project, $config);
     foreach ($package_config->executables as $link_name => $source) {
         $target = $package->build_root($project, $config)->append($source);
         $link = $project->build_root->append($link_name);
@@ -76,7 +76,7 @@ function compile_packages(Project $project, Config $config, Package $package, ar
     Directory\renew_recursive($project->build_root->append("{$config->packages_directory}/{$package->owner}/{$package->repo}")->to_string());
 
     $files_and_directories = should_compile_files_and_directories_for_package($project, $config, $package);
-    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
+    $package_config = $package->config($project, $config);
     $package_root = $package->root($project, $config);
     $package_build_root = $package->build_root($project, $config);
 
@@ -244,7 +244,7 @@ function make_replace_map(Project $project, Config $config, Meta $meta): array
     $replace_map = [];
 
     $map_package_namespaces = function (Package $package) use (&$replace_map, $project, $config) {
-        $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
+        $package_config = $package->config($project, $config);
         $package_root = $package->build_root($project, $config);
 
         foreach ($package_config->map as $namespace => $source) {
@@ -265,7 +265,7 @@ function make_replace_map(Project $project, Config $config, Meta $meta): array
 
 function should_compile_files_and_directories_for_package(Project $project, Config $config, Package $package): array
 {
-    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
+    $package_config = $package->config($project, $config);
     $package_root = $package->root($project, $config);
 
     $excluded_paths = array_map(
