@@ -29,6 +29,13 @@ class Address
         return new static(Str\before_last_occurrence($this->string, DIRECTORY_SEPARATOR));
     }
 
+    public function leaf(): string
+    {
+        $leaf = Str\after_last_occurrence($this->string, DIRECTORY_SEPARATOR);
+
+        return $leaf ?? $this->string;
+    }
+
     public function append(string $path_string): static
     {
         return static::from_string($this->string . DIRECTORY_SEPARATOR . $path_string);

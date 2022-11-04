@@ -9,8 +9,6 @@ use Saeghe\Saeghe\FileManager\Address;
 use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Write\error;
-use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
 
 require Address::from_string(__DIR__ . '/Source/Commands/Add.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/Commands/Build.php')->to_string();
@@ -74,49 +72,6 @@ function makeProject($projectRoot, $environment): Project
         config_lock_file_path: Address::from_string($projectRoot . 'saeghe.config-lock.json'),
         credentials_path: Address::from_string(__DIR__ .'/credentials.json'),
     );
-}
-
-function dir_find_or_create(string $path): string
-{
-    if (! file_exists($path)) {
-        mkdir($path);
-    }
-
-    return $path;
-}
-
-function dir_preserve_copy(string $origin, string $destination): bool
-{
-    return mkdir($destination, fileperms($origin) & 0x0FFF);
-}
-
-function dir_make_recursive(string $path, $permission = 0755): bool
-{
-    return mkdir($path, $permission, true);
-}
-
-function dir_renew(string $path): string
-{
-    if (file_exists($path)) {
-        delete_recursive($path);
-    }
-
-    dir_make_recursive($path);
-
-    return $path;
-}
-
-function dir_clean(string $path): string
-{
-    $path = $path . DIRECTORY_SEPARATOR;
-
-    if (! file_exists($path)) {
-        dir_make_recursive($path);
-    } else {
-        flush($path);
-    }
-
-    return $path;
 }
 
 function file_preserve_modify(string $origin, string $destination, mixed $content): void

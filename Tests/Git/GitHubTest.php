@@ -4,7 +4,7 @@ namespace Tests\GitTest\GitHubTest;
 
 use Saeghe\Saeghe\FileManager\Address;
 use Saeghe\Saeghe\FileManager\FileType\Json;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\Providers\GitHub\clone_to;
 use function Saeghe\Saeghe\Providers\GitHub\download;
 use function Saeghe\Saeghe\Providers\GitHub\extract_owner;
@@ -132,7 +132,7 @@ test(
         return $packages_directory;
     },
     after: function (Address $packages_directory) {
-        flush($packages_directory->parent()->parent()->to_string());
+        clean($packages_directory->parent()->parent()->to_string());
     }
 );
 
@@ -157,7 +157,7 @@ test(
         return $packages_directory;
     },
     after: function (Address $packages_directory) {
-        flush($packages_directory->parent()->parent()->to_string());
+        clean($packages_directory->parent()->parent()->to_string());
     }
 );
 

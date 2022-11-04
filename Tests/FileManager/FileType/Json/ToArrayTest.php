@@ -3,7 +3,7 @@
 namespace Tests\FileManager\FileType\Json\ToArrayTest;
 
 use Saeghe\Saeghe\FileManager\Address;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\FileType\Json\to_array;
 
 test(
@@ -20,6 +20,6 @@ test(
         return $file;
     },
     after: function (Address $file) {
-        flush($file->parent()->to_string());
+        clean($file->parent()->to_string());
     }
 );

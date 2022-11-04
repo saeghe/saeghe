@@ -185,3 +185,12 @@ test(
         assert(! Address::from_string(__FILE__)->append('not_exists.txt')->exists());
     }
 );
+
+test(
+    title: 'it should detect the leaf',
+    case: function () {
+        assert(Address::from_string('/')->to_string() === Address::from_string('/')->leaf());
+        assert('AddressTest.php' === Address::from_string(__FILE__)->leaf());
+        assert('FileManager' === Address::from_string(__DIR__)->leaf());
+    }
+);

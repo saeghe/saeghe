@@ -4,7 +4,7 @@ namespace Tests\System\AddComand\AddReleasedPackageTest;
 
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\TestRunner\Assertions\File;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
@@ -23,7 +23,7 @@ test(
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
@@ -38,7 +38,7 @@ test(
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 

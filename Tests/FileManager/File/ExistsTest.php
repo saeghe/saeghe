@@ -4,7 +4,7 @@ namespace Tests\FileManager\File\ExistsTest;
 
 use Saeghe\Saeghe\FileManager\Address;
 use function Saeghe\Saeghe\FileManager\File\exists;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 
 test(
     title: 'it should return false when file is not exists',
@@ -29,7 +29,7 @@ test(
         return $file;
     },
     after: function (Address $file) {
-        flush($file->parent()->to_string());
+        clean($file->parent()->to_string());
     }
 );
 
@@ -47,6 +47,6 @@ test(
         return $file;
     },
     after: function (Address $file) {
-        flush($file->parent()->to_string());
+        clean($file->parent()->to_string());
     }
 );

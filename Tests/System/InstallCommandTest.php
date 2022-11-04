@@ -5,7 +5,7 @@ namespace Tests\System\InstallCommandTest;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
@@ -20,12 +20,12 @@ test(
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
         rename(root() . 'credentials.json', root() . 'credentials.json.back');
         github_token('');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
         rename(root() . 'credentials.json.back', root() . 'credentials.json');
     },
 );
@@ -40,12 +40,12 @@ test(
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
         rename(root() . 'credentials.json', root() . 'credentials.json.back');
         github_token('');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
         rename(root() . 'credentials.json.back', root() . 'credentials.json');
     },
 );
@@ -60,13 +60,13 @@ test(
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
         $credential = Json\to_array(root() . 'credentials.json');
         github_token($credential[GITHUB_DOMAIN]['token']);
         rename(root() . 'credentials.json', root() . 'credentials.json.back');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
         rename(root() . 'credentials.json.back', root() . 'credentials.json');
     },
 );
@@ -85,10 +85,10 @@ test(
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     },
 );
 

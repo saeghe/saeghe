@@ -6,6 +6,7 @@ use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
+use Saeghe\Saeghe\FileManager\Directory;
 use Saeghe\Saeghe\FileManager\File;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\parameter;
@@ -43,7 +44,7 @@ function run(Project $project)
     $version ? $package->version($version) : $package->latest_version();
 
     if (! file_exists($project->root->append($config->packages_directory)->to_string())) {
-        dir_make_recursive($project->root->append($config->packages_directory)->to_string());
+        Directory\make_recursive($project->root->append($config->packages_directory)->to_string());
     }
 
     $package->detect_hash();

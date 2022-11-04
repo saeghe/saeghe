@@ -5,7 +5,7 @@ namespace Tests\System\UpdateCommandTest;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
@@ -24,7 +24,7 @@ test(
         github_token('');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
         rename(root() . 'credentials.json.back', root() . 'credentials.json');
     }
 );
@@ -44,7 +44,7 @@ test(
         rename(root() . 'credentials.json', root() . 'credentials.json.back');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
         rename(root() . 'credentials.json.back', root() . 'credentials.json');
     }
 );
@@ -67,7 +67,7 @@ test(
         github_token('');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
         rename(root() . 'credentials.json.back', root() . 'credentials.json');
     }
 );
@@ -86,7 +86,7 @@ test(
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
@@ -102,7 +102,7 @@ test(
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
@@ -118,7 +118,7 @@ test(
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 

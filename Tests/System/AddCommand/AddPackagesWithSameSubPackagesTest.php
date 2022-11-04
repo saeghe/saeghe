@@ -4,7 +4,7 @@ namespace Tests\System\AddCommand\AddPackagesWithSameSubPackagesTest;
 
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
@@ -34,6 +34,6 @@ test(
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/test-runner.git --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );

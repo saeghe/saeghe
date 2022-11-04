@@ -2,7 +2,7 @@
 
 namespace Tests\System\WatchCommandTest;
 
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
@@ -30,6 +30,6 @@ test(
         mkdir(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Source'));
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );

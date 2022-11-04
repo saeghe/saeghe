@@ -4,7 +4,7 @@ namespace Tests\System\AddCommand\AddUsingHttpsPath;
 
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\TestRunner\Assertions\File;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
@@ -22,7 +22,7 @@ test(
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
@@ -34,11 +34,11 @@ test(
         assert_http_package_cloned('Http package does not cloned!' . $output);
     },
     before: function () {
-        flush(root() . 'TestRequirements/Fixtures/EmptyProject');
+        clean(root() . 'TestRequirements/Fixtures/EmptyProject');
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(root() . 'TestRequirements/Fixtures/EmptyProject');
+        clean(root() . 'TestRequirements/Fixtures/EmptyProject');
     }
 );
 

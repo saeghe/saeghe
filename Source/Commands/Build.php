@@ -7,6 +7,7 @@ use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\Directory;
 use Saeghe\Saeghe\FileManager\File;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\PhpFile;
@@ -27,8 +28,9 @@ function run(Project $project)
         ? Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()))
         : Meta::init();
 
-    dir_clean($project->build_root->to_string());
-    dir_find_or_create($project->build_root->append($config->packages_directory)->to_string());
+    Directory\renew_recursive($project->build_root->to_string());
+
+    Directory\exists_or_create($project->build_root->append($config->packages_directory)->to_string());
 
     $replace_map = make_replace_map($project, $config, $meta);
 
@@ -71,7 +73,7 @@ function add_executables(Project $project, Config $config, Package $package, arr
 
 function compile_packages(Project $project, Config $config, Package $package, array $replace_map): void
 {
-    dir_renew($project->build_root->append("{$config->packages_directory}/{$package->owner}/{$package->repo}")->to_string());
+    Directory\renew_recursive($project->build_root->append("{$config->packages_directory}/{$package->owner}/{$package->repo}")->to_string());
 
     $files_and_directories = should_compile_files_and_directories_for_package($project, $config, $package);
     $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
@@ -95,7 +97,7 @@ function compile_project_files(Project $project, Config $config, array $replace_
 function compile(Config $config, Address $origin, Address $destination, array $replace_map): void
 {
     if (is_dir($origin->to_string())) {
-        dir_preserve_copy($origin->to_string(), $destination->to_string());
+        Directory\preserve_copy($origin->to_string(), $destination->to_string());
         $sub_files_and_directories = all_files_and_directories($origin->to_string());
         foreach ($sub_files_and_directories as $sub_file_or_directory) {
             compile($config, $origin->append($sub_file_or_directory), $destination->append($sub_file_or_directory), $replace_map);

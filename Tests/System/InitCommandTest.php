@@ -4,7 +4,7 @@ namespace Tests\System\InitCommandTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 $initial_content = <<<EOD
@@ -55,7 +55,7 @@ test(
         assert_success('Project has been initialized.', $output);
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
@@ -74,6 +74,6 @@ test(
         File\assert_content($config_path, $initial_content_with_packages_directory, 'Config file content is not correct after running init!');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );

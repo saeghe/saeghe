@@ -3,7 +3,7 @@
 namespace Tests\System\RemovePackageAndLeaveUsedSubPackageTest;
 
 use Saeghe\Saeghe\FileManager\FileType\Json;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
@@ -22,7 +22,7 @@ test(
     },
     after: function () {
         shell_exec('php ' . root() . 'saeghe remove git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
