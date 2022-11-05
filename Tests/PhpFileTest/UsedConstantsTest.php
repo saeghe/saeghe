@@ -54,7 +54,7 @@ class MyClass
 }
 EOD;
 
-        assert(
+        assert_true(
             [
                 'Application\ClassInSameNamespace\CONST_C',
                 'Application\AnyNamespace\UsedClass\CONST_D',

@@ -1,25 +1,25 @@
 <?php
 
-namespace Tests\FileManager\Directory\FlushTest;
+namespace Tests\FileManager\Directory\CleanTest;
 
 use Saeghe\Saeghe\FileManager\Address;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 
 test(
-    title: 'it should flush directory',
+    title: 'it should clean directory',
     case: function (Address $directory) {
-        flush($directory->to_string());
+        clean($directory->to_string());
 
-        assert(file_exists($directory->to_string()), 'flush is not working!');
-        assert(
+        assert_true(file_exists($directory->to_string()), 'clean is not working!');
+        assert_true(
             scandir($directory->to_string()) === ['.', '..'],
-            'flush is not working and there are some items in the directory!'
+            'clean is not working and there are some items in the directory!'
         );
 
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(root() . 'Tests/PlayGround/Flush');
+        $directory = Address::from_string(root() . 'Tests/PlayGround/Clean');
         $subDirectory = $directory->append('SubDirectory');
         mkdir($directory->to_string());
         mkdir($subDirectory->to_string());

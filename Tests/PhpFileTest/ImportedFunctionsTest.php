@@ -18,7 +18,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
             'MyApp\OtherNamespace\functionA' => 'functionA'
         ] === $php_file->imported_functions());
     }
@@ -38,7 +38,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'MyApp\OtherNamespace\functionA' => 'functionA',
                 'MyApp\OtherNamespace\functionB' => 'functionB',
             ] === $php_file->imported_functions()
@@ -62,7 +62,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'MyApp\OtherNamespace\functionA' => 'functionA',
                 'MyApp\OtherNamespace\functionB' => 'functionB',
                 'MyApp\OtherNamespace\functionC' => 'C',
@@ -90,7 +90,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'MyApp\OtherNamespace\functionA' => 'functionA',
                 'MyApp\OtherNamespace\functionB' => 'functionB',
                 'MyApp\OtherNamespace\functionC' => 'C',

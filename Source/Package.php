@@ -3,8 +3,9 @@
 namespace Saeghe\Saeghe;
 
 use Saeghe\Saeghe\FileManager\Address;
-use Saeghe\Saeghe\Git\Repository;
 use Saeghe\Saeghe\FileManager\Directory;
+use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Git\Repository;
 
 class Package extends Repository
 {
@@ -26,5 +27,12 @@ class Package extends Repository
     public function is_downloaded(Project $project, Config $config): bool
     {
         return Directory\exists($this->root($project, $config)->to_string());
+    }
+
+    public function config(Project $project, Config $config): Config
+    {
+        return $this->config_path($project, $config)->exists()
+            ? Config::from_array(Json\to_array($this->config_path($project, $config)->to_string()))
+            : Config::init();
     }
 }

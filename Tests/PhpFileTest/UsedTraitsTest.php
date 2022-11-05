@@ -19,7 +19,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([] === $php_file->used_traits());
+        assert_true([] === $php_file->used_traits());
     }
 );
 
@@ -40,7 +40,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\MyTrait'] === $php_file->used_traits());
+        assert_true(['MyApp\MyTrait'] === $php_file->used_traits());
     }
 );
 
@@ -64,7 +64,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\MyTrait', 'Application\OtherNamespace\MyOtherTrait'] === $php_file->used_traits());
+        assert_true(['MyApp\MyTrait', 'Application\OtherNamespace\MyOtherTrait'] === $php_file->used_traits());
     }
 );
 
@@ -93,7 +93,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
             'MyApp\MyTrait',
             'Application\OtherNamespace\MyOtherTrait',
             'Application\Traits\ATrait',

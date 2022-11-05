@@ -13,3 +13,13 @@ function root(): string
 {
     return getcwd() . DIRECTORY_SEPARATOR;
 }
+
+function assert_true(bool $actual, $description = null)
+{
+    assert(true === $actual, $description);
+}
+
+function assert_false(bool $actual, $description = null)
+{
+    assert_true(! $actual, $description);
+}

@@ -3,7 +3,7 @@
 namespace Tests\System\RemovePackageAndLeaveUsedSubPackageTest;
 
 use Saeghe\Saeghe\FileManager\FileType\Json;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 
 test(
@@ -22,16 +22,17 @@ test(
     },
     after: function () {
         shell_exec('php ' . root() . 'saeghe remove git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
 function assert_desired_data_in_packages_directory($message)
 {
     clearstatcache();
-    assert(file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/simple-package'))
-        && ! file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/complex-package'))
-    ,
+    assert_true((
+            file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/simple-package'))
+            && ! file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/complex-package'))
+        ),
         $message
     );
 }
@@ -40,9 +41,10 @@ function assert_config_file_is_clean($message)
 {
     $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
-    assert(
-        isset($config['packages']['git@github.com:saeghe/simple-package.git'])
-        && ! isset($config['packages']['git@github.com:saeghe/complex-package.git']),
+    assert_true((
+            isset($config['packages']['git@github.com:saeghe/simple-package.git'])
+            && ! isset($config['packages']['git@github.com:saeghe/complex-package.git'])
+        ),
         $message
     );
 }
@@ -51,5 +53,5 @@ function assert_meta_is_clean($message)
 {
     $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
-    assert(isset($config['packages']['git@github.com:saeghe/simple-package.git']), $message);
+    assert_true(isset($config['packages']['git@github.com:saeghe/simple-package.git']), $message);
 }

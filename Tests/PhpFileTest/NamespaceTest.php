@@ -19,7 +19,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(null === $php_file->namespace());
+        assert_true(null === $php_file->namespace());
     }
 );
 
@@ -40,7 +40,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert('MyApp' === $php_file->namespace());
+        assert_true('MyApp' === $php_file->namespace());
     }
 );
 
@@ -61,6 +61,6 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert('MyApp\SubNamespace' === $php_file->namespace());
+        assert_true('MyApp\SubNamespace' === $php_file->namespace());
     }
 );

@@ -5,7 +5,7 @@ namespace Tests\System\UpdateCommandTest;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\Saeghe\FileManager\Directory\flush;
+use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Path\realpath;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
@@ -24,7 +24,7 @@ test(
         github_token('');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
         rename(root() . 'credentials.json.back', root() . 'credentials.json');
     }
 );
@@ -44,7 +44,7 @@ test(
         rename(root() . 'credentials.json', root() . 'credentials.json.back');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
         rename(root() . 'credentials.json.back', root() . 'credentials.json');
     }
 );
@@ -67,7 +67,7 @@ test(
         github_token('');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
         rename(root() . 'credentials.json.back', root() . 'credentials.json');
     }
 );
@@ -86,7 +86,7 @@ test(
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
@@ -102,7 +102,7 @@ test(
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
@@ -118,7 +118,7 @@ test(
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
-        flush(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
 
@@ -126,9 +126,10 @@ function assert_version_upgraded_in_config_file($message)
 {
     $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
-    assert(
-        isset($config['packages']['git@github.com:saeghe/released-package.git'])
-        && 'v1.0.6' === $config['packages']['git@github.com:saeghe/released-package.git'],
+    assert_true((
+            isset($config['packages']['git@github.com:saeghe/released-package.git'])
+            && 'v1.0.6' === $config['packages']['git@github.com:saeghe/released-package.git']
+        ),
         $message
     );
 }
@@ -137,12 +138,13 @@ function assert_meta_updated($message)
 {
     $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
-    assert(
-        isset($meta['packages']['git@github.com:saeghe/released-package.git'])
-        && 'v1.0.6' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
-        && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
-        && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
-        && '5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
+    assert_true((
+            isset($meta['packages']['git@github.com:saeghe/released-package.git'])
+            && 'v1.0.6' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
+            && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
+            && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
+            && '5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash']
+        ),
         $message
     );
 }
@@ -152,14 +154,15 @@ function assert_given_version_added($message)
     $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
     $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
-    assert(
-        isset($config['packages']['git@github.com:saeghe/released-package.git'])
-        && 'v1.0.5' === $config['packages']['git@github.com:saeghe/released-package.git']
-        && isset($meta['packages']['git@github.com:saeghe/released-package.git'])
-        && 'v1.0.5' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
-        && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
-        && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
-        && '5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash'],
+    assert_true((
+            isset($config['packages']['git@github.com:saeghe/released-package.git'])
+            && 'v1.0.5' === $config['packages']['git@github.com:saeghe/released-package.git']
+            && isset($meta['packages']['git@github.com:saeghe/released-package.git'])
+            && 'v1.0.5' === $meta['packages']['git@github.com:saeghe/released-package.git']['version']
+            && 'saeghe' === $meta['packages']['git@github.com:saeghe/released-package.git']['owner']
+            && 'released-package' === $meta['packages']['git@github.com:saeghe/released-package.git']['repo']
+            && '5885e5f3ed26c2289ceb2eeea1f108f7fbc10c01' === $meta['packages']['git@github.com:saeghe/released-package.git']['hash']
+        ),
         $message
     );
 }

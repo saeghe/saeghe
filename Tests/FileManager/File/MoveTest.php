@@ -12,10 +12,10 @@ test(
         $origin = $first->append('sample.txt');
         $destination = $second->append('sample.txt');
 
-        assert(move($origin->to_string(), $destination->to_string()));
+        assert_true(move($origin->to_string(), $destination->to_string()));
 
-        assert(! file_exists($origin->to_string()), 'origin file exists after move!');
-        assert(file_exists($destination->to_string()), 'destination file does not exist after move!');
+        assert_false(file_exists($origin->to_string()), 'origin file exists after move!');
+        assert_true(file_exists($destination->to_string()), 'destination file does not exist after move!');
 
         return [$first, $second];
     },

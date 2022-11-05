@@ -18,7 +18,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
             'MyApp\OtherNamespace\MyClass' => 'MyClass'
         ] === $php_file->imported_classes());
     }
@@ -43,7 +43,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherNamespace\ClassA' => 'ClassA'] === $php_file->imported_classes());
+        assert_true(['MyApp\OtherNamespace\ClassA' => 'ClassA'] === $php_file->imported_classes());
     }
 );
 
@@ -66,7 +66,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherNamespace\ClassA' => 'ClassA'] === $php_file->imported_classes());
+        assert_true(['MyApp\OtherNamespace\ClassA' => 'ClassA'] === $php_file->imported_classes());
     }
 );
 
@@ -84,7 +84,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'MyApp\OtherNamespace\ClassA' => 'ClassA',
                 'MyApp\OtherNamespace\ClassB' => 'ClassB',
             ] === $php_file->imported_classes()
@@ -108,7 +108,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'MyApp\OtherNamespace\ClassA' => 'ClassA',
                 'MyApp\OtherNamespace\ClassB' => 'ClassB',
                 'MyApp\OtherNamespace\ClassC' => 'C',
@@ -136,7 +136,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'MyApp\AnotherNamespace\SecondClass' => 'SecondClass',
                 'MyApp\OtherNamespace\ClassA' => 'ClassA',
                 'MyApp\OtherNamespace\ClassB' => 'ClassB',

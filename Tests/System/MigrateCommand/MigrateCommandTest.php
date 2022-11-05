@@ -29,9 +29,10 @@ function assert_correct_config_file($message)
     $root = root() . 'TestRequirements/Fixtures/composer-package/';
     $stub = root() . 'TestRequirements/Stubs/composer-package/';
 
-    assert(
-        file_exists(realpath($root . 'saeghe.config.json'))
-        && file_get_contents(realpath($root . 'saeghe.config.json')) === file_get_contents(realpath($stub . 'saeghe.config.json.stub')),
+    assert_true((
+            file_exists(realpath($root . 'saeghe.config.json'))
+            && file_get_contents(realpath($root . 'saeghe.config.json')) === file_get_contents(realpath($stub . 'saeghe.config.json.stub'))
+        ),
         $message
     );
 }
@@ -41,9 +42,10 @@ function assert_correct_meta_file($message)
     $root = root() . 'TestRequirements/Fixtures/composer-package/';
     $stub = root() . 'TestRequirements/Stubs/composer-package/';
 
-    assert(
-        file_exists(realpath($root . 'saeghe.config-lock.json'))
-        && file_get_contents(realpath($root . 'saeghe.config-lock.json')) === file_get_contents(realpath($stub . 'saeghe.config-lock.json.stub')),
+    assert_true((
+            file_exists(realpath($root . 'saeghe.config-lock.json'))
+            && file_get_contents(realpath($root . 'saeghe.config-lock.json')) === file_get_contents(realpath($stub . 'saeghe.config-lock.json.stub'))
+        ),
         $message
     );
 }
@@ -53,30 +55,30 @@ function assert_package_directory_content($message)
     $root = root() . 'TestRequirements/Fixtures/composer-package/';
     $stub = root() . 'TestRequirements/Stubs/composer-package/';
 
-    assert(
-        file_exists(realpath($root . 'Packages'))
-        && file_exists(realpath($root . 'Packages/Seldaek'))
-        && file_exists(realpath($root . 'Packages/Seldaek/monolog'))
-        && file_exists(realpath($root . 'Packages/Seldaek/monolog/composer.json'))
-        && file_exists(realpath($root . 'Packages/Seldaek/monolog/saeghe.config.json'))
-        && file_exists(realpath($root . 'Packages/Seldaek/monolog/saeghe.config-lock.json'))
-        && file_exists(realpath($root . 'Packages/php-fig'))
-        && file_exists(realpath($root . 'Packages/php-fig/log'))
-        && file_exists(realpath($root . 'Packages/php-fig/log/composer.json'))
-        && file_exists(realpath($root . 'Packages/php-fig/log/saeghe.config.json'))
-        && file_exists(realpath($root . 'Packages/php-fig/log/saeghe.config-lock.json'))
-        && file_exists(realpath($root . 'Packages/symfony'))
-        && file_exists(realpath($root . 'Packages/symfony/thanks'))
-        && file_exists(realpath($root . 'Packages/symfony/thanks/composer.json'))
-        && file_exists(realpath($root . 'Packages/symfony/thanks/saeghe.config.json'))
-        && file_exists(realpath($root . 'Packages/symfony/thanks/saeghe.config-lock.json'))
-        && file_get_contents(realpath($root . 'Packages/Seldaek/monolog/saeghe.config.json')) === file_get_contents(realpath($stub . 'monolog-saeghe.config.json.stub'))
-        && file_get_contents(realpath($root . 'Packages/Seldaek/monolog/saeghe.config-lock.json')) === file_get_contents(realpath($stub . 'monolog-saeghe.config-lock.json.stub'))
-        && file_get_contents(realpath($root . 'Packages/php-fig/log/saeghe.config.json')) === file_get_contents(realpath($stub . 'log-saeghe.config.json.stub'))
-        && file_get_contents(realpath($root . 'Packages/php-fig/log/saeghe.config-lock.json')) === file_get_contents(realpath($stub . 'log-saeghe.config-lock.json.stub'))
-        && file_get_contents(realpath($root . 'Packages/symfony/thanks/saeghe.config.json')) === file_get_contents(realpath($stub . 'symfony-thanks-saeghe.config.json.stub'))
-        && file_get_contents(realpath($root . 'Packages/symfony/thanks/saeghe.config-lock.json')) === file_get_contents(realpath($stub . 'symfony-thanks-saeghe.config-lock.json.stub'))
-        ,
+    assert_true((
+            file_exists(realpath($root . 'Packages'))
+            && file_exists(realpath($root . 'Packages/Seldaek'))
+            && file_exists(realpath($root . 'Packages/Seldaek/monolog'))
+            && file_exists(realpath($root . 'Packages/Seldaek/monolog/composer.json'))
+            && file_exists(realpath($root . 'Packages/Seldaek/monolog/saeghe.config.json'))
+            && file_exists(realpath($root . 'Packages/Seldaek/monolog/saeghe.config-lock.json'))
+            && file_exists(realpath($root . 'Packages/php-fig'))
+            && file_exists(realpath($root . 'Packages/php-fig/log'))
+            && file_exists(realpath($root . 'Packages/php-fig/log/composer.json'))
+            && file_exists(realpath($root . 'Packages/php-fig/log/saeghe.config.json'))
+            && file_exists(realpath($root . 'Packages/php-fig/log/saeghe.config-lock.json'))
+            && file_exists(realpath($root . 'Packages/symfony'))
+            && file_exists(realpath($root . 'Packages/symfony/thanks'))
+            && file_exists(realpath($root . 'Packages/symfony/thanks/composer.json'))
+            && file_exists(realpath($root . 'Packages/symfony/thanks/saeghe.config.json'))
+            && file_exists(realpath($root . 'Packages/symfony/thanks/saeghe.config-lock.json'))
+            && file_get_contents(realpath($root . 'Packages/Seldaek/monolog/saeghe.config.json')) === file_get_contents(realpath($stub . 'monolog-saeghe.config.json.stub'))
+            && file_get_contents(realpath($root . 'Packages/Seldaek/monolog/saeghe.config-lock.json')) === file_get_contents(realpath($stub . 'monolog-saeghe.config-lock.json.stub'))
+            && file_get_contents(realpath($root . 'Packages/php-fig/log/saeghe.config.json')) === file_get_contents(realpath($stub . 'log-saeghe.config.json.stub'))
+            && file_get_contents(realpath($root . 'Packages/php-fig/log/saeghe.config-lock.json')) === file_get_contents(realpath($stub . 'log-saeghe.config-lock.json.stub'))
+            && file_get_contents(realpath($root . 'Packages/symfony/thanks/saeghe.config.json')) === file_get_contents(realpath($stub . 'symfony-thanks-saeghe.config.json.stub'))
+            && file_get_contents(realpath($root . 'Packages/symfony/thanks/saeghe.config-lock.json')) === file_get_contents(realpath($stub . 'symfony-thanks-saeghe.config-lock.json.stub'))
+        ),
         $message
     );
 }

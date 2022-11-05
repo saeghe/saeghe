@@ -18,7 +18,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherNamespace\ConstantA' => 'ConstantA'] === $php_file->imported_constants());
+        assert_true(['MyApp\OtherNamespace\ConstantA' => 'ConstantA'] === $php_file->imported_constants());
     }
 );
 
@@ -36,7 +36,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'MyApp\OtherNamespace\ConstantA' => 'ConstantA',
                 'MyApp\OtherNamespace\ConstantB' => 'ConstantB',
             ] === $php_file->imported_constants()
@@ -60,7 +60,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'MyApp\OtherNamespace\ConstantA' => 'ConstantA',
                 'MyApp\OtherNamespace\ConstantB' => 'ConstantB',
                 'MyApp\OtherNamespace\ConstantC' => 'C',
@@ -89,7 +89,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'MyApp\OtherNamespace\ConstantA' => 'ConstantA',
                 'MyApp\OtherNamespace\ConstantB' => 'ConstantB',
                 'MyApp\OtherNamespace\ConstantC' => 'C',

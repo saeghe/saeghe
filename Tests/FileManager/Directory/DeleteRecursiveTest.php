@@ -8,8 +8,8 @@ use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 test(
     title: 'it should delete directory when it is empty',
     case: function (Address $directory) {
-        assert(delete_recursive($directory->to_string()));
-        assert(! file_exists($directory->to_string()), 'delete_recursive is not working!');
+        assert_true(delete_recursive($directory->to_string()));
+        assert_false(file_exists($directory->to_string()), 'delete_recursive is not working!');
     },
     before: function () {
         $directory = Address::from_string(root() . 'Tests/PlayGround/DeleteRecursive');
@@ -22,9 +22,9 @@ test(
 test(
     title: 'it should delete directory recursively',
     case: function (Address $directory) {
-        assert(delete_recursive($directory->to_string()));
+        assert_true(delete_recursive($directory->to_string()));
 
-        assert(! file_exists($directory->to_string()), 'delete_recursive is not working!');
+        assert_true(false ===file_exists($directory->to_string()), 'delete_recursive is not working!');
     },
     before: function () {
         $directory = Address::from_string(root() . 'Tests/PlayGround/DeleteRecursive');

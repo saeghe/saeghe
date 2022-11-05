@@ -7,6 +7,7 @@ use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Write\success;
+use function Saeghe\Saeghe\FileManager\Directory\exists_or_create;
 
 function run(Project $project)
 {
@@ -16,7 +17,7 @@ function run(Project $project)
     json_put($project->config_file_path->to_string(), $config);
     json_put($project->config_lock_file_path->to_string(), Meta::init()->to_array());
 
-    dir_find_or_create($project->root->append($config['packages-directory'])->to_string());
+    exists_or_create($project->root->append($config['packages-directory'])->to_string());
 
     success('Project has been initialized.');
 }

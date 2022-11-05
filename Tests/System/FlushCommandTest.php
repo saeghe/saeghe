@@ -26,10 +26,10 @@ test(
 
 function assert_development_build_is_empty($message)
 {
-    assert(['.', '..'] === scandir(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/development')), $message);
+    assert_true(['.', '..'] === scandir(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/development')), $message);
 }
 
 function assert_production_build_is_empty($message)
 {
-    assert(['.', '..'] === scandir(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/production')), $message);
+    assert_true(['.', '..'] === scandir(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/production')), $message);
 }

@@ -56,6 +56,6 @@ test(
     case: function () use ($man_content) {
         $output = shell_exec('php ' . root() . 'saeghe --man');
 
-        assert(str_contains($output, $man_content), 'Manual output is not what we want!' . $output);
+        assert_true(str_contains($output, $man_content), 'Manual output is not what we want!' . $output);
     }
 );

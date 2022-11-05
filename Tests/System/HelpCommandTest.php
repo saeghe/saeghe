@@ -30,7 +30,7 @@ test(
     case: function () use ($help_content) {
         $output = shell_exec('php ' . root() . 'saeghe -h');
 
-        assert(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
+        assert_true(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
     }
 );
 
@@ -39,7 +39,7 @@ test(
     case: function () use ($help_content) {
         $output = shell_exec('php ' . root() . 'saeghe --help');
 
-        assert(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
+        assert_true(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
     }
 );
 
@@ -48,6 +48,6 @@ test(
     case: function () use ($help_content) {
         $output = shell_exec('php ' . root() . 'saeghe');
 
-        assert(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
+        assert_true(str_contains($output, $help_content), 'Help output is not what we want!' . $output);
     }
 );
