@@ -89,11 +89,6 @@ function array_insert_after($array, $key, array $additional): array
     return array_merge(array_slice($array, 0, $pos), $additional, array_slice($array, $pos));
 }
 
-function json_put(string $path, array $content): bool
-{
-    return file_put_contents($path, json_encode($content, JSON_PRETTY_PRINT) . PHP_EOL) !== false;
-}
-
 function read_lines(string $source): Generator
 {
     $fileHandler = @fopen($source, "r");

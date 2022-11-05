@@ -57,7 +57,7 @@ function run(Project $project)
     add($project, $config, $package, $package_url);
 
     $config->packages[$package_url] = $package;
-    json_put($project->config_file_path->to_string(), $config->to_array());
+    Json\write($project->config_file_path->to_string(), $config->to_array());
 
     success("Package $package_url has been added successfully.");
 }
@@ -76,7 +76,7 @@ function add(Project $project, Config $config, Package $package, $package_url)
 
     if (! $is_in_meta) {
         $meta->packages[$package_url] = $package;
-        json_put($project->config_lock_file_path->to_string(), $meta->to_array());
+        Json\write($project->config_lock_file_path->to_string(), $meta->to_array());
     }
 
     $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));

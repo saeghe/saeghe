@@ -72,8 +72,8 @@ function run(Project $project)
         migrate_package($project, $project->root->append($config['packages-directory']), $name, $package, $meta['packages'][$package]);
     }
 
-    json_put($project->config_file_path->to_string(), $config);
-    json_put($project->config_lock_file_path->to_string(), $meta);
+    Json\write($project->config_file_path->to_string(), $config);
+    Json\write($project->config_lock_file_path->to_string(), $meta);
 
     Write\success('Project migrated successfully.');
 }
