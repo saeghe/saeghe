@@ -10,8 +10,8 @@ test(
     case: function () {
         $playGround = Address::from_string(root() . 'Tests/PlayGround');
         $regular = $playGround->append('regular');
-        mkdir($regular->to_string(), 0755);
-        assert(0755 === Directory\permission($regular->to_string()));
+        mkdir($regular->to_string(), 0774);
+        assert(0774 === Directory\permission($regular->to_string()));
 
         $full = $playGround->append('full');
         umask(0);

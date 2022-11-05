@@ -43,7 +43,7 @@ function is_empty(string $path): bool
     return scandir($path) == ['.', '..'];
 }
 
-function make(string $path, int $permission = 0755): bool
+function make(string $path, int $permission = 0775): bool
 {
     $old_umask = umask(0);
     $created = mkdir($path, $permission);
@@ -52,7 +52,7 @@ function make(string $path, int $permission = 0755): bool
     return $created;
 }
 
-function make_recursive(string $path, int $permission = 0755): bool
+function make_recursive(string $path, int $permission = 0775): bool
 {
     $old_umask = umask(0);
     $created = mkdir(directory: $path, permissions: $permission, recursive: true);
