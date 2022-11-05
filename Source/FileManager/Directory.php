@@ -2,6 +2,20 @@
 
 namespace Saeghe\Saeghe\FileManager\Directory;
 
+function clean(string $path): void
+{
+    $dir = opendir($path);
+
+    while (false !== ($file = readdir($dir))) {
+        if (! in_array($file, ['.', '..'])) {
+            $path_to_file = $path . DIRECTORY_SEPARATOR . $file;
+            is_dir($path_to_file) ? delete_recursive($path_to_file) : unlink($path_to_file);
+        }
+    }
+
+    closedir($dir);
+}
+
 function delete(string $path): bool
 {
     return rmdir($path);
@@ -24,23 +38,23 @@ function exists_or_create(string $path): bool
     return exists($path) || make($path);
 }
 
-function clean(string $path): void
-{
-    $dir = opendir($path);
-
-    while (false !== ($file = readdir($dir))) {
-        if (! in_array($file, ['.', '..'])) {
-            $path_to_file = $path . DIRECTORY_SEPARATOR . $file;
-            is_dir($path_to_file) ? delete_recursive($path_to_file) : unlink($path_to_file);
-        }
-    }
-
-    closedir($dir);
-}
-
 function is_empty(string $path): bool
 {
     return scandir($path) == ['.', '..'];
+}
+
+function ls(string $path): array
+{
+    $list = scandir($path);
+
+    return array_values(array_filter($list, fn ($item) => ! str_starts_with($item, '.')));
+}
+
+function ls_all(string $path): array
+{
+    $list = scandir($path);
+
+    return array_values(array_filter($list, fn ($item) => ! in_array($item, ['.', '..'])));
 }
 
 function make(string $path, int $permission = 0775): bool

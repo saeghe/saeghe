@@ -98,7 +98,7 @@ function compile(Config $config, Address $origin, Address $destination, array $r
 {
     if (is_dir($origin->to_string())) {
         Directory\preserve_copy($origin->to_string(), $destination->to_string());
-        $sub_files_and_directories = all_files_and_directories($origin->to_string());
+        $sub_files_and_directories = Directory\ls_all($origin->to_string());
         foreach ($sub_files_and_directories as $sub_file_or_directory) {
             compile($config, $origin->append($sub_file_or_directory), $destination->append($sub_file_or_directory), $replace_map);
         }
