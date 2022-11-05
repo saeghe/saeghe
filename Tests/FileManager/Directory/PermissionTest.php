@@ -14,7 +14,6 @@ test(
         assert_true(0774 === Directory\permission($regular->to_string()));
 
         $full = $playGround->append('full');
-        umask(0);
         Directory\make($full->to_string(), 0777);
         assert_true(0777 === Directory\permission($full->to_string()));
 

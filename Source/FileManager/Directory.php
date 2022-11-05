@@ -2,6 +2,15 @@
 
 namespace Saeghe\Saeghe\FileManager\Directory;
 
+function chmod(string $path, int $permission): bool
+{
+    $old_umask = umask(0);
+    $return = \chmod($path, $permission);
+    umask($old_umask);
+
+    return $return;
+}
+
 function clean(string $path): void
 {
     $dir = opendir($path);

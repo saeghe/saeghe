@@ -74,12 +74,6 @@ function makeProject($projectRoot, $environment): Project
     );
 }
 
-function file_preserve_modify(string $origin, string $destination, mixed $content): void
-{
-    file_put_contents($destination, $content);
-    chmod($destination, fileperms($origin) & 0x0FFF);
-}
-
 function array_insert_after($array, $key, array $additional): array
 {
     $keys = array_keys($array);
@@ -102,10 +96,4 @@ function read_lines(string $source): Generator
         }
         fclose($fileHandler);
     }
-}
-
-function intact_copy(string $origin, string $destination)
-{
-    copy($origin, $destination);
-    chmod($destination, fileperms($origin) & 0x0FFF);
 }

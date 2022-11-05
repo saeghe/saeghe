@@ -90,7 +90,7 @@ function migrate_package(Project $project, Address $packages_directory, $name, $
 
     recursive_copy($package_vendor_directory, $package_directory->to_string());
 
-    $package_composer_settings = json_decode(file_get_contents($package_directory->append('composer.json')->to_string()), true);
+    $package_composer_settings = Json\to_array($package_directory->append('composer.json')->to_string());
 
     $config = ['map' => []];
 
@@ -105,8 +105,8 @@ function migrate_package(Project $project, Address $packages_directory, $name, $
         }
     }
 
-    file_put_contents($package_directory->append('saeghe.config.json')->to_string(), json_encode($config, JSON_PRETTY_PRINT) . PHP_EOL);
-    file_put_contents($package_directory->append( 'saeghe.config-lock.json')->to_string(), json_encode([], JSON_PRETTY_PRINT) . PHP_EOL);
+    Json\write($package_directory->append('saeghe.config.json')->to_string(), $config);
+    Json\write($package_directory->append( 'saeghe.config-lock.json')->to_string(), []);
 }
 
 function get_meta_from_package($package)

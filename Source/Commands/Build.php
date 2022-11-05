@@ -67,7 +67,7 @@ function add_executables(Project $project, Config $config, Package $package, arr
         $link = $project->build_root->append($link_name);
         symlink($target->to_string(), $link->to_string());
         add_autoloads($target, $replace_map, $autoloads);
-        chmod($target->to_string(), 0774);
+        File\chmod($target->to_string(), 0774);
     }
 }
 
@@ -117,13 +117,13 @@ function compile(Config $config, Address $origin, Address $destination, array $r
         return;
     }
 
-    intact_copy($origin->to_string(), $destination->to_string());
+    File\preserve_copy($origin->to_string(), $destination->to_string());
 }
 
 function compile_file(Address $origin, Address $destination, array $replace_map): void
 {
     $modifiedFile = apply_file_modifications($origin, $replace_map);
-    file_preserve_modify($origin->to_string(), $destination->to_string(), $modifiedFile);
+    File\create($destination->to_string(), $modifiedFile, File\permission($origin->to_string()));
 }
 
 function apply_file_modifications(Address $origin, array $replace_map): string
@@ -379,6 +379,5 @@ function add_autoloads(Address $target, array $replace_map, array $autoloads): v
     }
 
     $lines = array_insert_after($lines, $number, $autoload_lines);
-
-    file_put_contents($target->to_string(), implode(PHP_EOL, $lines));
+    File\modify($target->to_string(), implode(PHP_EOL, $lines));
 }
