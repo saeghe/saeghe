@@ -19,7 +19,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([] === $php_file->implemented_interfaces());
+        assert_true([] === $php_file->implemented_interfaces());
     }
 );
 
@@ -40,7 +40,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\MyInterface'] === $php_file->implemented_interfaces());
+        assert_true(['MyApp\MyInterface'] === $php_file->implemented_interfaces());
     }
 );
 
@@ -61,7 +61,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\FirstInterface', 'MyApp\SecondInterface', 'MyApp\ThirdInterface'] === $php_file->implemented_interfaces());
+        assert_true(['MyApp\FirstInterface', 'MyApp\SecondInterface', 'MyApp\ThirdInterface'] === $php_file->implemented_interfaces());
     }
 );
 
@@ -88,7 +88,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
                 'Application\FirstInterface',
                 'Application\ForthInterface',
                 'Application\Namespaces\ThirdInterface',

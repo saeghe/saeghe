@@ -63,6 +63,8 @@ function make_recursive(string $path, int $permission = 0775): bool
 
 function permission(string $path): int
 {
+    clearstatcache();
+
     return fileperms($path) & 0x0FFF;
 }
 

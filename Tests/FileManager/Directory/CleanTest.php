@@ -10,8 +10,8 @@ test(
     case: function (Address $directory) {
         clean($directory->to_string());
 
-        assert(file_exists($directory->to_string()), 'clean is not working!');
-        assert(
+        assert_true(file_exists($directory->to_string()), 'clean is not working!');
+        assert_true(
             scandir($directory->to_string()) === ['.', '..'],
             'clean is not working and there are some items in the directory!'
         );

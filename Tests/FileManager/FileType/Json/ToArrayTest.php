@@ -9,7 +9,7 @@ use function Saeghe\Saeghe\FileManager\FileType\Json\to_array;
 test(
     title: 'it should return associated array from json file',
     case: function (Address $file) {
-        assert(['foo' => 'bar'] === to_array($file->to_string()));
+        assert_true(['foo' => 'bar'] === to_array($file->to_string()));
 
         return $file;
     },

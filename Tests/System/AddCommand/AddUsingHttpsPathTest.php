@@ -54,10 +54,11 @@ function assert_packages_directory_created_for_empty_project($message)
 
 function assert_http_package_cloned($message)
 {
-    assert(
-        File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/cli'))
-        && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/cli/saeghe.config.json'))
-        && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/cli/saeghe.config-lock.json')),
+    assert_true((
+            File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/cli'))
+            && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/cli/saeghe.config.json'))
+            && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/cli/saeghe.config-lock.json'))
+        ),
         $message
     );
 }
@@ -66,9 +67,10 @@ function assert_http_package_added_to_config($message)
 {
     $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
-    assert(
-        assert(isset($config['packages']['https://github.com/saeghe/cli.git']))
-        && assert('v2.0.0' === $config['packages']['https://github.com/saeghe/cli.git']),
+    assert_true((
+            isset($config['packages']['https://github.com/saeghe/cli.git'])
+            && 'v2.0.0' === $config['packages']['https://github.com/saeghe/cli.git']
+        ),
         $message
     );
 }
@@ -77,12 +79,13 @@ function assert_meta_has_desired_data($message)
 {
     $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
-    assert(
-        isset($meta['packages']['https://github.com/saeghe/cli.git'])
-        && 'v2.0.0' === $meta['packages']['https://github.com/saeghe/cli.git']['version']
-        && 'saeghe' === $meta['packages']['https://github.com/saeghe/cli.git']['owner']
-        && 'cli' === $meta['packages']['https://github.com/saeghe/cli.git']['repo']
-        && '1c4c0fbbe320574a135931c9cd59d7f0d1c03754' === $meta['packages']['https://github.com/saeghe/cli.git']['hash'],
+    assert_true((
+            isset($meta['packages']['https://github.com/saeghe/cli.git'])
+            && 'v2.0.0' === $meta['packages']['https://github.com/saeghe/cli.git']['version']
+            && 'saeghe' === $meta['packages']['https://github.com/saeghe/cli.git']['owner']
+            && 'cli' === $meta['packages']['https://github.com/saeghe/cli.git']['repo']
+            && '1c4c0fbbe320574a135931c9cd59d7f0d1c03754' === $meta['packages']['https://github.com/saeghe/cli.git']['hash']
+        ),
         $message
     );
 }

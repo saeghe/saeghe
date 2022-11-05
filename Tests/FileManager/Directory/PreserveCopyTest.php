@@ -9,9 +9,9 @@ test(
     title: 'it should copy directory by preserving permission',
     case: function (Address $origin, Address $destination) {
         $copied_directory = $destination->append($origin->leaf());
-        assert(Directory\preserve_copy($origin->to_string(), $copied_directory->to_string()));
-        assert(Directory\exists($copied_directory->to_string()));
-        assert(Directory\permission($origin->to_string()) === Directory\permission($copied_directory->to_string()));
+        assert_true(Directory\preserve_copy($origin->to_string(), $copied_directory->to_string()));
+        assert_true(Directory\exists($copied_directory->to_string()));
+        assert_true(Directory\permission($origin->to_string()) === Directory\permission($copied_directory->to_string()));
 
         return [$origin, $destination];
     },
@@ -33,9 +33,9 @@ test(
     title: 'it should copy directory by preserving permission with any permission',
     case: function (Address $origin, Address $destination) {
         $copied_directory = $destination->append($origin->leaf());
-        assert(Directory\preserve_copy($origin->to_string(), $copied_directory->to_string()));
-        assert(Directory\exists($copied_directory->to_string()));
-        assert(0777 === Directory\permission($copied_directory->to_string()));
+        assert_true(Directory\preserve_copy($origin->to_string(), $copied_directory->to_string()));
+        assert_true(Directory\exists($copied_directory->to_string()));
+        assert_true(0777 === Directory\permission($copied_directory->to_string()));
 
         return [$origin, $destination];
     },

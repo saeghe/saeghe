@@ -16,7 +16,7 @@ test(
 
         Write\assert_success('Credential for github.com has been set successfully.', $output);
 
-        assert(
+        assert_true(
             ['github.com' => ['token' => $token]]
             ===
             Json\to_array(realpath(root() . 'credentials.json')),
@@ -44,7 +44,7 @@ test(
 
         Write\assert_success('Credential for github.com has been set successfully.', $output);
 
-        assert(
+        assert_true(
             ['gitlab.com' => ['token' => 'gitlab-token'], 'github.com' => ['token' => $token]]
             ===
             Json\to_array(realpath(root() . 'credentials.json')),

@@ -8,7 +8,7 @@ test(
     title: 'it should remove last character',
     case: function () {
         $subject = 'hello world';
-        assert('hello worl' === Str\remove_last_character($subject));
+        assert_true('hello worl' === Str\remove_last_character($subject));
     }
 );
 
@@ -16,6 +16,6 @@ test(
     title: 'it should return empty string when subject is empty',
     case: function () {
         $subject = '';
-        assert('' === Str\remove_last_character($subject));
+        assert_true('' === Str\remove_last_character($subject));
     }
 );

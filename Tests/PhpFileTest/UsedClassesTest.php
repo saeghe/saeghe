@@ -107,7 +107,7 @@ class MyClass extends ParentClass implements InterfaceA, interfaceB
 }
 EOD;
 
-        assert(
+        assert_true(
             [
                 'Application\Statics\ClassA',
                 'Application\Statics\CompoundNamespace\ClassD',

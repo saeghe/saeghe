@@ -21,7 +21,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([] === $php_file->extended_classes());
+        assert_true([] === $php_file->extended_classes());
     }
 );
 
@@ -42,7 +42,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\ParentClass'] === $php_file->extended_classes());
+        assert_true(['MyApp\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -65,7 +65,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['\ArrayObject'] === $php_file->extended_classes());
+        assert_true(['\ArrayObject'] === $php_file->extended_classes());
     }
 );
 
@@ -86,7 +86,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['\ArrayObject'] === $php_file->extended_classes());
+        assert_true(['\ArrayObject'] === $php_file->extended_classes());
     }
 );
 
@@ -109,7 +109,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['Application\ParentClass'] === $php_file->extended_classes());
+        assert_true(['Application\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -132,7 +132,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['Application\SubNamespace\ParentClass'] === $php_file->extended_classes());
+        assert_true(['Application\SubNamespace\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -155,7 +155,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['Application\SubNamespace\ParentClass'] === $php_file->extended_classes());
+        assert_true(['Application\SubNamespace\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -178,7 +178,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['Application\SubNamespace\ParentClass'] === $php_file->extended_classes());
+        assert_true(['Application\SubNamespace\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -200,7 +200,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\ParentClass'] === $php_file->extended_classes());
+        assert_true(['MyApp\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -220,7 +220,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\ParentClass'] === $php_file->extended_classes());
+        assert_true(['MyApp\ParentClass'] === $php_file->extended_classes());
     }
 );
 
@@ -238,7 +238,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\ParentAbstractClass'] === $php_file->extended_classes());
+        assert_true(['MyApp\ParentAbstractClass'] === $php_file->extended_classes());
     }
 );
 
@@ -258,7 +258,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherInterface'] === $php_file->extended_classes());
+        assert_true(['MyApp\OtherInterface'] === $php_file->extended_classes());
     }
 );
 
@@ -278,7 +278,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert(['MyApp\OtherTrait'] === $php_file->extended_classes());
+        assert_true(['MyApp\OtherTrait'] === $php_file->extended_classes());
     }
 );
 
@@ -301,7 +301,7 @@ EOD;
 
         $php_file = new PhpFile($content);
 
-        assert([
+        assert_true([
             'MyApp\SecondInterface',
             'MyApp\ThirdInterface',
             'MyApp\ForthInterface',

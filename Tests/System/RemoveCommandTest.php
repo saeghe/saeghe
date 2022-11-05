@@ -34,9 +34,10 @@ test(
 function assert_desired_data_in_packages_directory($message)
 {
     clearstatcache();
-    assert(! file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/simple-package'))
-        && ! file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/complex-package'))
-    ,
+    assert_true((
+            ! file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/simple-package'))
+            && ! file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/saeghe/complex-package'))
+        ),
         $message
     );
 }
@@ -45,12 +46,12 @@ function assert_config_file_is_clean($message)
 {
     $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
-    assert($config['packages'] === [], $message);
+    assert_true($config['packages'] === [], $message);
 }
 
 function assert_meta_is_clean($message)
 {
     $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
-    assert($config['packages'] === [], $message);
+    assert_true($config['packages'] === [], $message);
 }

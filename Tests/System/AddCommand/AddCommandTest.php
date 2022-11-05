@@ -136,8 +136,8 @@ test(
         assert_error('Package https://github.com/saeghe/simple-package.git is already exists', $output);
         $config = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json');
         $meta = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json');
-        assert(count($config['packages']) === 1);
-        assert(count($meta['packages']) === 1);
+        assert_true(count($config['packages']) === 1);
+        assert_true(count($meta['packages']) === 1);
     },
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
@@ -160,10 +160,11 @@ function assert_packages_directory_created_for_empty_project($message)
 
 function assert_simple_package_cloned($message)
 {
-    assert(
-        File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package'))
-        && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/saeghe.config.json'))
-        && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/README.md')),
+    assert_true((
+            File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package'))
+            && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/saeghe.config.json'))
+            && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/README.md'))
+        ),
         $message
     );
 }
@@ -172,9 +173,10 @@ function assert_simple_package_added_to_config($message)
 {
     $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'));
 
-    assert(
-        assert(isset($config['packages']['git@github.com:saeghe/simple-package.git']))
-        && assert('development' === $config['packages']['git@github.com:saeghe/simple-package.git']),
+    assert_true((
+            isset($config['packages']['git@github.com:saeghe/simple-package.git'])
+            && 'development' === $config['packages']['git@github.com:saeghe/simple-package.git']
+        ),
         $message
     );
 }
@@ -183,12 +185,13 @@ function assert_meta_has_desired_data($message)
 {
     $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json'));
 
-    assert(
-        isset($meta['packages']['git@github.com:saeghe/simple-package.git'])
-        && 'development' === $meta['packages']['git@github.com:saeghe/simple-package.git']['version']
-        && 'saeghe' === $meta['packages']['git@github.com:saeghe/simple-package.git']['owner']
-        && 'simple-package' === $meta['packages']['git@github.com:saeghe/simple-package.git']['repo']
-        && '85f94d8c34cb5678a5b37707479517654645c102' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash'],
+    assert_true((
+            isset($meta['packages']['git@github.com:saeghe/simple-package.git'])
+            && 'development' === $meta['packages']['git@github.com:saeghe/simple-package.git']['version']
+            && 'saeghe' === $meta['packages']['git@github.com:saeghe/simple-package.git']['owner']
+            && 'simple-package' === $meta['packages']['git@github.com:saeghe/simple-package.git']['repo']
+            && '85f94d8c34cb5678a5b37707479517654645c102' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash']
+        ),
         $message
     );
 }

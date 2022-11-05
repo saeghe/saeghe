@@ -71,7 +71,7 @@ class MyClass
 }
 EOD;
 
-        assert(
+        assert_true(
             [
                 'str_replace',
                 '\strlen',

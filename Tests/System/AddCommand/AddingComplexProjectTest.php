@@ -66,13 +66,14 @@ function delete_packages_directory()
 
 function assert_pacakges_added_to_packages_directory($message)
 {
-    assert(
-        file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package')
-        && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/saeghe.config.json')
-        && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/README.md')
-        && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package')
-        && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/saeghe.config.json')
-        && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/saeghe.config-lock.json'),
+    assert_true((
+            file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/saeghe.config.json')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/README.md')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/saeghe.config.json')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/saeghe.config-lock.json')
+        ),
         $message
     );
 }
@@ -81,11 +82,11 @@ function assert_config_file_has_desired_data($message)
 {
     $config = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'));
 
-    assert(
-        assert(! isset($config['packages']['git@github.com:saeghe/simple-package.git']))
-
-        && assert(isset($config['packages']['git@github.com:saeghe/complex-package.git']))
-        && assert('development' === $config['packages']['git@github.com:saeghe/complex-package.git']),
+    assert_true((
+            ! isset($config['packages']['git@github.com:saeghe/simple-package.git'])
+            && isset($config['packages']['git@github.com:saeghe/complex-package.git'])
+            && 'development' === $config['packages']['git@github.com:saeghe/complex-package.git']
+        ),
         $message
     );
 }
@@ -94,18 +95,19 @@ function assert_meta_file_has_desired_data($message)
 {
     $meta = Json\to_array(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'));
 
-    assert(
-        isset($meta['packages']['git@github.com:saeghe/simple-package.git'])
-        && 'development' === $meta['packages']['git@github.com:saeghe/simple-package.git']['version']
-        && 'saeghe' === $meta['packages']['git@github.com:saeghe/simple-package.git']['owner']
-        && 'simple-package' === $meta['packages']['git@github.com:saeghe/simple-package.git']['repo']
-        && '85f94d8c34cb5678a5b37707479517654645c102' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash']
+    assert_true((
+            isset($meta['packages']['git@github.com:saeghe/simple-package.git'])
+            && 'development' === $meta['packages']['git@github.com:saeghe/simple-package.git']['version']
+            && 'saeghe' === $meta['packages']['git@github.com:saeghe/simple-package.git']['owner']
+            && 'simple-package' === $meta['packages']['git@github.com:saeghe/simple-package.git']['repo']
+            && '85f94d8c34cb5678a5b37707479517654645c102' === $meta['packages']['git@github.com:saeghe/simple-package.git']['hash']
 
-        && isset($meta['packages']['git@github.com:saeghe/complex-package.git'])
-        && 'development' === $meta['packages']['git@github.com:saeghe/complex-package.git']['version']
-        && 'saeghe' === $meta['packages']['git@github.com:saeghe/complex-package.git']['owner']
-        && 'complex-package' === $meta['packages']['git@github.com:saeghe/complex-package.git']['repo']
-        && '08cccc569cffaf9ca67660d43e1de65b12895867' === $meta['packages']['git@github.com:saeghe/complex-package.git']['hash'],
+            && isset($meta['packages']['git@github.com:saeghe/complex-package.git'])
+            && 'development' === $meta['packages']['git@github.com:saeghe/complex-package.git']['version']
+            && 'saeghe' === $meta['packages']['git@github.com:saeghe/complex-package.git']['owner']
+            && 'complex-package' === $meta['packages']['git@github.com:saeghe/complex-package.git']['repo']
+            && '08cccc569cffaf9ca67660d43e1de65b12895867' === $meta['packages']['git@github.com:saeghe/complex-package.git']['hash']
+        ),
         $message
     );
 }

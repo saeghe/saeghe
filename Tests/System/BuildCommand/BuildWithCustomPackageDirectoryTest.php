@@ -44,9 +44,10 @@ function assert_file_with_package_dependency_has_been_built($message)
     $environment_build_path = root() . 'TestRequirements/Fixtures/ProjectWithTests/builds/development';
     $stubs_directory = root() . 'TestRequirements/Stubs/ProjectWithTests';
 
-    assert(
-        file_exists(realpath($environment_build_path . '/Source/FileUsingVendor.php'))
-        && file_get_contents(realpath($environment_build_path . '/Source/FileUsingVendor.php')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/Source/FileUsingVendor.stub'))),
+    assert_true((
+            file_exists(realpath($environment_build_path . '/Source/FileUsingVendor.php'))
+            && file_get_contents(realpath($environment_build_path . '/Source/FileUsingVendor.php')) === str_replace('$environment_build_path', realpath($environment_build_path), file_get_contents(realpath($stubs_directory . '/Source/FileUsingVendor.stub')))
+        ),
         $message
     );
 }

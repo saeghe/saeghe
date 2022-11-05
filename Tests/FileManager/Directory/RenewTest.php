@@ -10,8 +10,8 @@ test(
     title: 'it should clean directory when directory exists',
     case: function (Address $directory) {
         Directory\renew($directory->to_string());
-        assert(Directory\exists($directory->to_string()));
-        assert(! File\exists($directory->append('file.txt')->to_string()));
+        assert_true(Directory\exists($directory->to_string()));
+        assert_false(File\exists($directory->append('file.txt')->to_string()));
 
         return $directory;
     },
@@ -33,7 +33,7 @@ test(
         $directory = Address::from_string(root() . 'Tests/PlayGround/Renew');
 
         Directory\renew($directory->to_string());
-        assert(Directory\exists($directory->to_string()));
+        assert_true(Directory\exists($directory->to_string()));
 
         return $directory;
     },

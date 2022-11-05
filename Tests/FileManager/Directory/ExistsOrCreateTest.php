@@ -8,7 +8,7 @@ use Saeghe\Saeghe\FileManager\Directory;
 test(
     title: 'it should return true when directory exists',
     case: function (Address $directory) {
-        assert(Directory\exists_or_create($directory->to_string()));
+        assert_true(Directory\exists_or_create($directory->to_string()));
 
         return $directory;
     },
@@ -28,8 +28,8 @@ test(
     case: function () {
         $directory = Address::from_string(root() . 'Tests/PlayGround/ExistsOrCreate');
 
-        assert(Directory\exists_or_create($directory->to_string()));
-        assert(Directory\exists($directory->to_string()));
+        assert_true(Directory\exists_or_create($directory->to_string()));
+        assert_true(Directory\exists($directory->to_string()));
 
         return $directory;
     },

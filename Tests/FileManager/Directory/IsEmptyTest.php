@@ -9,7 +9,7 @@ use function Saeghe\Saeghe\FileManager\Directory\is_empty;
 test(
     title: 'it should return true when directory is empty',
     case: function (Address $directory) {
-        assert(is_empty($directory->to_string()));
+        assert_true(is_empty($directory->to_string()));
 
         return $directory;
     },
@@ -26,7 +26,7 @@ test(
 test(
     title: 'it should return false when directory has file empty',
     case: function (Address $directory) {
-        assert(! is_empty($directory->to_string()));
+        assert_false(is_empty($directory->to_string()));
 
         return $directory;
     },
@@ -45,7 +45,7 @@ test(
 test(
     title: 'it should return false when directory has sub directory empty',
     case: function (Address $directory) {
-        assert(! is_empty($directory->to_string()));
+        assert_false(is_empty($directory->to_string()));
 
         return $directory;
     },

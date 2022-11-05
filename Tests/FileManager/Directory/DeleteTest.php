@@ -10,7 +10,7 @@ test(
     case: function (Address $directory) {
         Directory\delete($directory->to_string());
 
-        assert(! Directory\exists($directory->to_string()));
+        assert_false(Directory\exists($directory->to_string()));
     },
     before: function () {
         $directory = Address::from_string(root() . 'Tests/PlayGround/DeleteDirectory');

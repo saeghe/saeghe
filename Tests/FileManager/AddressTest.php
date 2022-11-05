@@ -7,43 +7,43 @@ use Saeghe\Saeghe\FileManager\Address;
 test(
     title: 'it should create path from string',
     case: function () {
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             (new Address('\user\home/directory     '))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             (new Address('     \user\home/directory     '))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             (new Address('\user\home/directory'))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             (new Address('\user\\\\home//directory'))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             (new Address('\user\\\\home//directory/'))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'middle-directory' . DIRECTORY_SEPARATOR . 'directory'
             ===
             (new Address('\user\home\../middle-directory\directory'))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'middle-directory' . DIRECTORY_SEPARATOR . 'directory'
             ===
             (new Address('\user\home\.././middle-directory/directory'))->to_string()
@@ -54,31 +54,31 @@ test(
 test(
     title: 'it should create path by calling fromString method',
     case: function () {
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             Address::from_string('\user\home/directory')->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             Address::from_string('\user\\\\home///directory')->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             Address::from_string('\user\\\\home///directory/')->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'middle-directory' . DIRECTORY_SEPARATOR . 'directory'
             ===
             Address::from_string('\user\home\../middle-directory\directory')->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'middle-directory' . DIRECTORY_SEPARATOR . 'directory'
             ===
             Address::from_string('\user\home\.././middle-directory/directory')->to_string()
@@ -90,7 +90,7 @@ test(
     title: 'it should append and return a new path instance',
     case: function () {
         $path = Address::from_string('/user/home');
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             $path->append('directory')->to_string()
@@ -100,37 +100,37 @@ test(
             $path->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             (Address::from_string('/user/home')->append('\directory'))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             (Address::from_string('/user/home')->append('\directory\\'))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension'
             ===
             (Address::from_string('\user/home')->append('directory\filename.extension'))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension'
             ===
             (Address::from_string('\user/home')->append('directory\filename.extension/'))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension'
             ===
             (Address::from_string('\user////home')->append('directory\\\\filename.extension'))->to_string()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension'
             ===
             (Address::from_string('\user/home/..\./')->append('./another-directory/../directory\\\\filename.extension'))->to_string()
@@ -143,7 +143,7 @@ test(
     case: function () {
         $path = Address::from_string('/user/home/directory/filename.extension');
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
             $path->parent()->to_string()
@@ -158,19 +158,19 @@ test(
 test(
     title: 'it should return directory for the given path',
     case: function () {
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR
             ===
             Address::from_string('/user/home/directory')->directory()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension' . DIRECTORY_SEPARATOR
             ===
             Address::from_string('/user/home/directory/filename.extension')->directory()
         );
 
-        assert(
+        assert_true(
             DIRECTORY_SEPARATOR
             ===
             Address::from_string('/')->directory()
@@ -181,16 +181,16 @@ test(
 test(
     title: 'it should check if the given file exists',
     case: function () {
-        assert(Address::from_string(__FILE__)->exists());
-        assert(! Address::from_string(__FILE__)->append('not_exists.txt')->exists());
+        assert_true(Address::from_string(__FILE__)->exists());
+        assert_false(Address::from_string(__FILE__)->append('not_exists.txt')->exists());
     }
 );
 
 test(
     title: 'it should detect the leaf',
     case: function () {
-        assert(Address::from_string('/')->to_string() === Address::from_string('/')->leaf());
-        assert('AddressTest.php' === Address::from_string(__FILE__)->leaf());
-        assert('FileManager' === Address::from_string(__DIR__)->leaf());
+        assert_true(Address::from_string('/')->to_string() === Address::from_string('/')->leaf());
+        assert_true('AddressTest.php' === Address::from_string(__FILE__)->leaf());
+        assert_true('FileManager' === Address::from_string(__DIR__)->leaf());
     }
 );

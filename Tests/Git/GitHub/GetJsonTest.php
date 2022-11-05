@@ -12,7 +12,7 @@ use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 test(
     title: 'it should get json response from github api',
     case: function () {
-        assert('Saeghe package manager' === get_json('repos/saeghe/saeghe')['description']);
+        assert_true('Saeghe package manager' === get_json('repos/saeghe/saeghe')['description']);
     },
     before: function () {
         $credentials = Json\to_array(realpath(root() . 'credentials.json'));
@@ -25,9 +25,9 @@ test(
     case: function () {
         try {
             get_json('repos/saeghe/saeghe');
-            assert(false, 'It should not pass');
+            assert_false(true, 'It should not pass');
         } catch (InvalidTokenException $exception) {
-            assert($exception->getMessage() === 'GitHub token is not valid.');
+            assert_true($exception->getMessage() === 'GitHub token is not valid.');
         }
     },
     before: function () {

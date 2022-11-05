@@ -10,9 +10,9 @@ test(
     case: function () {
         $directory = Address::from_string(root() . 'Tests/PlayGround/MakeDirectory');
 
-        assert(Directory\make($directory->to_string()));
-        assert(Directory\exists($directory->to_string()));
-        assert(0755 === Directory\permission($directory->to_string()));
+        assert_true(Directory\make($directory->to_string()));
+        assert_true(Directory\exists($directory->to_string()));
+        assert_true(0775 === Directory\permission($directory->to_string()));
 
         return $directory;
     },
@@ -26,9 +26,9 @@ test(
     case: function () {
         $directory = Address::from_string(root() . 'Tests/PlayGround/MakeDirectory');
 
-        assert(Directory\make($directory->to_string(), 0777));
-        assert(Directory\exists($directory->to_string()));
-        assert(0777 === Directory\permission($directory->to_string()));
+        assert_true(Directory\make($directory->to_string(), 0777));
+        assert_true(Directory\exists($directory->to_string()));
+        assert_true(0777 === Directory\permission($directory->to_string()));
 
         return $directory;
     },

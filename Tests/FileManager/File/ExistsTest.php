@@ -10,14 +10,14 @@ test(
     title: 'it should return false when file is not exists',
     case: function () {
         $file = Address::from_string(root() . 'Tests/PlayGround/IsExists');
-        assert(! exists($file->to_string()), 'File/exists is not working!');
+        assert_false(exists($file->to_string()), 'File/exists is not working!');
     }
 );
 
 test(
     title: 'it should return false when given path is a directory',
     case: function (Address $file) {
-        assert(! exists($file->to_string()), 'File/exists is not working!');
+        assert_false(exists($file->to_string()), 'File/exists is not working!');
 
         return $file;
     },
@@ -36,7 +36,7 @@ test(
 test(
     title: 'it should return true when file is exist and is a file',
     case: function (Address $file) {
-        assert(exists($file->to_string()), 'File/exists is not working!');
+        assert_true(exists($file->to_string()), 'File/exists is not working!');
 
         return $file;
     },
