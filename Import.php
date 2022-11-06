@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'Str.php';
+require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'DataType' . DIRECTORY_SEPARATOR . 'Str.php';
 require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Path.php';
 require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Address.php';
 
@@ -22,8 +22,10 @@ spl_autoload_register(function ($class) {
 
 require Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php')->to_string();
 require Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php')->to_string();
+require Address::from_string(__DIR__ . '/Source/DataType/Arr.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/PhpFile.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/FileManager/File.php')->to_string();
+require Address::from_string(__DIR__ . '/Source/FileManager/Symlink.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/FileManager/Directory.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/FileManager/FileType/Json.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/Git/GitHub.php')->to_string();

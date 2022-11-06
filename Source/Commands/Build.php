@@ -10,9 +10,12 @@ use Saeghe\Saeghe\FileManager\Address;
 use Saeghe\Saeghe\FileManager\Directory;
 use Saeghe\Saeghe\FileManager\File;
 use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\FileManager\Symlink;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
-use Saeghe\Saeghe\Str;
+use Saeghe\Saeghe\DataType\Arr;
+use Saeghe\Saeghe\DataType\Str;
+
 
 $autoloads = [];
 
@@ -65,9 +68,9 @@ function add_executables(Project $project, Config $config, Package $package, arr
     foreach ($package_config->executables as $link_name => $source) {
         $target = $package->build_root($project, $config)->append($source);
         $link = $project->build_root->append($link_name);
-        symlink($target->to_string(), $link->to_string());
+        Symlink\link($target->to_string(), $link->to_string());
         add_autoloads($target, $replace_map, $autoloads);
-        chmod($target->to_string(), 0774);
+        File\chmod($target->to_string(), 0774);
     }
 }
 
@@ -96,9 +99,9 @@ function compile_project_files(Project $project, Config $config, array $replace_
 
 function compile(Config $config, Address $origin, Address $destination, array $replace_map): void
 {
-    if (is_dir($origin->to_string())) {
+    if ($origin->is_directory()) {
         Directory\preserve_copy($origin->to_string(), $destination->to_string());
-        $sub_files_and_directories = all_files_and_directories($origin->to_string());
+        $sub_files_and_directories = Directory\ls_all($origin->to_string());
         foreach ($sub_files_and_directories as $sub_file_or_directory) {
             compile($config, $origin->append($sub_file_or_directory), $destination->append($sub_file_or_directory), $replace_map);
         }
@@ -110,20 +113,20 @@ function compile(Config $config, Address $origin, Address $destination, array $r
         compile_file($origin, $destination, $replace_map);
 
         return;
-    } else if (is_link($origin->to_string())) {
+    } else if ($origin->is_symlink()) {
         $source_link = $origin->parent()->append(readlink($origin->to_string()));
-        symlink($source_link->to_string(), $destination->to_string());
+        Symlink\link($source_link->to_string(), $destination->to_string());
 
         return;
     }
 
-    intact_copy($origin->to_string(), $destination->to_string());
+    File\preserve_copy($origin->to_string(), $destination->to_string());
 }
 
 function compile_file(Address $origin, Address $destination, array $replace_map): void
 {
     $modifiedFile = apply_file_modifications($origin, $replace_map);
-    file_preserve_modify($origin->to_string(), $destination->to_string(), $modifiedFile);
+    File\create($destination->to_string(), $modifiedFile, File\permission($origin->to_string()));
 }
 
 function apply_file_modifications(Address $origin, array $replace_map): string
@@ -209,7 +212,7 @@ function add_requires_and_autoload(array $require_statements, Address $file): st
 
     $requires_added = false;
 
-    foreach (read_lines($file->to_string()) as $line) {
+    foreach (File\lines($file->to_string()) as $line) {
         $content .= $line;
 
         if (str_starts_with($line, 'namespace')) {
@@ -224,7 +227,7 @@ function add_requires_and_autoload(array $require_statements, Address $file): st
 
     if (! $requires_added) {
         $content = '';
-        foreach (read_lines($file->to_string()) as $line) {
+        foreach (File\lines($file->to_string()) as $line) {
             $content .= $line;
 
             if (! $requires_added && str_starts_with($line, '<?php')) {
@@ -378,7 +381,6 @@ function add_autoloads(Address $target, array $replace_map, array $autoloads): v
         }
     }
 
-    $lines = array_insert_after($lines, $number, $autoload_lines);
-
-    file_put_contents($target->to_string(), implode(PHP_EOL, $lines));
+    $lines = Arr\insert_after($lines, $number, $autoload_lines);
+    File\modify($target->to_string(), implode(PHP_EOL, $lines));
 }

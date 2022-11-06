@@ -1,20 +1,20 @@
 <?php
 
-namespace Tests\FileManager\File\MoveTest;
+namespace Tests\FileManager\File\CopyTest;
 
 use Saeghe\Saeghe\FileManager\Address;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
-use function Saeghe\Saeghe\FileManager\File\move;
+use function Saeghe\Saeghe\FileManager\File\copy;
+use function Saeghe\Saeghe\FileManager\File\create;
 
 test(
-    title: 'it should move file',
+    title: 'it should copy file',
     case: function (Address $first, Address $second) {
         $origin = $first->append('sample.txt');
         $destination = $second->append('sample.txt');
 
-        assert_true(move($origin->to_string(), $destination->to_string()));
-
-        assert_false(file_exists($origin->to_string()), 'origin file exists after move!');
+        assert_true(copy($origin->to_string(), $destination->to_string()));
+        assert_true(file_exists($origin->to_string()), 'origin file does not exist after move!');
         assert_true(file_exists($destination->to_string()), 'destination file does not exist after move!');
 
         return [$first, $second];
@@ -25,7 +25,7 @@ test(
         mkdir($first->to_string());
         mkdir($second->to_string());
         $file = $first->append('sample.txt');
-        file_put_contents($file->to_string(), 'sample text');
+        create($file->to_string(), 'sample text');
 
         return [$first, $second];
     },

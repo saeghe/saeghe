@@ -51,7 +51,7 @@ function run(Project $project)
     add($project, $config, $package, $package_url);
 
     $config->packages[$package_url] = $package;
-    json_put($project->config_file_path->to_string(), $config->to_array());
+    Json\write($project->config_file_path->to_string(), $config->to_array());
 
     success("Package $given_package_url has been updated.");
 }

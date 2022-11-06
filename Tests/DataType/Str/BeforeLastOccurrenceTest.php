@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\StrTests\BeforeLastOccurrenceTest;
+namespace Tests\DataType\Str\BeforeLastOccurrenceTest;
 
-use Saeghe\Saeghe\Str;
+use Saeghe\Saeghe\DataType\Str;
 
 test(
     title: 'it should return the subject when needle is empty',

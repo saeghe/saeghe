@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\StrTests\AfterLastOccurrenceTest;
+namespace Tests\DataType\Str\AfterLastOccurrenceTest;
 
-use Saeghe\Saeghe\Str;
+use Saeghe\Saeghe\DataType\Str;
 
 test(
     title: 'it should return empty string when needle is empty',

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\StrTests\ReplaceFirstOccurrenceTest;
+namespace Tests\DataType\Str\ReplaceFirstOccurrenceTest;
 
-use Saeghe\Saeghe\Str;
+use Saeghe\Saeghe\DataType\Str;
 
 test(
     title: 'it should replace first occurrence of sub string',

@@ -1,16 +1,20 @@
 <?php
 
-namespace Saeghe\Saeghe\Str;
+namespace Saeghe\Saeghe\DataType\Str;
 
-function between(string $string, string $start, string $end): string
+function after_first_occurrence(string $subject, string $needle): string
 {
-    $start_position = stripos($string, $start);
-    $first = substr($string, $start_position);
-    $second = substr($first, strlen($start));
-    $position_end = stripos($second, $end);
-    $final = substr($second, 0, $position_end);
+    if ($needle === '') {
+        return $subject;
+    }
 
-    return trim($final);
+    $pos = mb_strpos($subject, $needle);
+
+    if ($pos === false) {
+        return '';
+    }
+
+    return mb_substr(string: $subject, start: $pos + 1,  encoding: 'UTF-8');
 }
 
 function after_last_occurrence(string $subject, string $needle): string
@@ -56,6 +60,17 @@ function before_last_occurrence(string $subject, string $needle): string
     }
 
     return mb_substr(string: $subject, start: 0, length: $pos,  encoding: 'UTF-8');
+}
+
+function between(string $string, string $start, string $end): string
+{
+    $start_position = stripos($string, $start);
+    $first = substr($string, $start_position);
+    $second = substr($first, strlen($start));
+    $position_end = stripos($second, $end);
+    $final = substr($second, 0, $position_end);
+
+    return trim($final);
 }
 
 function last_character(string $subject): string

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Str\Tests\LastCharacterTest;
+namespace Tests\DataType\Str\LastCharacterTest;
 
-use Saeghe\Saeghe\Str;
+use Saeghe\Saeghe\DataType\Str;
 
 test(
     title: 'it should return last character',

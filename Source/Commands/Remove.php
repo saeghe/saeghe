@@ -44,7 +44,7 @@ function run(Project $project)
     remove($project, $config, $package, $package_url);
 
     unset($config->packages[$package_url]);
-    json_put($project->config_file_path->to_string(), $config->to_array());
+    Json\write($project->config_file_path->to_string(), $config->to_array());
 
     success("Package $given_package_url has been removed successfully.");
 }
@@ -69,5 +69,5 @@ function remove(Project $project, Config $config, Package $package, $package_url
     $meta = Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()));
 
     unset($meta->packages[$package_url]);
-    json_put($project->config_lock_file_path->to_string(), $meta->to_array());
+    Json\write($project->config_lock_file_path->to_string(), $meta->to_array());
 }

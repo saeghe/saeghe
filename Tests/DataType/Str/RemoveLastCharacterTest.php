@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\StrTests\RemoveLastCharacterTest;
+namespace Tests\DataType\Str\RemoveLastCharacterTest;
 
-use Saeghe\Saeghe\Str;
+use Saeghe\Saeghe\DataType\Str;
 
 test(
     title: 'it should remove last character',
