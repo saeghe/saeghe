@@ -22,6 +22,7 @@ spl_autoload_register(function ($class) {
 
 require Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php')->to_string();
 require Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php')->to_string();
+require Address::from_string(__DIR__ . '/Source/DataType/Arr.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/PhpFile.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/FileManager/File.php')->to_string();
 require Address::from_string(__DIR__ . '/Source/FileManager/Directory.php')->to_string();

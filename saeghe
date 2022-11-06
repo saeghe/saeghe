@@ -73,12 +73,3 @@ function makeProject($projectRoot, $environment): Project
         credentials_path: Address::from_string(__DIR__ .'/credentials.json'),
     );
 }
-
-function array_insert_after($array, $key, array $additional): array
-{
-    $keys = array_keys($array);
-    $index = array_search($key, $keys);
-    $pos = false === $index ? count($array) : $index + 1;
-
-    return array_merge(array_slice($array, 0, $pos), $additional, array_slice($array, $pos));
-}

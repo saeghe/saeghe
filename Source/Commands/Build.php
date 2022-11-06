@@ -12,7 +12,9 @@ use Saeghe\Saeghe\FileManager\File;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
+use Saeghe\Saeghe\DataType\Arr;
 use Saeghe\Saeghe\DataType\Str;
+
 
 $autoloads = [];
 
@@ -378,6 +380,6 @@ function add_autoloads(Address $target, array $replace_map, array $autoloads): v
         }
     }
 
-    $lines = array_insert_after($lines, $number, $autoload_lines);
+    $lines = Arr\insert_after($lines, $number, $autoload_lines);
     File\modify($target->to_string(), implode(PHP_EOL, $lines));
 }
