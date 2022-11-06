@@ -41,6 +41,17 @@ function exists(string $path): bool
     return file_exists($path) && ! is_dir($path);
 }
 
+function lines(string $path): \Generator
+{
+    $fileHandler = @fopen($path, "r");
+
+    while (($line = fgets($fileHandler)) !== false) {
+        yield $line;
+    }
+
+    fclose($fileHandler);
+}
+
 function modify(string $path, string $content): bool
 {
     return false !== file_put_contents($path, $content);

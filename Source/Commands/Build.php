@@ -209,7 +209,7 @@ function add_requires_and_autoload(array $require_statements, Address $file): st
 
     $requires_added = false;
 
-    foreach (read_lines($file->to_string()) as $line) {
+    foreach (File\lines($file->to_string()) as $line) {
         $content .= $line;
 
         if (str_starts_with($line, 'namespace')) {
@@ -224,7 +224,7 @@ function add_requires_and_autoload(array $require_statements, Address $file): st
 
     if (! $requires_added) {
         $content = '';
-        foreach (read_lines($file->to_string()) as $line) {
+        foreach (File\lines($file->to_string()) as $line) {
             $content .= $line;
 
             if (! $requires_added && str_starts_with($line, '<?php')) {

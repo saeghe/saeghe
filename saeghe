@@ -82,18 +82,3 @@ function array_insert_after($array, $key, array $additional): array
 
     return array_merge(array_slice($array, 0, $pos), $additional, array_slice($array, $pos));
 }
-
-function read_lines(string $source): Generator
-{
-    $fileHandler = @fopen($source, "r");
-
-    if ($fileHandler) {
-        while (($line = fgets($fileHandler)) !== false) {
-            yield $line;
-        }
-        if (!feof($fileHandler)) {
-            var_dump("Error: unexpected fgets() fail");
-        }
-        fclose($fileHandler);
-    }
-}
