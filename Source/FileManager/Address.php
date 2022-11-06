@@ -4,6 +4,9 @@ namespace Saeghe\Saeghe\FileManager;
 
 use Saeghe\Saeghe\DataType\Str;
 use Saeghe\Saeghe\FileManager\Path;
+use Saeghe\Saeghe\FileManager\Directory;
+use Saeghe\Saeghe\FileManager\File;
+use Saeghe\Saeghe\FileManager\Symlink;
 
 class Address
 {
@@ -53,5 +56,20 @@ class Address
     public function exists(): bool
     {
         return File\exists($this->to_string());
+    }
+
+    public function is_directory(): bool
+    {
+        return Directory\exists($this->string);
+    }
+
+    public function is_file(): bool
+    {
+        return File\exists($this->string);
+    }
+
+    public function is_symlink(): bool
+    {
+        return Symlink\exists($this->string);
     }
 }
