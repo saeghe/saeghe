@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\StrTests\RemoveFirstCharacterTest;
+namespace Tests\DataType\Str\RemoveFirstCharacterTest;
 
-use Saeghe\Saeghe\Str;
+use Saeghe\Saeghe\DataType\Str;
 
 test(
     title: 'it should remove first character',

@@ -12,7 +12,7 @@ use Saeghe\Saeghe\FileManager\File;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
-use Saeghe\Saeghe\Str;
+use Saeghe\Saeghe\DataType\Str;
 
 $autoloads = [];
 

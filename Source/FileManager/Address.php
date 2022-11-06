@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\FileManager;
 
-use Saeghe\Saeghe\Str;
+use Saeghe\Saeghe\DataType\Str;
 use Saeghe\Saeghe\FileManager\Path;
 
 class Address
