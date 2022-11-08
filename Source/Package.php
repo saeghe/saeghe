@@ -2,31 +2,31 @@
 
 namespace Saeghe\Saeghe;
 
-use Saeghe\Saeghe\FileManager\Address;
-use Saeghe\Saeghe\FileManager\Directory;
+use Saeghe\Saeghe\FileManager\DirectoryAddress;
+use Saeghe\Saeghe\FileManager\FileAddress;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\Git\Repository;
 
 class Package extends Repository
 {
-    public function config_path(Project $project, Config $config): Address
+    public function config_path(Project $project, Config $config): FileAddress
     {
-        return $this->root($project, $config)->append('saeghe.config.json');
+        return $this->root($project, $config)->file('saeghe.config.json');
     }
 
-    public function build_root(Project $project, Config $config): Address
+    public function build_root(Project $project, Config $config): DirectoryAddress
     {
-        return $project->build_root->append("{$config->packages_directory}/{$this->owner}/{$this->repo}");
+        return $project->build_root->subdirectory("{$config->packages_directory}/{$this->owner}/{$this->repo}");
     }
 
-    public function root(Project $project, Config $config): Address
+    public function root(Project $project, Config $config): DirectoryAddress
     {
-        return $project->root->append("{$config->packages_directory}/{$this->owner}/{$this->repo}");
+        return $project->root->subdirectory("{$config->packages_directory}/{$this->owner}/{$this->repo}");
     }
 
     public function is_downloaded(Project $project, Config $config): bool
     {
-        return Directory\exists($this->root($project, $config)->to_string());
+        return $this->root($project, $config)->exists();
     }
 
     public function config(Project $project, Config $config): Config

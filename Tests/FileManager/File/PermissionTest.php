@@ -42,7 +42,7 @@ test(
 
         return $file;
     },
-    after: function (Address $File) {
-        File\delete($File->to_string());
+    after: function (Address $file) {
+        File\delete($file->to_string());
     }
 );

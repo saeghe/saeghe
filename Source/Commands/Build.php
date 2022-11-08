@@ -4,13 +4,13 @@ namespace Saeghe\Saeghe\Commands\Build;
 
 use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\FileManager\DirectoryAddress;
+use Saeghe\Saeghe\FileManager\FileAddress;
+use Saeghe\Saeghe\FileManager\SymlinkAddress;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\FileManager\Address;
-use Saeghe\Saeghe\FileManager\Directory;
-use Saeghe\Saeghe\FileManager\File;
 use Saeghe\Saeghe\FileManager\FileType\Json;
-use Saeghe\Saeghe\FileManager\Symlink;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
 use Saeghe\Saeghe\DataType\Arr;
@@ -23,17 +23,16 @@ function run(Project $project)
 {
     umask(0);
 
-    $config = File\exists($project->config_file_path->to_string())
-        ? Config::from_array(Json\to_array($project->config_file_path->to_string()))
+    $config = $project->config->exists()
+        ? Config::from_array(Json\to_array($project->config->to_string()))
         : Config::init();
 
-    $meta = File\exists($project->config_lock_file_path->to_string())
-        ? Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()))
+    $meta = $project->config_lock->exists()
+        ? Meta::from_array(Json\to_array($project->config_lock->to_string()))
         : Meta::init();
 
-    Directory\renew_recursive($project->build_root->to_string());
-
-    Directory\exists_or_create($project->build_root->append($config->packages_directory)->to_string());
+    $project->build_root->renew_recursive();
+    $project->build_root->subdirectory($config->packages_directory)->exists_or_create();
 
     $replace_map = make_replace_map($project, $config, $meta);
 
@@ -58,7 +57,7 @@ function run(Project $project)
 function make_entry_points(Project $project, Config $config, array $replace_map, array $autoloads): void
 {
     foreach ($config->entry_points as $entry_point) {
-        add_autoloads($project->build_root->append($entry_point), $replace_map, $autoloads);
+        add_autoloads($project->build_root->file($entry_point), $replace_map, $autoloads);
     }
 }
 
@@ -66,17 +65,17 @@ function add_executables(Project $project, Config $config, Package $package, arr
 {
     $package_config = $package->config($project, $config);
     foreach ($package_config->executables as $link_name => $source) {
-        $target = $package->build_root($project, $config)->append($source);
-        $link = $project->build_root->append($link_name);
-        Symlink\link($target->to_string(), $link->to_string());
+        $target = $package->build_root($project, $config)->file($source);
+        $link = $project->build_root->symlink($link_name);
+        $link->link($target);
         add_autoloads($target, $replace_map, $autoloads);
-        File\chmod($target->to_string(), 0774);
+        $target->chmod(0774);
     }
 }
 
 function compile_packages(Project $project, Config $config, Package $package, array $replace_map): void
 {
-    Directory\renew_recursive($project->build_root->append("{$config->packages_directory}/{$package->owner}/{$package->repo}")->to_string());
+    $project->build_root->subdirectory("{$config->packages_directory}/{$package->owner}/{$package->repo}")->renew_recursive();
 
     $files_and_directories = should_compile_files_and_directories_for_package($project, $config, $package);
     $package_config = $package->config($project, $config);
@@ -84,7 +83,13 @@ function compile_packages(Project $project, Config $config, Package $package, ar
     $package_build_root = $package->build_root($project, $config);
 
     foreach ($files_and_directories as $file_or_directory) {
-        compile($package_config, $package_root->append($file_or_directory), $package_build_root->append($file_or_directory), $replace_map);
+        compile(
+            $package_config,
+            $file_or_directory,
+            $package_root,
+            $package_build_root,
+            $replace_map
+        );
     }
 }
 
@@ -93,47 +98,70 @@ function compile_project_files(Project $project, Config $config, array $replace_
     $files_and_directories = should_compile_files_and_directories($project, $config);
 
     foreach ($files_and_directories as $file_or_directory) {
-        compile($config, $project->root->append($file_or_directory), $project->build_root->append($file_or_directory), $replace_map);
+        compile(
+            $config,
+            $file_or_directory,
+            $project->root,
+            $project->build_root,
+            $replace_map
+        );
     }
 }
 
-function compile(Config $config, Address $origin, Address $destination, array $replace_map): void
+function compile(Config $config, Address $address, DirectoryAddress $origin, DirectoryAddress $destination, array $replace_map): void
 {
-    if ($origin->is_directory()) {
-        Directory\preserve_copy($origin->to_string(), $destination->to_string());
-        $sub_files_and_directories = Directory\ls_all($origin->to_string());
+    $destination_address = Str\replace_first_occurrence($address->to_string(), $origin->to_string(), $destination->to_string());
+
+    if ($address instanceof DirectoryAddress) {
+        $destination_directory = DirectoryAddress::from_string($destination_address);
+        $address->preserve_copy($destination_directory);
+
+        $sub_files_and_directories = $address->ls_all();
+
         foreach ($sub_files_and_directories as $sub_file_or_directory) {
-            compile($config, $origin->append($sub_file_or_directory), $destination->append($sub_file_or_directory), $replace_map);
+            compile(
+                $config,
+                $sub_file_or_directory,
+                $origin->subdirectory($address->leaf()),
+                $destination->subdirectory($address->leaf()),
+                $replace_map
+            );
         }
 
         return;
     }
 
-    if (file_needs_modification($origin, $config)) {
-        compile_file($origin, $destination, $replace_map);
-
-        return;
-    } else if ($origin->is_symlink()) {
-        $source_link = $origin->parent()->append(readlink($origin->to_string()));
-        Symlink\link($source_link->to_string(), $destination->to_string());
+    if ($address instanceof SymlinkAddress) {
+        $source_link = $address->parent()->file(readlink($address->to_string()));
+        SymlinkAddress::from_string($destination_address)->link($source_link);
 
         return;
     }
 
-    File\preserve_copy($origin->to_string(), $destination->to_string());
+    if (file_needs_modification($address, $config)) {
+        compile_file(
+            FileAddress::from_string($address->to_string()),
+            FileAddress::from_string($destination_address),
+            $replace_map
+        );
+
+        return;
+    }
+
+    $address->preserve_copy($destination->file($address->leaf()));
 }
 
-function compile_file(Address $origin, Address $destination, array $replace_map): void
+function compile_file(FileAddress $origin, FileAddress $destination, array $replace_map): void
 {
-    $modifiedFile = apply_file_modifications($origin, $replace_map);
-    File\create($destination->to_string(), $modifiedFile, File\permission($origin->to_string()));
+    $modified_file_content = apply_file_modifications($origin, $replace_map);
+    $destination->create($modified_file_content, $origin->permission());
 }
 
-function apply_file_modifications(Address $origin, array $replace_map): string
+function apply_file_modifications(FileAddress $origin, array $replace_map): string
 {
     global $autoloads;
 
-    $content = file_get_contents($origin->to_string());
+    $content = $origin->content();
     $php_file = new PhpFile($content);
 
     $imports = array_merge(
@@ -206,13 +234,13 @@ function path_finder(array $replace_map, string $import, bool $absolute): ?strin
     return $realpath ? Address::from_string($realpath)->to_string() : null;
 }
 
-function add_requires_and_autoload(array $require_statements, Address $file): string
+function add_requires_and_autoload(array $require_statements, FileAddress $file): string
 {
     $content = '';
 
     $requires_added = false;
 
-    foreach (File\lines($file->to_string()) as $line) {
+    foreach ($file->lines() as $line) {
         $content .= $line;
 
         if (str_starts_with($line, 'namespace')) {
@@ -227,7 +255,7 @@ function add_requires_and_autoload(array $require_statements, Address $file): st
 
     if (! $requires_added) {
         $content = '';
-        foreach (File\lines($file->to_string()) as $line) {
+        foreach ($file->lines() as $line) {
             $content .= $line;
 
             if (! $requires_added && str_starts_with($line, '<?php')) {
@@ -273,18 +301,17 @@ function should_compile_files_and_directories_for_package(Project $project, Conf
 
     $excluded_paths = array_map(
         function ($excluded_path) use ($package, $package_root) {
-            return $package_root->directory() . $excluded_path;
+            return $package_root->append($excluded_path)->to_string();
         },
-        array_merge(['.', '..', '.git'], $package_config->excludes)
+        array_merge(['.git'], $package_config->excludes)
     );
 
-    $files_and_directories = scandir($package->root($project, $config)->to_string());
+    $files_and_directories = $package->root($project, $config)->ls_all();
 
     return array_filter(
         $files_and_directories,
-        function ($file_or_directory) use ($package, $excluded_paths, $package_root) {
-            $file_or_directory_path = $package_root->directory() . $file_or_directory;
-            return ! in_array($file_or_directory_path, $excluded_paths);
+        function (Address $file_or_directory) use ($package, $excluded_paths, $package_root) {
+            return ! in_array($file_or_directory->to_string(), $excluded_paths);
         },
     );
 }
@@ -293,18 +320,17 @@ function should_compile_files_and_directories(Project $project, Config $config):
 {
     $excluded_paths = array_map(
         function ($excluded_path) use ($project) {
-            return $project->root->directory() . $excluded_path;
+            return $project->root->append($excluded_path)->to_string();
         },
-        array_merge(['.', '..', 'builds', '.git', '.idea', $config->packages_directory], $config->excludes)
+        array_merge(['builds', '.git', '.idea', $config->packages_directory], $config->excludes)
     );
 
-    $files_and_directories = scandir($project->root->to_string());
+    $files_and_directories = $project->root->ls_all();
 
     return array_filter(
         $files_and_directories,
-        function ($file_or_directory) use ($project, $excluded_paths) {
-            $file_or_directory_path = $project->root->directory() . $file_or_directory;
-            return ! in_array($file_or_directory_path, $excluded_paths);
+        function (Address $file_or_directory) use ($project, $excluded_paths) {
+            return ! in_array($file_or_directory->to_string(), $excluded_paths);
         },
     );
 }
@@ -319,7 +345,7 @@ function file_needs_modification(Address $file, Config $config): bool
         || str_ends_with($file->to_string(), '.php');
 }
 
-function add_autoloads(Address $target, array $replace_map, array $autoloads): void
+function add_autoloads(FileAddress $target, array $replace_map, array $autoloads): void
 {
     $autoload_lines = [];
 
@@ -372,7 +398,7 @@ function add_autoloads(Address $target, array $replace_map, array $autoloads): v
         '});',
     ]);
 
-    $lines = explode(PHP_EOL, file_get_contents($target->to_string()));
+    $lines = explode(PHP_EOL, $target->content());
     $number = 1;
     foreach ($lines as $line_number => $line) {
         if (str_contains($line, '<?php')) {
@@ -382,5 +408,5 @@ function add_autoloads(Address $target, array $replace_map, array $autoloads): v
     }
 
     $lines = Arr\insert_after($lines, $number, $autoload_lines);
-    File\modify($target->to_string(), implode(PHP_EOL, $lines));
+    $target->modify(implode(PHP_EOL, $lines));
 }

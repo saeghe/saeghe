@@ -13,8 +13,8 @@ function run(Project $project)
 {
     $project->set_env_credentials();
 
-    $config = Config::from_array(Json\to_array($project->config_file_path->to_string()));
-    $meta = Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()));
+    $config = Config::from_array(Json\to_array($project->config->to_string()));
+    $meta = Meta::from_array(Json\to_array($project->config_lock->to_string()));
 
     array_walk(
         $meta->packages,

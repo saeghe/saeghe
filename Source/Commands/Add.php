@@ -6,8 +6,6 @@ use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
-use Saeghe\Saeghe\FileManager\Directory;
-use Saeghe\Saeghe\FileManager\File;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
@@ -21,12 +19,12 @@ function run(Project $project)
     $package_url = argument(2);
     $version = parameter('version');
 
-    if (! file_exists($project->config_file_path->to_string())) {
+    if (! $project->config->exists()) {
         error('Project is not initialized. Please try to initialize using the init command.');
         return;
     }
 
-    $config = Config::from_array(Json\to_array($project->config_file_path->to_string()));
+    $config = Config::from_array(Json\to_array($project->config->to_string()));
 
     $package = array_reduce(
         $config->packages,
@@ -43,8 +41,9 @@ function run(Project $project)
 
     $version ? $package->version($version) : $package->latest_version();
 
-    if (! file_exists($project->root->append($config->packages_directory)->to_string())) {
-        Directory\make_recursive($project->root->append($config->packages_directory)->to_string());
+    $packages_directory = $project->root->subdirectory($config->packages_directory);
+    if (! $packages_directory->exists()) {
+        $packages_directory->make_recursive();
     }
 
     $package->detect_hash();
@@ -57,7 +56,7 @@ function run(Project $project)
     add($project, $config, $package, $package_url);
 
     $config->packages[$package_url] = $package;
-    Json\write($project->config_file_path->to_string(), $config->to_array());
+    Json\write($project->config->to_string(), $config->to_array());
 
     success("Package $package_url has been added successfully.");
 }
@@ -68,15 +67,15 @@ function add(Project $project, Config $config, Package $package, $package_url)
         $package->download($package->root($project, $config)->to_string());
     }
 
-    $meta = File\exists($project->config_lock_file_path->to_string())
-        ? Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()))
+    $meta = $project->config_lock->exists()
+        ? Meta::from_array(Json\to_array($project->config_lock->to_string()))
         : Meta::init();
 
     $is_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($package), false);
 
     if (! $is_in_meta) {
         $meta->packages[$package_url] = $package;
-        Json\write($project->config_lock_file_path->to_string(), $meta->to_array());
+        Json\write($project->config_lock->to_string(), $meta->to_array());
     }
 
     $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));

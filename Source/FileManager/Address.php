@@ -4,9 +4,6 @@ namespace Saeghe\Saeghe\FileManager;
 
 use Saeghe\Saeghe\DataType\Str;
 use Saeghe\Saeghe\FileManager\Path;
-use Saeghe\Saeghe\FileManager\Directory;
-use Saeghe\Saeghe\FileManager\File;
-use Saeghe\Saeghe\FileManager\Symlink;
 
 class Address
 {
@@ -27,9 +24,9 @@ class Address
         return $this->string;
     }
 
-    public function parent(): static
+    public function parent(): DirectoryAddress
     {
-        return new static(Str\before_last_occurrence($this->string, DIRECTORY_SEPARATOR));
+        return new DirectoryAddress(Str\before_last_occurrence($this->string, DIRECTORY_SEPARATOR));
     }
 
     public function leaf(): string
@@ -44,32 +41,8 @@ class Address
         return static::from_string($this->string . DIRECTORY_SEPARATOR . $path_string);
     }
 
-    public function directory(): string
-    {
-        if (Str\last_character($this->string) !== DIRECTORY_SEPARATOR) {
-            return $this->string . DIRECTORY_SEPARATOR;
-        }
-
-        return $this->string;
-    }
-
     public function exists(): bool
     {
-        return File\exists($this->to_string());
-    }
-
-    public function is_directory(): bool
-    {
-        return Directory\exists($this->string);
-    }
-
-    public function is_file(): bool
-    {
-        return File\exists($this->string);
-    }
-
-    public function is_symlink(): bool
-    {
-        return Symlink\exists($this->string);
+        return \file_exists($this->to_string());
     }
 }

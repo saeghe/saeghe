@@ -6,6 +6,8 @@ require __DIR__ . DIRECTORY_SEPARATOR . 'Import.php';
 use Saeghe\Cli\IO\Read;
 use Saeghe\Exception\CredentialCanNotBeSetException;
 use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\DirectoryAddress;
+use Saeghe\Saeghe\FileManager\FileAddress;
 use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Write\error;
@@ -66,10 +68,10 @@ match ($command) {
 function makeProject($projectRoot, $environment): Project
 {
     return new Project(
-        root: Address::from_string($projectRoot),
+        root: DirectoryAddress::from_string($projectRoot),
         environment: $environment,
-        config_file_path: Address::from_string($projectRoot . 'saeghe.config.json'),
-        config_lock_file_path: Address::from_string($projectRoot . 'saeghe.config-lock.json'),
-        credentials_path: Address::from_string(__DIR__ .'/credentials.json'),
+        config: FileAddress::from_string($projectRoot . 'saeghe.config.json'),
+        config_lock: FileAddress::from_string($projectRoot . 'saeghe.config-lock.json'),
+        credentials: FileAddress::from_string(__DIR__ .'/credentials.json'),
     );
 }

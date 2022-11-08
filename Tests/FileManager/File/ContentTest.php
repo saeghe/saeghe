@@ -7,7 +7,7 @@ use function Saeghe\Saeghe\FileManager\File\content;
 use function Saeghe\Saeghe\FileManager\File\delete;
 
 test(
-    title: 'it should create file',
+    title: 'it should get file content',
     case: function (Address $file) {
         assert_true('sample text' === content($file->to_string()));
 
