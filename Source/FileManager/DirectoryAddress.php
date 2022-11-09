@@ -2,39 +2,39 @@
 
 namespace Saeghe\Saeghe\FileManager;
 
-use function Saeghe\Saeghe\FileManager\Directory\chmod;
-use function Saeghe\Saeghe\FileManager\Directory\delete;
-use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
-use function Saeghe\Saeghe\FileManager\Directory\exists;
-use function Saeghe\Saeghe\FileManager\Directory\exists_or_create;
-use function Saeghe\Saeghe\FileManager\Directory\ls;
-use function Saeghe\Saeghe\FileManager\Directory\ls_all;
-use function Saeghe\Saeghe\FileManager\Directory\make;
-use function Saeghe\Saeghe\FileManager\Directory\make_recursive;
-use function Saeghe\Saeghe\FileManager\Directory\permission;
-use function Saeghe\Saeghe\FileManager\Directory\preserve_copy;
-use function Saeghe\Saeghe\FileManager\Directory\renew;
-use function Saeghe\Saeghe\FileManager\Directory\renew_recursive;
+use Saeghe\Saeghe\FileManager\Directory;
 
 class DirectoryAddress extends Address
 {
     public function chmod(int $permission): self
     {
-        chmod($this->to_string(), $permission);
+        Directory\chmod($this->to_string(), $permission);
 
         return $this;
     }
 
     public function delete(): self
     {
-        delete($this->to_string());
+        Directory\delete($this->to_string());
 
         return $this;
     }
 
     public function delete_recursive(): self
     {
-        delete_recursive($this->to_string());
+        Directory\delete_recursive($this->to_string());
+
+        return $this;
+    }
+
+    public function exists(): bool
+    {
+        return Directory\exists($this->to_string());
+    }
+
+    public function exists_or_create(): self
+    {
+        Directory\exists_or_create($this->to_string());
 
         return $this;
     }
@@ -44,33 +44,30 @@ class DirectoryAddress extends Address
         return new FileAddress($this->append($path)->to_string());
     }
 
-    public function exists(): bool
+    public function item(string $path): DirectoryAddress|FileAddress|SymlinkAddress|Address
     {
-        return exists($this->to_string());
-    }
+        $address = Address::from_string($this->to_string())->append($path);
 
-    public function exists_or_create(): self
-    {
-        exists_or_create($this->to_string());
+        if (is_dir($address->to_string())) {
+            return DirectoryAddress::from_string($address->to_string());
+        }
+        if (is_link($address->to_string())) {
+            return SymlinkAddress::from_string($address->to_string());
+        }
+        if (\file_exists($address->to_string())) {
+            return FileAddress::from_string($address->to_string());
+        }
 
-        return $this;
+        return $address;
     }
 
     public function ls(): array
     {
-        $list = ls($this->to_string());
+        $list = Directory\ls($this->to_string());
         $results = [];
 
         foreach ($list as $item) {
-            $item = $this->append($item)->to_string();
-
-            if (is_dir($item)) {
-                $results[] = DirectoryAddress::from_string($item);
-            } else if (is_link($item)) {
-                $results[] = SymlinkAddress::from_string($item);
-            } else {
-                $results[] = FileAddress::from_string($item);
-            }
+            $results[] = $this->item($item);
         }
 
         return $results;
@@ -78,19 +75,11 @@ class DirectoryAddress extends Address
 
     public function ls_all(): array
     {
-        $list = ls_all($this->to_string());
+        $list = Directory\ls_all($this->to_string());
         $results = [];
 
         foreach ($list as $item) {
-            $item = $this->append($item)->to_string();
-
-            if (is_dir($item)) {
-                $results[] = DirectoryAddress::from_string($item);
-            } else if (is_link($item)) {
-                $results[] = SymlinkAddress::from_string($item);
-            } else {
-                $results[] = FileAddress::from_string($item);
-            }
+            $results[] = $this->item($item);
         }
 
         return $results;
@@ -98,40 +87,40 @@ class DirectoryAddress extends Address
 
     public function make(int $permission = 0775): self
     {
-        make($this->to_string(), $permission);
+        Directory\make($this->to_string(), $permission);
 
         return $this;
     }
 
     public function make_recursive(int $permission = 0775): self
     {
-        make_recursive($this->to_string(), $permission);
+        Directory\make_recursive($this->to_string(), $permission);
 
         return $this;
     }
 
     public function permission(): int
     {
-        return permission($this->to_string());
+        return Directory\permission($this->to_string());
     }
 
     public function preserve_copy(DirectoryAddress $destination): self
     {
-        preserve_copy($this->to_string(), $destination->to_string());
+        Directory\preserve_copy($this->to_string(), $destination->to_string());
 
         return $this;
     }
 
     public function renew(): self
     {
-        renew($this->to_string());
+        Directory\renew($this->to_string());
 
         return $this;
     }
 
     public function renew_recursive(): self
     {
-        renew_recursive($this->to_string());
+        Directory\renew_recursive($this->to_string());
 
         return $this;
     }

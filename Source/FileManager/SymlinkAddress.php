@@ -2,27 +2,25 @@
 
 namespace Saeghe\Saeghe\FileManager;
 
-use function Saeghe\Saeghe\FileManager\Symlink\delete;
-use function Saeghe\Saeghe\FileManager\Symlink\exists;
-use function Saeghe\Saeghe\FileManager\Symlink\link;
+use Saeghe\Saeghe\FileManager\Symlink;
 
 class SymlinkAddress extends Address
 {
     public function delete(): self
     {
-        delete($this->to_string());
+        Symlink\delete($this->to_string());
 
         return $this;
     }
 
     public function exists(): bool
     {
-        return exists($this->to_string());
+        return Symlink\exists($this->to_string());
     }
 
     public function link(FileAddress $file): self
     {
-        link($file->to_string(), $this->to_string());
+        Symlink\link($file->to_string(), $this->to_string());
 
         return $this;
     }

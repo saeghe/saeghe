@@ -19,14 +19,14 @@ class Address
         return new static($path_string);
     }
 
-    public function to_string(): string
+    public function append(string $path_string): static
     {
-        return $this->string;
+        return static::from_string($this->string . DIRECTORY_SEPARATOR . $path_string);
     }
 
-    public function parent(): DirectoryAddress
+    public function exists(): bool
     {
-        return new DirectoryAddress(Str\before_last_occurrence($this->string, DIRECTORY_SEPARATOR));
+        return \file_exists($this->to_string());
     }
 
     public function leaf(): string
@@ -36,13 +36,13 @@ class Address
         return $leaf ?? $this->string;
     }
 
-    public function append(string $path_string): static
+    public function parent(): DirectoryAddress
     {
-        return static::from_string($this->string . DIRECTORY_SEPARATOR . $path_string);
+        return new DirectoryAddress(Str\before_last_occurrence($this->string, DIRECTORY_SEPARATOR));
     }
 
-    public function exists(): bool
+    public function to_string(): string
     {
-        return \file_exists($this->to_string());
+        return $this->string;
     }
 }

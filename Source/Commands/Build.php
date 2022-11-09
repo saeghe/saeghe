@@ -306,10 +306,8 @@ function should_compile_files_and_directories_for_package(Project $project, Conf
         array_merge(['.git'], $package_config->excludes)
     );
 
-    $files_and_directories = $package->root($project, $config)->ls_all();
-
     return array_filter(
-        $files_and_directories,
+        $package->root($project, $config)->ls_all(),
         function (Address $file_or_directory) use ($package, $excluded_paths, $package_root) {
             return ! in_array($file_or_directory->to_string(), $excluded_paths);
         },
@@ -325,10 +323,8 @@ function should_compile_files_and_directories(Project $project, Config $config):
         array_merge(['builds', '.git', '.idea', $config->packages_directory], $config->excludes)
     );
 
-    $files_and_directories = $project->root->ls_all();
-
     return array_filter(
-        $files_and_directories,
+        $project->root->ls_all(),
         function (Address $file_or_directory) use ($project, $excluded_paths) {
             return ! in_array($file_or_directory->to_string(), $excluded_paths);
         },
