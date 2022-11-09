@@ -2,7 +2,7 @@
 
 namespace Tests\GitTest\GitHubTest;
 
-use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\Path;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\Providers\GitHub\clone_to;
@@ -17,7 +17,7 @@ use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use function Saeghe\Saeghe\Providers\GitHub\has_release;
 use function Saeghe\Saeghe\Providers\GitHub\is_ssh;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 
 test(
     title: 'it should detect if url is ssh',
@@ -110,40 +110,40 @@ test(
 
 test(
     title: 'it should download given repository',
-    case: function (Address $packages_directory) {
-        assert_true(download($packages_directory->to_string(), 'saeghe', 'released-package', 'v1.0.5'));
+    case: function (Path $packages_directory) {
+        assert_true(download($packages_directory->stringify(), 'saeghe', 'released-package', 'v1.0.5'));
         // Assert latest changes on the latest commit
         assert_true(true ===
             str_contains(
-                file_get_contents($packages_directory->append('saeghe.config-lock.json')->to_string()),
+                file_get_contents($packages_directory->append('saeghe.config-lock.json')->stringify()),
                 '080478442a9ef1d19f5966edc9bf3c1eccca4848'
             )
         );
-        assert_false(\file_exists($packages_directory->parent()->append('released-package.zip')->to_string()));
+        assert_false(\file_exists($packages_directory->parent()->append('released-package.zip')->stringify()));
 
         return $packages_directory;
     },
     before: function () {
         $credentials = Json\to_array(realpath(root() . 'credentials.json'));
         github_token($credentials[GITHUB_DOMAIN]['token']);
-        $packages_directory = Address::from_string(root() . 'Tests/PlayGround/downloads/package');
-        mkdir($packages_directory->to_string(), 0777, true);
+        $packages_directory = Path::from_string(root() . 'Tests/PlayGround/downloads/package');
+        mkdir($packages_directory->stringify(), 0777, true);
 
         return $packages_directory;
     },
-    after: function (Address $packages_directory) {
-        clean($packages_directory->parent()->parent()->to_string());
+    after: function (Path $packages_directory) {
+        clean($packages_directory->parent()->parent()->stringify());
     }
 );
 
 test(
     title: 'it should clone given repository',
-    case: function (Address $packages_directory) {
-        assert_true(clone_to($packages_directory->to_string(), 'saeghe', 'simple-package'));
+    case: function (Path $packages_directory) {
+        assert_true(clone_to($packages_directory->stringify(), 'saeghe', 'simple-package'));
         // Assert latest changes on the latest commit
         assert_true(true ===
             str_contains(
-                file_get_contents($packages_directory->append('entry-point')->to_string()),
+                file_get_contents($packages_directory->append('entry-point')->stringify()),
                 'new ImaginaryClass();'
             )
         );
@@ -151,13 +151,13 @@ test(
         return $packages_directory;
     },
     before: function () {
-        $packages_directory = Address::from_string(root() . 'Tests/PlayGround/downloads/package');
-        mkdir($packages_directory->to_string(), 0777, true);
+        $packages_directory = Path::from_string(root() . 'Tests/PlayGround/downloads/package');
+        mkdir($packages_directory->stringify(), 0777, true);
 
         return $packages_directory;
     },
-    after: function (Address $packages_directory) {
-        clean($packages_directory->parent()->parent()->to_string());
+    after: function (Path $packages_directory) {
+        clean($packages_directory->parent()->parent()->stringify());
     }
 );
 

@@ -2,29 +2,29 @@
 
 namespace Tests\FileManager\Symlink\DeleteTest;
 
-use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\Path;
 use Saeghe\Saeghe\FileManager\File;
 use function Saeghe\Saeghe\FileManager\Symlink\link;
 use function Saeghe\Saeghe\FileManager\Symlink\delete;
 
 test(
     title: 'it should delete the link',
-    case: function (Address $file, Address $link) {
-        assert_true(delete($link->to_string()));
+    case: function (Path $file, Path $link) {
+        assert_true(delete($link->stringify()));
         assert_true($file->exists());
         assert_false($link->exists());
 
         return $file;
     },
     before: function () {
-        $file = Address::from_string(root() . 'Tests/PlayGround/LinkSource');
-        File\create($file->to_string(), 'file content');
+        $file = Path::from_string(root() . 'Tests/PlayGround/LinkSource');
+        File\create($file->stringify(), 'file content');
         $link = $file->parent()->append('symlink');
-        link($file->to_string(), $link->to_string());
+        link($file->as_file()->stringify(), $link->stringify());
 
         return [$file, $link];
     },
-    after: function (Address $file) {
-        File\delete($file->to_string());
+    after: function (Path $file) {
+        File\delete($file->stringify());
     }
 );

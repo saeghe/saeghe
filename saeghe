@@ -18,8 +18,8 @@ require \realpath(__DIR__ . '/Source/Commands/Watch.php');
 
 use Saeghe\Cli\IO\Read;
 use Saeghe\Exception\CredentialCanNotBeSetException;
-use Saeghe\Saeghe\FileManager\DirectoryAddress;
-use Saeghe\Saeghe\FileManager\FileAddress;
+use Saeghe\Saeghe\FileManager\Filesystem\Directory;
+use Saeghe\Saeghe\FileManager\Filesystem\File;
 use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Write\error;
@@ -66,10 +66,10 @@ match ($command) {
 function makeProject($projectRoot, $environment): Project
 {
     return new Project(
-        root: DirectoryAddress::from_string($projectRoot),
+        root: new Directory($projectRoot),
         environment: $environment,
-        config: FileAddress::from_string($projectRoot . 'saeghe.config.json'),
-        config_lock: FileAddress::from_string($projectRoot . 'saeghe.config-lock.json'),
-        credentials: FileAddress::from_string(__DIR__ .'/credentials.json'),
+        config: new File($projectRoot . 'saeghe.config.json'),
+        config_lock: new File($projectRoot . 'saeghe.config-lock.json'),
+        credentials: new File(__DIR__ .'/credentials.json'),
     );
 }

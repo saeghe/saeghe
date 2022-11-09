@@ -4,7 +4,7 @@ namespace Saeghe\Saeghe\Commands\Migrate;
 
 use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\Config;
-use Saeghe\Saeghe\FileManager\DirectoryAddress;
+use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\Project;
@@ -28,8 +28,8 @@ function run(Project $project)
         return;
     }
 
-    $composer_setting = Json\to_array($composer_file->to_string());
-    $composer_lock_setting = Json\to_array($composer_lock_file->to_string());
+    $composer_setting = Json\to_array($composer_file->stringify());
+    $composer_lock_setting = Json\to_array($composer_lock_file->stringify());
 
     if (isset($composer_setting['autoload']['psr-4'])) {
         $config['map'] = [];
@@ -72,13 +72,13 @@ function run(Project $project)
         migrate_package($project, $project->root->subdirectory($config['packages-directory']), $name, $package, $meta['packages'][$package]);
     }
 
-    Json\write($project->config->to_string(), $config);
-    Json\write($project->config_lock->to_string(), $meta);
+    Json\write($project->config->stringify(), $config);
+    Json\write($project->config_lock->stringify(), $meta);
 
     Write\success('Project migrated successfully.');
 }
 
-function migrate_package(Project $project, DirectoryAddress $packages_directory, $name, $package, $package_meta)
+function migrate_package(Project $project, Directory $packages_directory, $name, $package, $package_meta)
 {
     $package_vendor_directory = $project->root->subdirectory('vendor/' . $name);
 
@@ -88,9 +88,9 @@ function migrate_package(Project $project, DirectoryAddress $packages_directory,
         $packages_directory->make_recursive(0755);
     }
 
-    recursive_copy($package_vendor_directory->to_string(), $package_directory->to_string());
+    recursive_copy($package_vendor_directory->stringify(), $package_directory->stringify());
 
-    $package_composer_settings = Json\to_array($package_directory->file('composer.json')->to_string());
+    $package_composer_settings = Json\to_array($package_directory->file('composer.json')->stringify());
 
     $config = ['map' => []];
 
@@ -105,8 +105,8 @@ function migrate_package(Project $project, DirectoryAddress $packages_directory,
         }
     }
 
-    Json\write($package_directory->file('saeghe.config.json')->to_string(), $config);
-    Json\write($package_directory->file( 'saeghe.config-lock.json')->to_string(), []);
+    Json\write($package_directory->file('saeghe.config.json')->stringify(), $config);
+    Json\write($package_directory->file( 'saeghe.config-lock.json')->stringify(), []);
 }
 
 function get_meta_from_package($package)

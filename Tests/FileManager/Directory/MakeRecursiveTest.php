@@ -2,39 +2,39 @@
 
 namespace Tests\FileManager\Directory\MakeRecursiveTest;
 
-use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\Path;
 use Saeghe\Saeghe\FileManager\Directory;
 
 test(
     title: 'it should create directory recursively',
     case: function () {
-        $directory = Address::from_string(root() . 'Tests/PlayGround/Origin/MakeRecursive');
+        $directory = Path::from_string(root() . 'Tests/PlayGround/Origin/MakeRecursive');
 
-        assert_true(Directory\make_recursive($directory->to_string()));
-        assert_true(Directory\exists($directory->parent()->to_string()));
-        assert_true(Directory\exists($directory->to_string()));
+        assert_true(Directory\make_recursive($directory->stringify()));
+        assert_true(Directory\exists($directory->parent()->stringify()));
+        assert_true(Directory\exists($directory->stringify()));
 
         return $directory;
     },
-    after: function (Address $directory) {
-        Directory\delete_recursive($directory->parent()->to_string());
+    after: function (Path $directory) {
+        Directory\delete_recursive($directory->parent()->stringify());
     }
 );
 
 test(
     title: 'it should create directory recursively with given permission',
     case: function () {
-        $directory = Address::from_string(root() . 'Tests/PlayGround/Origin/MakeRecursive');
+        $directory = Path::from_string(root() . 'Tests/PlayGround/Origin/MakeRecursive');
 
-        assert_true(Directory\make_recursive($directory->to_string(), 0777));
-        assert_true(Directory\exists($directory->parent()->to_string()));
-        assert_true(0777 === Directory\permission($directory->parent()->to_string()));
-        assert_true(Directory\exists($directory->to_string()));
-        assert_true(0777 === Directory\permission($directory->to_string()));
+        assert_true(Directory\make_recursive($directory->stringify(), 0777));
+        assert_true(Directory\exists($directory->parent()->stringify()));
+        assert_true(0777 === Directory\permission($directory->parent()->stringify()));
+        assert_true(Directory\exists($directory->stringify()));
+        assert_true(0777 === Directory\permission($directory->stringify()));
 
         return $directory;
     },
-    after: function (Address $directory) {
-        Directory\delete_recursive($directory->parent()->to_string());
+    after: function (Path $directory) {
+        Directory\delete_recursive($directory->parent()->stringify());
     }
 );

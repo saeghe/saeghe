@@ -5,7 +5,7 @@ namespace Tests\System\AddCommand\AddWithCustomPackagesDirectoryCommandTest;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 
 test(
     title: 'it should add package to the given directory',

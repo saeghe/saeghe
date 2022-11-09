@@ -14,8 +14,8 @@ function run(Project $project)
     $config = Config::init()->to_array();
     $config['packages-directory'] = parameter('packages-directory', 'Packages');
 
-    write($project->config->to_string(), $config);
-    write($project->config_lock->to_string(), Meta::init()->to_array());
+    write($project->config->stringify(), $config);
+    write($project->config_lock->stringify(), Meta::init()->to_array());
 
     $project->root->subdirectory($config['packages-directory'])->exists_or_create();
 

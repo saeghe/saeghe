@@ -5,7 +5,7 @@ namespace Tests\System\CredentialCommand\CredentialCommandTest;
 use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\FileManager\File\delete;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\Saeghe\FileManager\File\move;
 
 test(
