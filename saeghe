@@ -1,30 +1,28 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__ . DIRECTORY_SEPARATOR . 'Import.php';
+require \realpath(__DIR__ . '/Import.php');
+require \realpath(__DIR__ . '/Source/Commands/Add.php');
+require \realpath(__DIR__ . '/Source/Commands/Build.php');
+require \realpath(__DIR__ . '/Source/Commands/Credential.php');
+require \realpath(__DIR__ . '/Source/Commands/Flush.php');
+require \realpath(__DIR__ . '/Source/Commands/Help.php');
+require \realpath(__DIR__ . '/Source/Commands/Init.php');
+require \realpath(__DIR__ . '/Source/Commands/Install.php');
+require \realpath(__DIR__ . '/Source/Commands/Man.php');
+require \realpath(__DIR__ . '/Source/Commands/Migrate.php');
+require \realpath(__DIR__ . '/Source/Commands/Remove.php');
+require \realpath(__DIR__ . '/Source/Commands/Update.php');
+require \realpath(__DIR__ . '/Source/Commands/Version.php');
+require \realpath(__DIR__ . '/Source/Commands/Watch.php');
 
 use Saeghe\Cli\IO\Read;
 use Saeghe\Exception\CredentialCanNotBeSetException;
-use Saeghe\Saeghe\FileManager\Address;
 use Saeghe\Saeghe\FileManager\DirectoryAddress;
 use Saeghe\Saeghe\FileManager\FileAddress;
 use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Write\error;
-
-require Address::from_string(__DIR__ . '/Source/Commands/Add.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Build.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Credential.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Flush.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Help.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Init.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Install.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Man.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Migrate.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Remove.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Update.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Version.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Watch.php')->to_string();
 
 $command = Read\command() ?? Read\parameter('command');
 

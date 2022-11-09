@@ -1,13 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__ . DIRECTORY_SEPARATOR . 'Import.php';
-
-use Saeghe\Saeghe\FileManager\Address;
-
-require_once Address::from_string(__DIR__ . '/Packages/saeghe/test-runner/Source/Assertions/File.php')->to_string();
-
-require_once Address::from_string(__DIR__ . '/Packages/saeghe/test-runner/run')->to_string();
+require \realpath(__DIR__ . '/Import.php');
+require_once \realpath(__DIR__ . '/Packages/saeghe/test-runner/Source/Assertions/File.php');
+require_once \realpath(__DIR__ . '/Packages/saeghe/test-runner/run');
 
 function root(): string
 {
