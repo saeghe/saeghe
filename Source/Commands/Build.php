@@ -20,8 +20,6 @@ $autoloads = [];
 
 function run(Project $project)
 {
-    umask(0);
-
     $config = $project->config->exists()
         ? Config::from_array(Json\to_array($project->config->stringify()))
         : Config::init();
@@ -47,8 +45,6 @@ function run(Project $project)
     foreach ($meta->packages as $package) {
         add_executables($project, $config, $package, $replace_map, $autoloads);
     }
-
-    clearstatcache();
 
     Write\success('Build finished successfully.');
 }
