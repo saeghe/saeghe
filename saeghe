@@ -18,8 +18,6 @@ require \realpath(__DIR__ . '/Source/Commands/Watch.php');
 
 use Saeghe\Cli\IO\Read;
 use Saeghe\Exception\CredentialCanNotBeSetException;
-use Saeghe\Saeghe\FileManager\Filesystem\Directory;
-use Saeghe\Saeghe\FileManager\Filesystem\File;
 use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Write\error;
@@ -32,9 +30,10 @@ if (is_null($command)) {
 
 $project = Read\parameter('project', '');
 
-$project = makeProject(
+$project = Project::make(
     strlen($project) ? getcwd() . '/' . $project . '/' : getcwd() . '/',
-    $command === 'build' ? Read\argument(2, 'development') : 'development'
+    $command === 'build' ? Read\argument(2, 'development') : 'development',
+    \Saeghe\Saeghe\FileManager\Resolver\realpath(__DIR__ .'/credentials.json'),
 );
 
 set_exception_handler(function (\Throwable $exception) {
@@ -62,14 +61,3 @@ match ($command) {
     'watch' => \Saeghe\Saeghe\Commands\Watch\run($project),
     default => \Saeghe\Saeghe\Commands\Help\run($project),
 };
-
-function makeProject($projectRoot, $environment): Project
-{
-    return new Project(
-        root: new Directory($projectRoot),
-        environment: $environment,
-        config: new File($projectRoot . 'saeghe.config.json'),
-        config_lock: new File($projectRoot . 'saeghe.config-lock.json'),
-        credentials: new File(__DIR__ .'/credentials.json'),
-    );
-}

@@ -31,6 +31,17 @@ class Project
         $this->build_root = $this->root->subdirectory('builds/' . $this->environment);
     }
 
+    public static function make(string $projectRoot, string $environment, string $credential_path): self
+    {
+        return new static(
+            root: new Directory($projectRoot),
+            environment: $environment,
+            config: new File($projectRoot . 'saeghe.config.json'),
+            config_lock: new File($projectRoot . 'saeghe.config-lock.json'),
+            credentials: new File($credential_path),
+        );
+    }
+
     public function set_env_credentials(): void
     {
         $environmentToken = github_token();

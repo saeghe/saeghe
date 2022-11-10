@@ -84,7 +84,7 @@ test(
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
         rename(root() . 'credentials.json', root() . 'credentials.json.back');
-        shell_exec('php ' . root() . 'saeghe credential github.vom not-valid');
+        shell_exec('php ' . root() . 'saeghe credential github.com not-valid');
         github_token('');
     },
     after: function () {
