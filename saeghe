@@ -17,10 +17,10 @@ require \realpath(__DIR__ . '/Source/Commands/Version.php');
 require \realpath(__DIR__ . '/Source/Commands/Watch.php');
 
 use Saeghe\Cli\IO\Read;
-use Saeghe\Exception\CredentialCanNotBeSetException;
-use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use Saeghe\Saeghe\Project;
-use function Saeghe\Cli\IO\Write\error;
+use function Saeghe\Saeghe\Exception\register_exception_handler;
+
+register_exception_handler();
 
 $command = Read\command() ?? Read\parameter('command');
 
@@ -35,16 +35,6 @@ $project = Project::make(
     $command === 'build' ? Read\argument(2, 'development') : 'development',
     \Saeghe\Saeghe\FileManager\Resolver\realpath(__DIR__ .'/credentials.json'),
 );
-
-set_exception_handler(function (\Throwable $exception) {
-    if ($exception instanceof InvalidTokenException) {
-        error('The GitHub token is not valid. Either, you didn\'t set one yet, or it is not valid. Please use the `credential` command to set a valid token.');
-    }
-
-    if ($exception instanceof CredentialCanNotBeSetException) {
-        error($exception->getMessage());
-    }
-});
 
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run($project),
