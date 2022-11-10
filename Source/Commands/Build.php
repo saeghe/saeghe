@@ -73,16 +73,13 @@ function compile_packages(Project $project, Config $config, Package $package, ar
     $project->build_root->subdirectory("{$config->packages_directory}/{$package->owner}/{$package->repo}")->renew_recursive();
 
     $files_and_directories = should_compile_files_and_directories_for_package($project, $config, $package);
-    $package_config = $package->config($project, $config);
-    $package_root = $package->root($project, $config);
-    $package_build_root = $package->build_root($project, $config);
 
     foreach ($files_and_directories as $file_or_directory) {
         compile(
-            $package_config,
+            $package->config($project, $config),
             $file_or_directory,
-            $package_root,
-            $package_build_root,
+            $package->root($project, $config),
+            $package->build_root($project, $config),
             $replace_map
         );
     }
