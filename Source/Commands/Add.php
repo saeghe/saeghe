@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Commands\Add;
 
-use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Config\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
@@ -26,13 +26,13 @@ function run(Project $project)
 
     $config = Config::from_array(Json\to_array($project->config->stringify()));
 
-    $package = array_reduce(
-        $config->packages,
-        function ($carry, Package $package) {
-            return $package->is($carry) ? $package : $carry;
-        },
-        Package::from_url($package_url)
-    );
+    $package = $config->packages
+        ->reduce(
+            function ($carry, Package $package) {
+                return $package->is($carry) ? $package : $carry;
+            },
+            Package::from_url($package_url)
+        );
 
     if (isset($package->version)) {
         error("Package $package_url is already exists");
@@ -55,7 +55,8 @@ function run(Project $project)
 
     add($project, $config, $package, $package_url);
 
-    $config->packages[$package_url] = $package;
+    $config->packages->put($package, $package_url);
+
     Json\write($project->config->stringify(), $config->to_array());
 
     success("Package $package_url has been added successfully.");

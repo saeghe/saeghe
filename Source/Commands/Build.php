@@ -3,7 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Build;
 
 use Saeghe\Cli\IO\Write;
-use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Config\Config;
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\Saeghe\FileManager\Filesystem\File;
 use Saeghe\Saeghe\FileManager\Filesystem\FilesystemCollection;
@@ -273,7 +273,7 @@ function should_compile_files_and_directories_for_package(Project $project, Conf
         function ($excluded_path) use ($package, $package_root) {
             return $package_root->append($excluded_path)->stringify();
         },
-        array_merge(['.git'], $package_config->excludes)
+        $package_config->excludes->put('.git')->items()
     );
 
     return $package->root($project, $config)->ls_all()
@@ -288,7 +288,7 @@ function should_compile_files_and_directories(Project $project, Config $config):
         function ($excluded_path) use ($project) {
             return $project->root->append($excluded_path)->stringify();
         },
-        array_merge(['builds', '.git', '.idea', $config->packages_directory], $config->excludes)
+        $config->excludes->append(['builds', '.git', '.idea', $config->packages_directory])->items()
     );
 
     return $project->root
@@ -300,12 +300,12 @@ function should_compile_files_and_directories(Project $project, Config $config):
 
 function file_needs_modification(File $file, Config $config): bool
 {
-    return array_reduce(
-            array: array_merge(array_values($config->executables), $config->entry_points),
-            callback: fn ($carry, $entry_point) => str_ends_with($file->stringify(), $entry_point) || $carry,
-            initial: false
-        )
-        || str_ends_with($file->stringify(), '.php');
+    return str_ends_with($file->stringify(), '.php')
+        || $config->entry_points
+            ->append($config->executables->values())
+            ->reduce(fn ($carry, $entry_point)
+                => str_ends_with($file->stringify(), $entry_point) || $carry, false
+            );
 }
 
 function add_autoloads(File $target, array $replace_map, array $autoloads): void

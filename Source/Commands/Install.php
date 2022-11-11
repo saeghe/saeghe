@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Commands\Install;
 
-use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Config\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;

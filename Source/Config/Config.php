@@ -1,6 +1,8 @@
 <?php
 
-namespace Saeghe\Saeghe;
+namespace Saeghe\Saeghe\Config;
+
+use Saeghe\Saeghe\Package;
 
 class Config
 {
@@ -9,17 +11,17 @@ class Config
      *  DO NOT modify them!
      */
     public function __construct(
-        public array  $map,
-        public array  $entry_points,
-        public array  $excludes,
-        public array  $executables,
+        public Map $map,
+        public EntryPoints $entry_points,
+        public Excludes $excludes,
+        public Executables $executables,
         public string $packages_directory,
-        public array  $packages,
+        public Packages $packages,
     ) {}
 
     public static function init(): static
     {
-        return new static([], [], [], [], 'Packages', []);
+        return new static(new Map(), new EntryPoints(), new Excludes(), new Executables(), 'Packages', new Packages());
     }
 
     public static function from_array($config): static
@@ -30,12 +32,12 @@ class Config
         }
 
         return new static(
-            map: $config['map'] ?? [],
-            entry_points: $config['entry-points'] ?? [],
-            excludes: $config['excludes'] ?? [],
-            executables: $config['executables'] ?? [],
+            map: new Map($config['map'] ?? []),
+            entry_points: new EntryPoints($config['entry-points'] ?? []),
+            excludes: new Excludes($config['excludes'] ?? []),
+            executables: new Executables($config['executables'] ?? []),
             packages_directory: $config['packages-directory'] ?? 'Packages',
-            packages: $packages,
+            packages: new Packages($packages),
         );
     }
 
@@ -47,10 +49,10 @@ class Config
         }
 
         return [
-            'map' => $this->map,
-            'entry-points' => $this->entry_points,
-            'excludes' => $this->excludes,
-            'executables' => $this->executables,
+            'map' => $this->map->items(),
+            'entry-points' => $this->entry_points->items(),
+            'excludes' => $this->excludes->items(),
+            'executables' => $this->executables->items(),
             'packages-directory' => $this->packages_directory,
             'packages' => $packages,
         ];

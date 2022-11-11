@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Commands\Update;
 
-use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Config\Config;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
 use Saeghe\Saeghe\FileManager\FileType\Json;
@@ -22,13 +22,12 @@ function run(Project $project)
 
     $config = Config::from_array(Json\to_array($project->config->stringify()));
 
-    $package = array_reduce(
-        $config->packages,
-        function ($carry, Package $package) {
+    $package = $config->packages
+        ->reduce(function ($carry, Package $package) {
             return $package->is($carry) ? $package : $carry;
         },
-        Package::from_url($given_package_url)
-    );
+            Package::from_url($given_package_url)
+        );
 
     if (! isset($package->version)) {
         error("Package $given_package_url does not found in your project!");
@@ -50,7 +49,7 @@ function run(Project $project)
     $package->detect_hash();
     add($project, $config, $package, $package_url);
 
-    $config->packages[$package_url] = $package;
+    $config->packages->put($package, $package_url);
     Json\write($project->config->stringify(), $config->to_array());
 
     success("Package $given_package_url has been updated.");

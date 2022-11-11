@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\DataType;
 
-abstract class Collection implements \ArrayAccess
+abstract class Collection implements \ArrayAccess, \IteratorAggregate
 {
     private array $items;
 
@@ -18,6 +18,19 @@ abstract class Collection implements \ArrayAccess
     abstract public function key_is_valid(mixed $key): bool;
 
     abstract public function value_is_valid(mixed $value): bool;
+
+    public function append(array $items): static
+    {
+        foreach ($items as $key => $value) {
+            if (isset($this->items[$key])) {
+                $this->put($value);
+            } else {
+                $this->put($value, $key);
+            }
+        }
+
+        return $this;
+    }
 
     public function each(\Closure $closure): static
     {
@@ -62,9 +75,26 @@ abstract class Collection implements \ArrayAccess
         return new static(array_filter($this->items));
     }
 
+    public function forget(mixed $key): static
+    {
+        unset($this->items[$key]);
+
+        return $this;
+    }
+
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->items);
+    }
+
     public function items(): array
     {
         return $this->items;
+    }
+
+    public function keys(): array
+    {
+        return array_keys($this->items);
     }
 
     public function offsetExists(mixed $offset): bool
@@ -120,5 +150,10 @@ abstract class Collection implements \ArrayAccess
         if (! $this->value_is_valid($value)) {
             throw new \InvalidArgumentException('Invalid value type passed to collection.');
         }
+    }
+
+    public function values(): array
+    {
+        return array_values($this->items);
     }
 }

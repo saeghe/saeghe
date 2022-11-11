@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Commands\Remove;
 
-use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Config\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
@@ -17,13 +17,12 @@ function run(Project $project)
 
     $config = Config::from_array(Json\to_array($project->config->stringify()));
 
-    $package = array_reduce(
-        $config->packages,
-        function ($carry, Package $package) {
-            return $package->is($carry) ? $package : $carry;
-        },
-        Package::from_url($given_package_url)
-    );
+    $package = $config->packages
+        ->reduce(function ($carry, Package $package) {
+                return $package->is($carry) ? $package : $carry;
+            },
+            Package::from_url($given_package_url)
+        );
 
     if (! isset($package->version)) {
         error("Package $given_package_url does not found in your project!");
@@ -42,7 +41,7 @@ function run(Project $project)
 
     remove($project, $config, $package, $package_url);
 
-    unset($config->packages[$package_url]);
+    $config->packages->forget($package_url);
     Json\write($project->config->stringify(), $config->to_array());
 
     success("Package $given_package_url has been removed successfully.");

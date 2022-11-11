@@ -3,7 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Migrate;
 
 use Saeghe\Cli\IO\Write;
-use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Config\Config;
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\FileManager\FileType\Json;

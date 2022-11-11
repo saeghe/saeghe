@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Commands\Init;
 
-use Saeghe\Saeghe\Config;
+use Saeghe\Saeghe\Config\Config;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\parameter;
