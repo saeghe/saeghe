@@ -13,8 +13,8 @@ use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
-use Saeghe\Saeghe\DataType\Arr;
-use Saeghe\Saeghe\DataType\Str;
+use Saeghe\Saeghe\Datatype\Arr;
+use Saeghe\Saeghe\Datatype\Str;
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 
 $autoloads = [];

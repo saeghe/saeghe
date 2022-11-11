@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\FileManager\Filesystem;
 
-use Saeghe\Saeghe\DataType\Text;
+use Saeghe\Saeghe\Datatype\Text;
 
 class Filename extends Text
 {

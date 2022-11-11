@@ -12,10 +12,10 @@ spl_autoload_register(function ($class) {
         'Saeghe\Saeghe\Config\Map' => \realpath(__DIR__ . '/Source/Config/Map.php'),
         'Saeghe\Saeghe\Config\Meta' => \realpath(__DIR__ . '/Source/Config/Meta.php'),
         'Saeghe\Saeghe\Config\Packages' => \realpath(__DIR__ . '/Source/Config/Packages.php'),
-        'Saeghe\Saeghe\DataType\ArrayCollection' => \realpath(__DIR__ . '/Source/DataType/ArrayCollection.php'),
-        'Saeghe\Saeghe\DataType\Collection' => \realpath(__DIR__ . '/Source/DataType/Collection.php'),
-        'Saeghe\Saeghe\DataType\AnyText' => \realpath(__DIR__ . '/Source/DataType/AnyText.php'),
-        'Saeghe\Saeghe\DataType\Text' => \realpath(__DIR__ . '/Source/DataType/Text.php'),
+        'Saeghe\Saeghe\Datatype\ArrayCollection' => \realpath(__DIR__ . '/Source/Datatype/ArrayCollection.php'),
+        'Saeghe\Saeghe\Datatype\Collection' => \realpath(__DIR__ . '/Source/Datatype/Collection.php'),
+        'Saeghe\Saeghe\Datatype\AnyText' => \realpath(__DIR__ . '/Source/Datatype/AnyText.php'),
+        'Saeghe\Saeghe\Datatype\Text' => \realpath(__DIR__ . '/Source/Datatype/Text.php'),
         'Saeghe\Saeghe\FileManager\Path' => \realpath(__DIR__ . '/Source/FileManager/Path.php'),
         'Saeghe\Saeghe\FileManager\Filesystem\Address' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Address.php'),
         'Saeghe\Saeghe\FileManager\Filesystem\Directory' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Directory.php'),
@@ -33,8 +33,8 @@ spl_autoload_register(function ($class) {
 
 require \realpath(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php');
 require \realpath(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php');
-require \realpath(__DIR__ . '/Source/DataType/Arr.php');
-require \realpath(__DIR__ . '/Source/DataType/Str.php');
+require \realpath(__DIR__ . '/Source/Datatype/Arr.php');
+require \realpath(__DIR__ . '/Source/Datatype/Str.php');
 require \realpath(__DIR__ . '/Source/Exception/Handler.php');
 require \realpath(__DIR__ . '/Source/FileManager/Resolver.php');
 require \realpath(__DIR__ . '/Source/FileManager/File.php');

@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\FileManager\Resolver;
 
-use Saeghe\Saeghe\DataType\Str;
+use Saeghe\Saeghe\Datatype\Str;
 
 function realpath(string $path_string): string
 {

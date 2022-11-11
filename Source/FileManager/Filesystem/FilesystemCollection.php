@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\FileManager\Filesystem;
 
-use Saeghe\Saeghe\DataType\Collection;
+use Saeghe\Saeghe\Datatype\Collection;
 
 class FilesystemCollection extends Collection
 {

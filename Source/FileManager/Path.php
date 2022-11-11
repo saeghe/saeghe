@@ -2,12 +2,12 @@
 
 namespace Saeghe\Saeghe\FileManager;
 
-use Saeghe\Saeghe\DataType\Text;
+use Saeghe\Saeghe\Datatype\Text;
 use Saeghe\Saeghe\FileManager\Filesystem\Address;
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\Saeghe\FileManager\Filesystem\File;
 use Saeghe\Saeghe\FileManager\Filesystem\Symlink;
-use function Saeghe\Saeghe\DataType\Str\starts_with_regex;
+use function Saeghe\Saeghe\Datatype\Str\starts_with_regex;
 
 class Path extends Text
 {
