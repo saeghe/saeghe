@@ -7,6 +7,9 @@ use Saeghe\Saeghe\DataType\Str;
 function realpath(string $path_string): string
 {
     $path_string = rtrim(ltrim($path_string));
+    if ($path_string === '/') {
+        return $path_string;
+    }
     $needle = DIRECTORY_SEPARATOR === '/' ? '\\' : '/';
     $path_string = str_replace($needle, DIRECTORY_SEPARATOR, $path_string);
 

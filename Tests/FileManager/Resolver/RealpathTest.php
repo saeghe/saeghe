@@ -71,5 +71,7 @@ test(
             ===
             realpath('\user\home\.././directory')
         );
+
+        assert_true(DIRECTORY_SEPARATOR === realpath('/'));
     }
 );

@@ -19,6 +19,10 @@ trait Address
 
     public function leaf(): string
     {
+        if (strlen($this) === 1) {
+            return $this;
+        }
+
         $leaf = Str\after_last_occurrence($this, DIRECTORY_SEPARATOR);
 
         return $leaf ?? $this;

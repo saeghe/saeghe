@@ -2,7 +2,6 @@
 
 namespace Saeghe\Saeghe\FileManager\Filesystem;
 
-use Saeghe\Saeghe\FileManager\Path;
 use function Saeghe\Saeghe\FileManager\Directory\chmod;
 use function Saeghe\Saeghe\FileManager\Directory\delete;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;

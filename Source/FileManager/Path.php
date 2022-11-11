@@ -7,6 +7,7 @@ use Saeghe\Saeghe\FileManager\Filesystem\Address;
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\Saeghe\FileManager\Filesystem\File;
 use Saeghe\Saeghe\FileManager\Filesystem\Symlink;
+use function Saeghe\Saeghe\DataType\Str\start_with_regex;
 
 class Path extends Text
 {
@@ -34,6 +35,6 @@ class Path extends Text
 
     public function is_valid(string $string): bool
     {
-        return true;
+        return strlen($string) > 0 && (str_starts_with($string, '/') || start_with_regex($string, '[A-Za-z]:\\'));
     }
 }

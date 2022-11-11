@@ -224,3 +224,59 @@ test(
         assert_true($address->string() === $symlink->path->string());
     }
 );
+
+test(
+    title: 'it should not accept empty string',
+    case: function () {
+        try {
+            new Path('');
+            assert_true(false, 'code should not reach to this point');
+        } catch (\Exception $exception) {
+            assert_true($exception instanceof \InvalidArgumentException);
+            assert_true('Invalid string passed to text.' === $exception->getMessage());
+        }
+    }
+);
+
+test(
+    title: 'it should accept linux format path',
+    case: function () {
+        $path = new Path('/root/file');
+        assert_true('/root/file' === $path->string());
+    }
+);
+
+test(
+    title: 'it should not accept linux path if it does not start with root directory',
+    case: function () {
+        try {
+            new Path('root');
+            assert_true(false, 'code should not reach to this point');
+        } catch (\Exception $exception) {
+            assert_true($exception instanceof \InvalidArgumentException);
+            assert_true('Invalid string passed to text.' === $exception->getMessage());
+        }
+    }
+);
+
+
+test(
+    title: 'it should accept windows format path',
+    case: function () {
+        $path = new Path('c:\windows\system32');
+        assert_true('c:\windows\system32' === $path->string());
+    }
+);
+
+test(
+    title: 'it should not accept windows path if it does not start with drive letter',
+    case: function () {
+        try {
+            new Path('ftp:\\');
+            assert_true(false, 'code should not reach to this point');
+        } catch (\Exception $exception) {
+            assert_true($exception instanceof \InvalidArgumentException);
+            assert_true('Invalid string passed to text.' === $exception->getMessage());
+        }
+    }
+);
