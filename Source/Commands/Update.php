@@ -20,7 +20,7 @@ function run(Project $project)
     $given_package_url = argument(2);
     $version = parameter('version');
 
-    $config = Config::from_array(Json\to_array($project->config->stringify()));
+    $config = Config::from_array(Json\to_array($project->config));
 
     $package = $config->packages
         ->reduce(function ($carry, Package $package) {
@@ -50,7 +50,7 @@ function run(Project $project)
     add($project, $config, $package, $package_url);
 
     $config->packages->put($package, $package_url);
-    Json\write($project->config->stringify(), $config->to_array());
+    Json\write($project->config, $config->to_array());
 
     success("Package $given_package_url has been updated.");
 }

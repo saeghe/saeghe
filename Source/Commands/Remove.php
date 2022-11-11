@@ -15,7 +15,7 @@ function run(Project $project)
 {
     $given_package_url = argument(2);
 
-    $config = Config::from_array(Json\to_array($project->config->stringify()));
+    $config = Config::from_array(Json\to_array($project->config));
 
     $package = $config->packages
         ->reduce(function ($carry, Package $package) {
@@ -42,14 +42,14 @@ function run(Project $project)
     remove($project, $config, $package, $package_url);
 
     $config->packages->forget($package_url);
-    Json\write($project->config->stringify(), $config->to_array());
+    Json\write($project->config, $config->to_array());
 
     success("Package $given_package_url has been removed successfully.");
 }
 
 function remove(Project $project, Config $config, Package $package, $package_url)
 {
-    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->stringify()));
+    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)));
 
     foreach ($package_config->packages as $sub_package_url => $sub_package) {
         $sub_package_has_been_used = false;
@@ -64,8 +64,8 @@ function remove(Project $project, Config $config, Package $package, $package_url
 
     $package->root($project, $config)->delete_recursive();
 
-    $meta = Meta::from_array(Json\to_array($project->config_lock->stringify()));
+    $meta = Meta::from_array(Json\to_array($project->config_lock));
 
     unset($meta->packages[$package_url]);
-    Json\write($project->config_lock->stringify(), $meta->to_array());
+    Json\write($project->config_lock, $meta->to_array());
 }

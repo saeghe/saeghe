@@ -8,11 +8,11 @@ use function Saeghe\Saeghe\FileManager\Directory\clean;
 test(
     title: 'it should clean directory',
     case: function (Path $directory) {
-        clean($directory->stringify());
+        clean($directory);
 
-        assert_true(file_exists($directory->stringify()), 'clean is not working!');
+        assert_true(file_exists($directory), 'clean is not working!');
         assert_true(
-            scandir($directory->stringify()) === ['.', '..'],
+            scandir($directory) === ['.', '..'],
             'clean is not working and there are some items in the directory!'
         );
 
@@ -21,13 +21,13 @@ test(
     before: function () {
         $directory = Path::from_string(root() . 'Tests/PlayGround/Clean');
         $subDirectory = $directory->append('SubDirectory');
-        mkdir($directory->stringify());
-        mkdir($subDirectory->stringify());
-        file_put_contents($directory->append('FileInDirectory.php')->stringify(), '<?php');
+        mkdir($directory);
+        mkdir($subDirectory);
+        file_put_contents($directory->append('FileInDirectory.php'), '<?php');
 
         return $directory;
     },
     after: function (Path $directory) {
-        rmdir($directory->stringify());
+        rmdir($directory);
     }
 );

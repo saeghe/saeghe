@@ -7,7 +7,7 @@ use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 test(
     title: 'it should return directory\'s permission',
     case: function () {
-        $playGround = new Directory(root() . 'Tests/PlayGround');
+        $playGround = Directory::from_string(root() . 'Tests/PlayGround');
         $regular = $playGround->subdirectory('regular');
         $regular->make(0774);
         assert_true(0774 === $regular->permission());
@@ -27,11 +27,11 @@ test(
 test(
     title: 'it should not return cached permission',
     case: function () {
-        $playGround = new Directory(root() . 'Tests/PlayGround');
+        $playGround = Directory::from_string(root() . 'Tests/PlayGround');
         $directory = $playGround->subdirectory('regular');
         $directory->make(0775);
         assert_true(0775 === $directory->permission());
-        chmod($directory->stringify(), 0774);
+        chmod($directory, 0774);
         assert_true(0774 === $directory->permission());
 
         return $directory;

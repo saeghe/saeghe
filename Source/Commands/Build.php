@@ -22,11 +22,11 @@ $autoloads = [];
 function run(Project $project)
 {
     $config = $project->config->exists()
-        ? Config::from_array(Json\to_array($project->config->stringify()))
+        ? Config::from_array(Json\to_array($project->config))
         : Config::init();
 
     $meta = $project->config_lock->exists()
-        ? Meta::from_array(Json\to_array($project->config_lock->stringify()))
+        ? Meta::from_array(Json\to_array($project->config_lock))
         : Meta::init();
 
     $project->build_root->renew_recursive();
@@ -89,10 +89,10 @@ function compile_project_files(Project $project, Config $config, array $replace_
 
 function compile(Config $config, Directory|File|Symlink $address, Directory $origin, Directory $destination, array $replace_map): void
 {
-    $destination_address = Str\replace_first_occurrence($address->stringify(), $origin->stringify(), $destination->stringify());
+    $destination_address = Str\replace_first_occurrence($address, $origin, $destination);
 
     if ($address instanceof Directory) {
-        $destination_directory = new Directory($destination_address);
+        $destination_directory = Directory::from_string($destination_address);
         $address->preserve_copy($destination_directory);
 
         $address->ls_all()->each(fn (Directory|File|Symlink $filesystem)
@@ -103,16 +103,16 @@ function compile(Config $config, Directory|File|Symlink $address, Directory $ori
     }
 
     if ($address instanceof Symlink) {
-        $source_link = $address->parent()->file(readlink($address->stringify()));
-        (new Symlink($destination_address))->link($source_link);
+        $source_link = $address->parent()->file(readlink($address));
+        Symlink::from_string($destination_address)->link($source_link);
 
         return;
     }
 
     if (file_needs_modification($address, $config)) {
         compile_file(
-            new File($address->stringify()),
-            new File($destination_address),
+            File::from_string($address),
+            File::from_string($destination_address),
             $replace_map
         );
 
@@ -249,7 +249,7 @@ function make_replace_map(Project $project, Config $config, Meta $meta): array
         $package_root = $package->build_root($project, $config);
 
         foreach ($package_config->map as $namespace => $source) {
-            $replace_map[$namespace] = $package_root->append($source)->stringify();
+            $replace_map[$namespace] = $package_root->append($source);
         }
     };
 
@@ -258,7 +258,7 @@ function make_replace_map(Project $project, Config $config, Meta $meta): array
     }
 
     foreach ($config->map as $namespace => $source) {
-        $replace_map[$namespace] = $project->build_root->append($source)->stringify();
+        $replace_map[$namespace] = $project->build_root->append($source);
     }
 
     return $replace_map;
@@ -271,14 +271,14 @@ function should_compile_files_and_directories_for_package(Project $project, Conf
 
     $excluded_paths = array_map(
         function ($excluded_path) use ($package, $package_root) {
-            return $package_root->append($excluded_path)->stringify();
+            return $package_root->append($excluded_path)->string();
         },
         $package_config->excludes->put('.git')->items()
     );
 
     return $package->root($project, $config)->ls_all()
         ->except(fn (Directory|File|Symlink $file_or_directory)
-            => in_array($file_or_directory->stringify(), $excluded_paths)
+            => in_array($file_or_directory->path->string(), $excluded_paths)
         );
 }
 
@@ -286,7 +286,7 @@ function should_compile_files_and_directories(Project $project, Config $config):
 {
     $excluded_paths = array_map(
         function ($excluded_path) use ($project) {
-            return $project->root->append($excluded_path)->stringify();
+            return $project->root->append($excluded_path)->string();
         },
         $config->excludes->append(['builds', '.git', '.idea', $config->packages_directory->string()])->items()
     );
@@ -294,17 +294,17 @@ function should_compile_files_and_directories(Project $project, Config $config):
     return $project->root
         ->ls_all()
         ->except(fn (Directory|File|Symlink $filesystem)
-            => in_array($filesystem->stringify(), $excluded_paths)
+            => in_array($filesystem->path->string(), $excluded_paths)
         );
 }
 
 function file_needs_modification(File $file, Config $config): bool
 {
-    return str_ends_with($file->stringify(), '.php')
+    return str_ends_with($file, '.php')
         || $config->entry_points
             ->append($config->executables->values())
             ->reduce(fn ($carry, $entry_point)
-                => str_ends_with($file->stringify(), $entry_point) || $carry, false
+                => str_ends_with($file, $entry_point) || $carry, false
             );
 }
 

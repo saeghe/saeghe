@@ -17,56 +17,54 @@ use function Saeghe\Saeghe\FileManager\Directory\preserve_copy;
 use function Saeghe\Saeghe\FileManager\Directory\renew;
 use function Saeghe\Saeghe\FileManager\Directory\renew_recursive;
 
-class Directory
+class Directory extends Filesystem
 {
-    use Address;
-
     public function chmod(int $permission): self
     {
-        chmod($this->stringify(), $permission);
+        chmod($this->path, $permission);
 
         return $this;
     }
 
     public function delete(): self
     {
-        delete($this->stringify());
+        delete($this->path);
 
         return $this;
     }
 
     public function delete_recursive(): self
     {
-        delete_recursive($this->stringify());
+        delete_recursive($this->path);
 
         return $this;
     }
 
     public function exists(): bool
     {
-        return exists($this->stringify());
+        return exists($this->path);
     }
 
     public function exists_or_create(): self
     {
-        exists_or_create($this->stringify());
+        exists_or_create($this->path);
 
         return $this;
     }
 
     public function file(string $path): File
     {
-        return new File($this->append($path)->stringify());
+        return new File($this->append($path));
     }
 
     public function item(string $path): Directory|File|Symlink
     {
-        $path = (new Path($this->stringify()))->append($path);
+        $path = $this->path->append($path);
 
-        if (is_dir($path->stringify())) {
+        if (is_dir($path)) {
             return $path->as_directory();
         }
-        if (is_link($path->stringify())) {
+        if (is_link($path)) {
             return $path->as_symlink();
         }
 
@@ -77,7 +75,7 @@ class Directory
     {
         $result = new FilesystemCollection();
 
-        foreach (ls($this->stringify()) as $item) {
+        foreach (ls($this->path) as $item) {
             $result->put($this->item($item));
         }
 
@@ -88,7 +86,7 @@ class Directory
     {
         $result = new FilesystemCollection();
 
-        foreach (ls_all($this->stringify()) as $item) {
+        foreach (ls_all($this->path) as $item) {
             $result->put($this->item($item));
         }
 
@@ -97,51 +95,51 @@ class Directory
 
     public function make(int $permission = 0775): self
     {
-        make($this->stringify(), $permission);
+        make($this->path, $permission);
 
         return $this;
     }
 
     public function make_recursive(int $permission = 0775): self
     {
-        make_recursive($this->stringify(), $permission);
+        make_recursive($this->path, $permission);
 
         return $this;
     }
 
     public function permission(): int
     {
-        return permission($this->stringify());
+        return permission($this->path);
     }
 
     public function preserve_copy(Directory $destination): self
     {
-        preserve_copy($this->stringify(), $destination->stringify());
+        preserve_copy($this->path, $destination->path);
 
         return $this;
     }
 
     public function renew(): self
     {
-        renew($this->stringify());
+        renew($this->path);
 
         return $this;
     }
 
     public function renew_recursive(): self
     {
-        renew_recursive($this->stringify());
+        renew_recursive($this->path);
 
         return $this;
     }
 
     public function subdirectory(string $path): static
     {
-        return new static($this->append($path)->stringify());
+        return new static($this->append($path));
     }
 
     public function symlink(string $path): Symlink
     {
-        return new Symlink($this->append($path)->stringify());
+        return new Symlink($this->append($path));
     }
 }

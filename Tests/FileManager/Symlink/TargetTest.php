@@ -11,20 +11,20 @@ use function Saeghe\Saeghe\FileManager\File\delete;
 test(
     title: 'it should return target path to the link',
     case: function (Path $file, Path $link) {
-        assert_true($file->stringify(), target($link->stringify()));
+        assert_true($file->string() === target($link));
 
         return [$file, $link];
     },
     before: function () {
         $file = Path::from_string(root() . 'Tests/PlayGround/LinkSource');
-        create($file->stringify(), 'file content');
+        create($file, 'file content');
         $link = $file->parent()->append('symlink');
-        link($file->stringify(), $link->stringify());
+        link($file, $link);
 
         return [$file, $link];
     },
     after: function (Path $file, Path $link) {
-        unlink($link->stringify());
-        delete($file->stringify());
+        unlink($link);
+        delete($file);
     }
 );

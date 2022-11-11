@@ -13,10 +13,10 @@ function run(Project $project)
     $token = argument(3);
 
     $credentials = $project->credentials->exists()
-        ? Json\to_array($project->credentials->stringify())
+        ? Json\to_array($project->credentials)
         : [];
     $credentials[$provider] = ['token' => $token];
-    Json\write($project->credentials->stringify(), $credentials);
+    Json\write($project->credentials, $credentials);
 
     success("Credential for $provider has been set successfully.");
 }

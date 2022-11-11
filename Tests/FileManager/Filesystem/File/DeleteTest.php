@@ -9,13 +9,13 @@ test(
     title: 'it should delete a file',
     case: function (File $file) {
         $response = $file->delete();
-        assert_true($file->stringify() === $response->stringify());
-        assert_false(exists($file->stringify()));
+        assert_true($file->path->string() === $response->path->string());
+        assert_false(exists($file));
 
         return $file;
     },
     before: function () {
-        $file = new File(root() . 'Tests/PlayGround/File');
+        $file = File::from_string(root() . 'Tests/PlayGround/File');
         $file->create('');
 
         return $file;

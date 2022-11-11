@@ -12,19 +12,19 @@ test(
     case: function (Path $file) {
         $link = $file->parent()->append('symlink');
 
-        assert_true(link($file->stringify(), $link->stringify()));
-        assert_true($file->stringify(), readlink($link->stringify()));
+        assert_true(link($file, $link));
+        assert_true($file->string() === readlink($link));
 
         return [$file, $link];
     },
     before: function () {
         $file = Path::from_string(root() . 'Tests/PlayGround/LinkSource');
-        create($file->stringify(), 'file content');
+        create($file, 'file content');
 
         return $file;
     },
     after: function (Path $file, Path $link) {
-        unlink($link->stringify());
-        delete($file->stringify());
+        unlink($link);
+        delete($file);
     }
 );

@@ -12,21 +12,21 @@ test(
     title: 'it should detect when link exists',
     case: function (Path $file) {
         $link = $file->parent()->append('symlink');
-        assert_false(exists($link->stringify()));
+        assert_false(exists($link));
 
-        link($file->stringify(), $link->stringify());
-        assert_true(exists($link->stringify()));
+        link($file, $link);
+        assert_true(exists($link));
 
         return [$file, $link];
     },
     before: function () {
         $file = Path::from_string(root() . 'Tests/PlayGround/LinkSource');
-        create($file->stringify(), 'file content');
+        create($file, 'file content');
 
         return $file;
     },
     after: function (Path $file, Path $link) {
-        unlink($link->stringify());
-        delete($file->stringify());
+        unlink($link);
+        delete($file);
     }
 );

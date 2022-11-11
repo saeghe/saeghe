@@ -24,7 +24,7 @@ function run(Project $project)
         return;
     }
 
-    $config = Config::from_array(Json\to_array($project->config->stringify()));
+    $config = Config::from_array(Json\to_array($project->config));
 
     $package = $config->packages
         ->reduce(
@@ -57,7 +57,7 @@ function run(Project $project)
 
     $config->packages->put($package, $package_url);
 
-    Json\write($project->config->stringify(), $config->to_array());
+    Json\write($project->config, $config->to_array());
 
     success("Package $package_url has been added successfully.");
 }
@@ -65,21 +65,21 @@ function run(Project $project)
 function add(Project $project, Config $config, Package $package, $package_url)
 {
     if (! $package->is_downloaded($project, $config)) {
-        $package->download($package->root($project, $config)->stringify());
+        $package->download($package->root($project, $config));
     }
 
     $meta = $project->config_lock->exists()
-        ? Meta::from_array(Json\to_array($project->config_lock->stringify()))
+        ? Meta::from_array(Json\to_array($project->config_lock))
         : Meta::init();
 
     $is_in_meta = $meta->packages->reduce(fn ($carry, Package $installed_package) => $carry || $installed_package->is($package), false);
 
     if (! $is_in_meta) {
         $meta->packages[$package_url] = $package;
-        Json\write($project->config_lock->stringify(), $meta->to_array());
+        Json\write($project->config_lock, $meta->to_array());
     }
 
-    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->stringify()));
+    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)));
 
     foreach ($package_config->packages as $sub_package_url => $sub_package) {
         $is_sub_package_in_meta = $meta->packages->reduce(fn ($carry, Package $installed_package) => $carry || $installed_package->is($sub_package), false);

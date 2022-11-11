@@ -9,17 +9,17 @@ use function Saeghe\Saeghe\FileManager\FileType\Json\to_array;
 test(
     title: 'it should return associated array from json file',
     case: function (Path $file) {
-        assert_true(['foo' => 'bar'] === to_array($file->stringify()));
+        assert_true(['foo' => 'bar'] === to_array($file));
 
         return $file;
     },
     before: function () {
         $file = Path::from_string(root() . 'Tests/PlayGround/File');
-        file_put_contents($file->stringify(), json_encode(['foo' => 'bar']));
+        file_put_contents($file, json_encode(['foo' => 'bar']));
 
         return $file;
     },
     after: function (Path $file) {
-        clean($file->parent()->stringify());
+        clean($file->parent());
     }
 );

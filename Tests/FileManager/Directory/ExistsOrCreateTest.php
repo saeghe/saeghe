@@ -8,18 +8,18 @@ use Saeghe\Saeghe\FileManager\Directory;
 test(
     title: 'it should return true when directory exists',
     case: function (Path $directory) {
-        assert_true(Directory\exists_or_create($directory->stringify()));
+        assert_true(Directory\exists_or_create($directory));
 
         return $directory;
     },
     before: function () {
         $directory = Path::from_string(root() . 'Tests/PlayGround/ExistsOrCreate');
-        Directory\make($directory->stringify());
+        Directory\make($directory);
 
         return $directory;
     },
     after: function (Path $directory) {
-        Directory\delete($directory->stringify());
+        Directory\delete($directory);
     }
 );
 
@@ -28,12 +28,12 @@ test(
     case: function () {
         $directory = Path::from_string(root() . 'Tests/PlayGround/ExistsOrCreate');
 
-        assert_true(Directory\exists_or_create($directory->stringify()));
-        assert_true(Directory\exists($directory->stringify()));
+        assert_true(Directory\exists_or_create($directory));
+        assert_true(Directory\exists($directory));
 
         return $directory;
     },
     after: function (Path $directory) {
-        Directory\delete($directory->stringify());
+        Directory\delete($directory);
     }
 );

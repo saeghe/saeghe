@@ -10,11 +10,11 @@ test(
     title: 'it should delete a directory',
     case: function (Directory $directory) {
         $response = $directory->delete();
-        assert_true($directory->stringify() === $response->stringify());
-        assert_false(exists($directory->stringify()));
+        assert_true($directory->path->string() === $response->path->string());
+        assert_false(exists($directory));
     },
     before: function () {
-        $directory = new Directory(root() . 'Tests/PlayGround/DirectoryAddress');
+        $directory = Directory::from_string(root() . 'Tests/PlayGround/DirectoryAddress');
         $directory->make();
 
         return $directory;

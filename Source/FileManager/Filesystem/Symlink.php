@@ -6,25 +6,23 @@ use function Saeghe\Saeghe\FileManager\Symlink\delete;
 use function Saeghe\Saeghe\FileManager\Symlink\exists;
 use function Saeghe\Saeghe\FileManager\Symlink\link;
 
-class Symlink
+class Symlink extends Filesystem
 {
-    use Address;
-
     public function delete(): self
     {
-        delete($this->stringify());
+        delete($this->path);
 
         return $this;
     }
 
     public function exists(): bool
     {
-        return exists($this->stringify());
+        return exists($this->path);
     }
 
     public function link(File $file): self
     {
-        link($file->stringify(), $this->stringify());
+        link($file->path, $this->path);
 
         return $this;
     }

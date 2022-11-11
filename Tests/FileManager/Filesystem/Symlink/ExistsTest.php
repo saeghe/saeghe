@@ -15,9 +15,9 @@ test(
         return [$file, $symlink];
     },
     before: function () {
-        $file = new File(root() . 'Tests/PlayGround/File');
+        $file = File::from_string(root() . 'Tests/PlayGround/File');
         $file->create('');
-        $symlink = new Symlink(root() . 'Tests/PlayGround/Symlink');
+        $symlink = Symlink::from_string(root() . 'Tests/PlayGround/Symlink');
 
         return [$file, $symlink];
     },

@@ -10,21 +10,21 @@ test(
     case: function () {
         $playGround = Path::from_string(root() . 'Tests/PlayGround');
         $regular = $playGround->append('regular');
-        File\create($regular->stringify(), 'content');
-        chmod($regular->stringify(), 0664);
-        assert_true(0664 === File\permission($regular->stringify()));
+        File\create($regular, 'content');
+        chmod($regular, 0664);
+        assert_true(0664 === File\permission($regular));
 
         $full = $playGround->append('full');
         umask(0);
-        File\create($full->stringify(), 'full');
-        chmod($full->stringify(), 0777);
-        assert_true(0777 === File\permission($full->stringify()));
+        File\create($full, 'full');
+        chmod($full, 0777);
+        assert_true(0777 === File\permission($full));
 
         return [$regular, $full];
     },
     after: function (Path $regular, Path $full) {
-        File\delete($regular->stringify());
-        File\delete($full->stringify());
+        File\delete($regular);
+        File\delete($full);
     }
 );
 
@@ -33,16 +33,16 @@ test(
     case: function () {
         $playGround = Path::from_string(root() . 'Tests/PlayGround');
         $file = $playGround->append('regular');
-        File\create($file->stringify(), 0775);
+        File\create($file, 0775);
         umask(0);
-        chmod($file->stringify(), 0777);
-        assert_true(0777 === File\permission($file->stringify()));
-        chmod($file->stringify(), 0666);
-        assert_true(0666 === File\permission($file->stringify()));
+        chmod($file, 0777);
+        assert_true(0777 === File\permission($file));
+        chmod($file, 0666);
+        assert_true(0666 === File\permission($file));
 
         return $file;
     },
     after: function (Path $file) {
-        File\delete($file->stringify());
+        File\delete($file);
     }
 );

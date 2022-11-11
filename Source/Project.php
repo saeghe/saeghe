@@ -34,11 +34,11 @@ class Project
     public static function make(string $projectRoot, string $environment, string $credential_path): self
     {
         return new static(
-            root: new Directory($projectRoot),
+            root: Directory::from_string($projectRoot),
             environment: $environment,
-            config: new File($projectRoot . 'saeghe.config.json'),
-            config_lock: new File($projectRoot . 'saeghe.config-lock.json'),
-            credentials: new File($credential_path),
+            config: File::from_string($projectRoot . 'saeghe.config.json'),
+            config_lock: File::from_string($projectRoot . 'saeghe.config-lock.json'),
+            credentials: File::from_string($credential_path),
         );
     }
 
@@ -54,7 +54,7 @@ class Project
             throw new CredentialCanNotBeSetException('There is no credential file. Please use the `credential` command to add your token.');
         }
 
-        $credential = Json\to_array($this->credentials->stringify());
+        $credential = Json\to_array($this->credentials);
         github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
     }
 }

@@ -12,19 +12,19 @@ use function Saeghe\Saeghe\FileManager\File\exists;
 test(
     title: 'it should modify file',
     case: function (Path $file) {
-        assert_true(modify($file->stringify(), 'content in file'));
-        assert_true(exists($file->stringify()));
-        assert_true('content in file' === content($file->stringify()));
+        assert_true(modify($file, 'content in file'));
+        assert_true(exists($file));
+        assert_true('content in file' === content($file));
 
         return $file;
     },
     before: function () {
         $file = Path::from_string(root() . 'Tests/PlayGround/sample.txt');
-        create($file->stringify(), 'create content');
+        create($file, 'create content');
 
         return $file;
     },
     after: function (Path $file) {
-        delete($file->stringify());
+        delete($file);
     }
 );

@@ -13,10 +13,10 @@ function run(Project $project)
 {
     $project->set_env_credentials();
 
-    $config = Config::from_array(Json\to_array($project->config->stringify()));
-    $meta = Meta::from_array(Json\to_array($project->config_lock->stringify()));
+    $config = Config::from_array(Json\to_array($project->config));
+    $meta = Meta::from_array(Json\to_array($project->config_lock));
 
-    $meta->packages->each(fn (Package $package) => $package->download($package->root($project, $config)->stringify()));
+    $meta->packages->each(fn (Package $package) => $package->download($package->root($project, $config)));
 
     success('Packages has been installed successfully.');
 }

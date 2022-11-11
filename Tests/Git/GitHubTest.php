@@ -111,15 +111,15 @@ test(
 test(
     title: 'it should download given repository',
     case: function (Path $packages_directory) {
-        assert_true(download($packages_directory->stringify(), 'saeghe', 'released-package', 'v1.0.5'));
+        assert_true(download($packages_directory, 'saeghe', 'released-package', 'v1.0.5'));
         // Assert latest changes on the latest commit
         assert_true(true ===
             str_contains(
-                file_get_contents($packages_directory->append('saeghe.config-lock.json')->stringify()),
+                file_get_contents($packages_directory->append('saeghe.config-lock.json')),
                 '080478442a9ef1d19f5966edc9bf3c1eccca4848'
             )
         );
-        assert_false(\file_exists($packages_directory->parent()->append('released-package.zip')->stringify()));
+        assert_false(\file_exists($packages_directory->parent()->append('released-package.zip')));
 
         return $packages_directory;
     },
@@ -127,23 +127,23 @@ test(
         $credentials = Json\to_array(realpath(root() . 'credentials.json'));
         github_token($credentials[GITHUB_DOMAIN]['token']);
         $packages_directory = Path::from_string(root() . 'Tests/PlayGround/downloads/package');
-        mkdir($packages_directory->stringify(), 0777, true);
+        mkdir($packages_directory, 0777, true);
 
         return $packages_directory;
     },
     after: function (Path $packages_directory) {
-        clean($packages_directory->parent()->parent()->stringify());
+        clean($packages_directory->parent()->parent());
     }
 );
 
 test(
     title: 'it should clone given repository',
     case: function (Path $packages_directory) {
-        assert_true(clone_to($packages_directory->stringify(), 'saeghe', 'simple-package'));
+        assert_true(clone_to($packages_directory, 'saeghe', 'simple-package'));
         // Assert latest changes on the latest commit
         assert_true(true ===
             str_contains(
-                file_get_contents($packages_directory->append('entry-point')->stringify()),
+                file_get_contents($packages_directory->append('entry-point')),
                 'new ImaginaryClass();'
             )
         );
@@ -152,12 +152,12 @@ test(
     },
     before: function () {
         $packages_directory = Path::from_string(root() . 'Tests/PlayGround/downloads/package');
-        mkdir($packages_directory->stringify(), 0777, true);
+        mkdir($packages_directory, 0777, true);
 
         return $packages_directory;
     },
     after: function (Path $packages_directory) {
-        clean($packages_directory->parent()->parent()->stringify());
+        clean($packages_directory->parent()->parent());
     }
 );
 

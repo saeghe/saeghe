@@ -11,12 +11,12 @@ test(
     title: 'it should write associated array to json file',
     case: function () {
         $file = Path::from_string(root() . 'Tests/PlayGround/File');
-        write($file->stringify(), ['foo' => 'bar']);
-        assert_true(['foo' => 'bar'] === to_array($file->stringify()));
+        write($file, ['foo' => 'bar']);
+        assert_true(['foo' => 'bar'] === to_array($file));
 
         return $file;
     },
     after: function (Path $file) {
-        clean($file->parent()->stringify());
+        clean($file->parent());
     }
 );

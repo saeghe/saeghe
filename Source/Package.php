@@ -33,7 +33,7 @@ class Package extends Repository
     public function config(Project $project, Config $config): Config
     {
         return $this->config_path($project, $config)->exists()
-            ? Config::from_array(Json\to_array($this->config_path($project, $config)->stringify()))
+            ? Config::from_array(Json\to_array($this->config_path($project, $config)))
             : Config::init();
     }
 }

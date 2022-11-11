@@ -10,14 +10,14 @@ test(
         $result = $file->modify('content in file');
 
         assert_true($result instanceof File);
-        assert_true($result->stringify() === $file->stringify());
+        assert_true($result->path->string() === $file->path->string());
         assert_true($file->exists());
         assert_true('content in file' === $file->content());
 
         return $file;
     },
     before: function () {
-        $file = new File(root() . 'Tests/PlayGround/sample.txt');
+        $file = File::from_string(root() . 'Tests/PlayGround/sample.txt');
         $file->create('create content');
 
         return $file;

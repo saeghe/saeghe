@@ -36,9 +36,9 @@ test(
 test(
     title: 'it should accept Directory, File and Symlink objects',
     case: function () {
-        $directory = new Directory('/');
-        $file = new File('/file');
-        $symlink = new Symlink('/symlink');
+        $directory = Directory::from_string('/');
+        $file = File::from_string('/file');
+        $symlink = Symlink::from_string('/symlink');
 
         $collection = new FilesystemCollection([$directory, $file, $symlink]);
 

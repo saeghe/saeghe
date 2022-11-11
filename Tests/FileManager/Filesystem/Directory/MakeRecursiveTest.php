@@ -7,10 +7,10 @@ use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 test(
     title: 'it should create directory recursively',
     case: function () {
-        $directory = new Directory(root() . 'Tests/PlayGround/Origin/MakeRecursive');
+        $directory = Directory::from_string(root() . 'Tests/PlayGround/Origin/MakeRecursive');
 
         $result = $directory->make_recursive();
-        assert_true($result->stringify() === $directory->stringify());
+        assert_true($result->path->string() === $directory->path->string());
         assert_true($directory->parent()->exists());
         assert_true($directory->exists());
 
@@ -24,7 +24,7 @@ test(
 test(
     title: 'it should create directory recursively with given permission',
     case: function () {
-        $directory = new Directory(root() . 'Tests/PlayGround/Origin/MakeRecursive');
+        $directory = Directory::from_string(root() . 'Tests/PlayGround/Origin/MakeRecursive');
 
         $directory->make_recursive(0777);
 

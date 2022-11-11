@@ -21,6 +21,7 @@ spl_autoload_register(function ($class) {
         'Saeghe\Saeghe\FileManager\Filesystem\Directory' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Directory.php'),
         'Saeghe\Saeghe\FileManager\Filesystem\File' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/File.php'),
         'Saeghe\Saeghe\FileManager\Filesystem\Filename' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Filename.php'),
+        'Saeghe\Saeghe\FileManager\Filesystem\Filesystem' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Filesystem.php'),
         'Saeghe\Saeghe\FileManager\Filesystem\FilesystemCollection' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/FilesystemCollection.php'),
         'Saeghe\Saeghe\FileManager\Filesystem\Symlink' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Symlink.php'),
         'Saeghe\Saeghe\Package' => \realpath(__DIR__ . '/Source/Package.php'),

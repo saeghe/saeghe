@@ -19,7 +19,7 @@ test(
         return $file;
     },
     before: function () {
-        $file = new File(root() . 'Tests/PlayGround/NewFile.txt');
+        $file = File::from_string(root() . 'Tests/PlayGround/NewFile.txt');
         $file->create('First line.' . PHP_EOL . 'Second line.');
 
         return $file;

@@ -9,14 +9,14 @@ test(
     case: function (Directory $directory) {
         $result = $directory->renew_recursive();
 
-        assert_true($result->stringify() === $directory->stringify());
+        assert_true($result->path->string() === $directory->path->string());
         assert_true($directory->exists());
         assert_false($directory->file('file.txt')->exists());
 
         return $directory;
     },
     before: function () {
-        $directory = new Directory(root() . 'Tests/PlayGround/Renew/Recursive');
+        $directory = Directory::from_string(root() . 'Tests/PlayGround/Renew/Recursive');
         $directory->make_recursive();
         $directory->file('file.txt')->create('content');
 
@@ -30,7 +30,7 @@ test(
 test(
     title: 'it should create the directory recursively when directory not exists',
     case: function () {
-        $directory = new Directory(root() . 'Tests/PlayGround/Renew/Recursive');
+        $directory = Directory::from_string(root() . 'Tests/PlayGround/Renew/Recursive');
 
         $directory->renew_recursive();
         assert_true($directory->parent()->exists());

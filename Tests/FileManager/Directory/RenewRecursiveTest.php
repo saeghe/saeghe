@@ -9,21 +9,21 @@ use Saeghe\Saeghe\FileManager\File;
 test(
     title: 'it should clean directory when directory exists',
     case: function (Path $directory) {
-        Directory\renew_recursive($directory->stringify());
-        assert_true(Directory\exists($directory->stringify()));
-        assert_false(File\exists($directory->append('file.txt')->stringify()));
+        Directory\renew_recursive($directory);
+        assert_true(Directory\exists($directory));
+        assert_false(File\exists($directory->append('file.txt')));
 
         return $directory;
     },
     before: function () {
         $directory = Path::from_string(root() . 'Tests/PlayGround/Renew/Recursive');
-        Directory\make_recursive($directory->stringify());
-        file_put_contents($directory->append('file.txt')->stringify(), 'content');
+        Directory\make_recursive($directory);
+        file_put_contents($directory->append('file.txt'), 'content');
 
         return $directory;
     },
     after: function (Path $directory) {
-        Directory\delete_recursive($directory->parent()->stringify());
+        Directory\delete_recursive($directory->parent());
     }
 );
 
@@ -32,13 +32,13 @@ test(
     case: function () {
         $directory = Path::from_string(root() . 'Tests/PlayGround/Renew/Recursive');
 
-        Directory\renew_recursive($directory->stringify());
-        assert_true(Directory\exists($directory->parent()->stringify()));
-        assert_true(Directory\exists($directory->stringify()));
+        Directory\renew_recursive($directory);
+        assert_true(Directory\exists($directory->parent()));
+        assert_true(Directory\exists($directory));
 
         return $directory;
     },
     after: function (Path $directory) {
-        Directory\delete_recursive($directory->parent()->stringify());
+        Directory\delete_recursive($directory->parent());
     }
 );

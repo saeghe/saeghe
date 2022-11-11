@@ -14,7 +14,7 @@ test(
         return $directory;
     },
     before: function () {
-        return new Directory(root() . 'Tests/PlayGround/DirectoryAddress');
+        return Directory::from_string(root() . 'Tests/PlayGround/DirectoryAddress');
     },
     after: function (Directory $directory) {
         $directory->delete();

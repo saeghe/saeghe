@@ -7,11 +7,11 @@ use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 test(
     title: 'it should change directory\'s permission',
     case: function () {
-        $playGround = new Directory(root() . 'Tests/PlayGround');
+        $playGround = Directory::from_string(root() . 'Tests/PlayGround');
         $regular = $playGround->subdirectory('regular');
         $regular->make(0666);
         $result = $regular->chmod(0774);
-        assert_true($result->stringify() === $regular->stringify(), 'It should return same directory');
+        assert_true($result->path->string() === $regular->path->string(), 'It should return same directory');
         assert_true(0774 === $regular->permission(), 'Permission is not correct');
 
         $full = $playGround->subdirectory('full');

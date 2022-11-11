@@ -10,16 +10,16 @@ test(
         $copied_directory = $destination->subdirectory($origin->leaf());
         $result = $origin->preserve_copy($copied_directory);
 
-        assert_true($result->stringify() === $origin->stringify());
+        assert_true($result->path->string() === $origin->path->string());
         assert_true($copied_directory->exists());
         assert_true($origin->permission() === $copied_directory->permission());
 
         return [$origin, $destination];
     },
     before: function () {
-        $origin = new Directory(root() . 'Tests/PlayGround/Origin/PreserveCopy');
+        $origin = Directory::from_string(root() . 'Tests/PlayGround/Origin/PreserveCopy');
         $origin->make_recursive();
-        $destination = new Directory(root() . 'Tests/PlayGround/Destination');
+        $destination = Directory::from_string(root() . 'Tests/PlayGround/Destination');
         $destination->make();
 
         return [$origin, $destination];
@@ -42,9 +42,9 @@ test(
         return [$origin, $destination];
     },
     before: function () {
-        $origin = new Directory(root() . 'Tests/PlayGround/Origin/PreserveCopy');
+        $origin = Directory::from_string(root() . 'Tests/PlayGround/Origin/PreserveCopy');
         $origin->make_recursive(0777);
-        $destination = new Directory(root() . 'Tests/PlayGround/Destination');
+        $destination = Directory::from_string(root() . 'Tests/PlayGround/Destination');
         $destination->make();
 
         return [$origin, $destination];

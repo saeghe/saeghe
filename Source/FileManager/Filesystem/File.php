@@ -12,61 +12,59 @@ use function Saeghe\Saeghe\FileManager\File\modify;
 use function Saeghe\Saeghe\FileManager\File\permission;
 use function Saeghe\Saeghe\FileManager\File\preserve_copy;
 
-class File
+class File extends Filesystem
 {
-    use Address;
-
     public function chmod(int $permission): self
     {
-        chmod($this->stringify(), $permission);
+        chmod($this->path, $permission);
 
         return $this;
     }
 
     public function content(): string
     {
-        return content($this->stringify());
+        return content($this->path);
     }
 
     public function create(string $content, int $permission = 0664): self
     {
-        create($this->stringify(), $content, $permission);
+        create($this->path, $content, $permission);
 
         return $this;
     }
 
     public function delete(): self
     {
-        delete($this->stringify());
+        delete($this->path);
 
         return $this;
     }
 
     public function exists(): bool
     {
-        return exists($this->stringify());
+        return exists($this->path);
     }
 
     public function lines(): \Generator
     {
-        return lines($this->stringify());
+        return lines($this->path);
     }
 
     public function modify(string $content): self
     {
-        modify($this->stringify(), $content);
+        modify($this->path, $content);
 
         return $this;
     }
 
     public function permission(): int
     {
-        return permission($this->stringify());
+        return permission($this->path);
     }
 
     public function preserve_copy(File $destination): self
     {
-        preserve_copy($this->stringify(), $destination->stringify());
+        preserve_copy($this->path, $destination->path);
 
         return $this;
     }

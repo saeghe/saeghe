@@ -10,19 +10,19 @@ test(
     case: function () {
         $playGround = Path::from_string(root() . 'Tests/PlayGround');
         $regular = $playGround->append('regular');
-        File\create($regular->stringify(), 'content');
-        assert_true(File\chmod($regular->stringify(), 0664));
-        assert_true(0664 === File\permission($regular->stringify()));
+        File\create($regular, 'content');
+        assert_true(File\chmod($regular, 0664));
+        assert_true(0664 === File\permission($regular));
 
         $full = $playGround->append('full');
-        File\create($full->stringify(), 'full');
-        assert_true(File\chmod($full->stringify(), 0777));
-        assert_true(0777 === File\permission($full->stringify()));
+        File\create($full, 'full');
+        assert_true(File\chmod($full, 0777));
+        assert_true(0777 === File\permission($full));
 
         return [$regular, $full];
     },
     after: function (Path $regular, Path $full) {
-        File\delete($regular->stringify());
-        File\delete($full->stringify());
+        File\delete($regular);
+        File\delete($full);
     }
 );

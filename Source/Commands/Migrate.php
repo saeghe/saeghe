@@ -28,8 +28,8 @@ function run(Project $project)
         return;
     }
 
-    $composer_setting = Json\to_array($composer_file->stringify());
-    $composer_lock_setting = Json\to_array($composer_lock_file->stringify());
+    $composer_setting = Json\to_array($composer_file);
+    $composer_lock_setting = Json\to_array($composer_lock_file);
 
     if (isset($composer_setting['autoload']['psr-4'])) {
         $config['map'] = [];
@@ -72,8 +72,8 @@ function run(Project $project)
         migrate_package($project, $project->root->subdirectory($config['packages-directory']), $name, $package, $meta['packages'][$package]);
     }
 
-    Json\write($project->config->stringify(), $config);
-    Json\write($project->config_lock->stringify(), $meta);
+    Json\write($project->config, $config);
+    Json\write($project->config_lock, $meta);
 
     Write\success('Project migrated successfully.');
 }
@@ -88,9 +88,9 @@ function migrate_package(Project $project, Directory $packages_directory, $name,
         $packages_directory->make_recursive(0755);
     }
 
-    recursive_copy($package_vendor_directory->stringify(), $package_directory->stringify());
+    recursive_copy($package_vendor_directory, $package_directory);
 
-    $package_composer_settings = Json\to_array($package_directory->file('composer.json')->stringify());
+    $package_composer_settings = Json\to_array($package_directory->file('composer.json'));
 
     $config = ['map' => []];
 
@@ -105,8 +105,8 @@ function migrate_package(Project $project, Directory $packages_directory, $name,
         }
     }
 
-    Json\write($package_directory->file('saeghe.config.json')->stringify(), $config);
-    Json\write($package_directory->file( 'saeghe.config-lock.json')->stringify(), []);
+    Json\write($package_directory->file('saeghe.config.json'), $config);
+    Json\write($package_directory->file( 'saeghe.config-lock.json'), []);
 }
 
 function get_meta_from_package($package)
@@ -126,7 +126,7 @@ function get_meta_from_package($package)
     return $meta;
 }
 
-function recursive_copy($source, $destination)
+function recursive_copy(string $source, string $destination)
 {
     $dir = opendir($source);
     @mkdir($destination, 0755, true);

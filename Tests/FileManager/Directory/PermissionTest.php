@@ -10,18 +10,18 @@ test(
     case: function () {
         $playGround = Path::from_string(root() . 'Tests/PlayGround');
         $regular = $playGround->append('regular');
-        Directory\make($regular->stringify(), 0774);
-        assert_true(0774 === Directory\permission($regular->stringify()));
+        Directory\make($regular, 0774);
+        assert_true(0774 === Directory\permission($regular));
 
         $full = $playGround->append('full');
-        Directory\make($full->stringify(), 0777);
-        assert_true(0777 === Directory\permission($full->stringify()));
+        Directory\make($full, 0777);
+        assert_true(0777 === Directory\permission($full));
 
         return [$regular, $full];
     },
     after: function (Path $regular, Path $full) {
-        Directory\delete($regular->stringify());
-        Directory\delete($full->stringify());
+        Directory\delete($regular);
+        Directory\delete($full);
     }
 );
 
@@ -30,14 +30,14 @@ test(
     case: function () {
         $playGround = Path::from_string(root() . 'Tests/PlayGround');
         $directory = $playGround->append('regular');
-        Directory\make($directory->stringify(), 0775);
-        assert_true(0775 === Directory\permission($directory->stringify()));
-        chmod($directory->stringify(), 0774);
-        assert_true(0774 === Directory\permission($directory->stringify()));
+        Directory\make($directory, 0775);
+        assert_true(0775 === Directory\permission($directory));
+        chmod($directory, 0774);
+        assert_true(0774 === Directory\permission($directory));
 
         return $directory;
     },
     after: function (Path $directory) {
-        Directory\delete($directory->stringify());
+        Directory\delete($directory);
     }
 );

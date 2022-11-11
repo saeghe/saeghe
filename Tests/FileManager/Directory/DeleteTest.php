@@ -8,13 +8,13 @@ use Saeghe\Saeghe\FileManager\Directory;
 test(
     title: 'it should delete the given directory',
     case: function (Path $directory) {
-        Directory\delete($directory->stringify());
+        Directory\delete($directory);
 
-        assert_false(Directory\exists($directory->stringify()));
+        assert_false(Directory\exists($directory));
     },
     before: function () {
         $directory = Path::from_string(root() . 'Tests/PlayGround/DeleteDirectory');
-        mkdir($directory->stringify());
+        mkdir($directory);
 
         return $directory;
     }

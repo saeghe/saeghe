@@ -12,7 +12,7 @@ test(
         return $file;
     },
     before: function () {
-        $file = new File(root() . 'Tests/PlayGround/sample.txt');
+        $file = File::from_string(root() . 'Tests/PlayGround/sample.txt');
         $file->create('sample text');
 
         return $file;

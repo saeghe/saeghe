@@ -14,7 +14,7 @@ test(
         return $file;
     },
     before: function () {
-        return new File(root() . 'Tests/PlayGround/File');
+        return File::from_string(root() . 'Tests/PlayGround/File');
     },
     after: function (File $file) {
         $file->delete();

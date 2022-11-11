@@ -11,15 +11,15 @@ test(
         $results = $directory->ls_all();
 
         assert_true($directory->ls_all() instanceof FilesystemCollection);
-        assert_true($results[0]->stringify() === $directory->file('.hidden.txt')->stringify());
-        assert_true($results[1]->stringify() === $directory->file('sample.txt')->stringify());
-        assert_true($results[2]->stringify() === $directory->file('sub-directory')->stringify());
-        assert_true($results[3]->stringify() === $directory->file('symlink')->stringify());
+        assert_true($results[0]->path->string() === $directory->file('.hidden.txt')->path->string());
+        assert_true($results[1]->path->string() === $directory->file('sample.txt')->path->string());
+        assert_true($results[2]->path->string() === $directory->file('sub-directory')->path->string());
+        assert_true($results[3]->path->string() === $directory->file('symlink')->path->string());
 
         return $directory;
     },
     before: function () {
-        $directory = new Directory(root() . 'Tests/PlayGround/Directory');
+        $directory = Directory::from_string(root() . 'Tests/PlayGround/Directory');
         $directory->make();
         $directory->subdirectory('sub-directory')->make();
         $directory->file('sample.txt')->create('');
@@ -44,7 +44,7 @@ test(
         return $directory;
     },
     before: function () {
-        $directory = new Directory(root() . 'Tests/PlayGround/Directory');
+        $directory = Directory::from_string(root() . 'Tests/PlayGround/Directory');
         $directory->make();
 
         return $directory;

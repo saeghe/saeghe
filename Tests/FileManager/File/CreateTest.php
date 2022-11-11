@@ -13,15 +13,15 @@ test(
     title: 'it should create file',
     case: function () {
         $file = Path::from_string(root() . 'Tests/PlayGround/sample.txt');
-        assert_true(create($file->stringify(), 'content in file'));
-        assert_true(exists($file->stringify()));
-        assert_true('content in file' === content($file->stringify()));
-        assert_true(0664 === permission($file->stringify()));
+        assert_true(create($file, 'content in file'));
+        assert_true(exists($file));
+        assert_true('content in file' === content($file));
+        assert_true(0664 === permission($file));
 
         return $file;
     },
     after: function (Path $file) {
-        delete($file->stringify());
+        delete($file);
     }
 );
 
@@ -29,14 +29,14 @@ test(
     title: 'it should create file with given permission',
     case: function () {
         $file = Path::from_string(root() . 'Tests/PlayGround/sample.txt');
-        assert_true(create($file->stringify(), 'content in file', 0765));
-        assert_true(exists($file->stringify()));
-        assert_true('content in file' === content($file->stringify()));
-        assert_true(0765 === permission($file->stringify()));
+        assert_true(create($file, 'content in file', 0765));
+        assert_true(exists($file));
+        assert_true('content in file' === content($file));
+        assert_true(0765 === permission($file));
 
         return $file;
     },
     after: function (Path $file) {
-        delete($file->stringify());
+        delete($file);
     }
 );

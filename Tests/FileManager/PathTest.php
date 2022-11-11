@@ -13,43 +13,43 @@ test(
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            (new Path('\user\home/directory     '))->stringify()
+            Path::from_string('\user\home/directory     ')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            (new Path('     \user\home/directory     '))->stringify()
+            Path::from_string('     \user\home/directory     ')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            (new Path('\user\home/directory'))->stringify()
+            Path::from_string('\user\home/directory')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            (new Path('\user\\\\home//directory'))->stringify()
+            Path::from_string('\user\\\\home//directory')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            (new Path('\user\\\\home//directory/'))->stringify()
+            Path::from_string('\user\\\\home//directory/')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'middle-directory' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            (new Path('\user\home\../middle-directory\directory'))->stringify()
+            Path::from_string('\user\home\../middle-directory\directory')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'middle-directory' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            (new Path('\user\home\.././middle-directory/directory'))->stringify()
+            Path::from_string('\user\home\.././middle-directory/directory')->string()
         );
     }
 );
@@ -60,31 +60,31 @@ test(
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            Path::from_string('\user\home/directory')->stringify()
+            Path::from_string('\user\home/directory')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            Path::from_string('\user\\\\home///directory')->stringify()
+            Path::from_string('\user\\\\home///directory')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            Path::from_string('\user\\\\home///directory/')->stringify()
+            Path::from_string('\user\\\\home///directory/')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'middle-directory' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            Path::from_string('\user\home\../middle-directory\directory')->stringify()
+            Path::from_string('\user\home\../middle-directory\directory')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'middle-directory' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            Path::from_string('\user\home\.././middle-directory/directory')->stringify()
+            Path::from_string('\user\home\.././middle-directory/directory')->string()
         );
     }
 );
@@ -97,47 +97,47 @@ test(
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            $path->append('directory')->stringify()
+            $path->append('directory')->string()
             &&
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home'
             ===
-            $path->stringify()
+            $path->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            (Path::from_string('/user/home')->append('\directory'))->stringify()
+            Path::from_string('/user/home')->append('\directory')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            (Path::from_string('/user/home')->append('\directory\\'))->stringify()
+            Path::from_string('/user/home')->append('\directory\\')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension'
             ===
-            (Path::from_string('\user/home')->append('directory\filename.extension'))->stringify()
+            Path::from_string('\user/home')->append('directory\filename.extension')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension'
             ===
-            (Path::from_string('\user/home')->append('directory\filename.extension/'))->stringify()
+            Path::from_string('\user/home')->append('directory\filename.extension/')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension'
             ===
-            (Path::from_string('\user////home')->append('directory\\\\filename.extension'))->stringify()
+            Path::from_string('\user////home')->append('directory\\\\filename.extension')->string()
         );
 
         assert_true(
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension'
             ===
-            (Path::from_string('\user/home/..\./')->append('./another-directory/../directory\\\\filename.extension'))->stringify()
+            Path::from_string('\user/home/..\./')->append('./another-directory/../directory\\\\filename.extension')->string()
         );
     }
 );
@@ -152,11 +152,11 @@ test(
             &&
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory'
             ===
-            $path->parent()->stringify()
+            $path->parent()->path->string()
             &&
             DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR . 'directory' . DIRECTORY_SEPARATOR . 'filename.extension'
             ===
-            $path->stringify()
+            $path->string()
         );
     }
 );
@@ -175,7 +175,7 @@ test(
 test(
     title: 'it should detect the leaf',
     case: function () {
-        assert_true(Path::from_string('/')->stringify() === Path::from_string('/')->leaf(), 'root leaf is not detected');
+        assert_true(Path::from_string('/')->string() === Path::from_string('/')->leaf(), 'root leaf is not detected');
         assert_true('PathTest.php' === Path::from_string(__FILE__)->leaf(), 'leaf for file is not detected');
         assert_true('FileManager' === Path::from_string(__DIR__)->leaf(), 'leaf for directory is not detected');
     }
@@ -188,7 +188,7 @@ test(
         $sibling = $address->sibling('sibling');
 
         assert_true($sibling instanceof Path);
-        assert_true($address->parent()->append('sibling')->stringify() === $sibling->stringify());
+        assert_true($address->parent()->append('sibling')->string() === $sibling->string());
     }
 );
 
@@ -199,7 +199,7 @@ test(
         $file = $address->as_file();
 
         assert_true($file instanceof File);
-        assert_true($address->stringify() === $file->stringify());
+        assert_true($address->string() === $file->path->string());
     }
 );
 
@@ -210,7 +210,7 @@ test(
         $directory = $address->as_directory();
 
         assert_true($directory instanceof Directory);
-        assert_true($address->stringify() === $directory->stringify());
+        assert_true($address->string() === $directory->path->string());
     }
 );
 
@@ -221,6 +221,6 @@ test(
         $symlink = $address->as_symlink();
 
         assert_true($symlink instanceof Symlink);
-        assert_true($address->stringify() === $symlink->stringify());
+        assert_true($address->string() === $symlink->path->string());
     }
 );

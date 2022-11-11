@@ -8,12 +8,12 @@ use Saeghe\Saeghe\FileManager\Filesystem\File;
 test(
     title: 'it should change file\'s permission',
     case: function () {
-        $playGround = new Directory(root() . 'Tests/PlayGround');
+        $playGround = Directory::from_string(root() . 'Tests/PlayGround');
         $regular = $playGround->file('regular');
         $regular->create('content');
         $result = $regular->chmod(0664);
         assert_true($result instanceof File);
-        assert_true($result->stringify() === $regular->stringify());
+        assert_true($result->path->string() === $regular->path->string());
         assert_true(0664 === $regular->permission());
 
         $full = $playGround->file('full');

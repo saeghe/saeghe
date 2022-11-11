@@ -9,17 +9,17 @@ test(
     title: 'it should link a symlink',
     case: function (File $file, Symlink $symlink) {
         $response = $symlink->link($file);
-        assert_true($symlink->stringify() === $response->stringify());
+        assert_true($symlink->path->string() === $response->path->string());
         assert_true($file->exists());
-        assert_true(\file_exists($symlink->stringify()));
-        assert_true(\readlink($symlink->stringify()) === $file->stringify());
+        assert_true(\file_exists($symlink));
+        assert_true(\readlink($symlink) === $file->path->string());
 
         return [$file, $symlink];
     },
     before: function () {
-        $file = new File(root() . 'Tests/PlayGround/File');
+        $file = File::from_string(root() . 'Tests/PlayGround/File');
         $file->create('');
-        $symlink = new Symlink(root() . 'Tests/PlayGround/Symlink');
+        $symlink = Symlink::from_string(root() . 'Tests/PlayGround/Symlink');
 
         return [$file, $symlink];
     },
