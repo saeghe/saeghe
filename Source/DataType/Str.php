@@ -98,7 +98,7 @@ function replace_first_occurrence(string $subject, string $search, string $repla
     return $subject;
 }
 
-function start_with_regex(string $subject, string $pattern): bool
+function starts_with_regex(string $subject, string $pattern): bool
 {
     $pattern = str_ends_with($pattern, '\\') ? $pattern . '\\' : $pattern;
 
