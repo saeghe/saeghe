@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\DataType;
 
-abstract class Collection implements \ArrayAccess, \IteratorAggregate
+abstract class Collection implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     private array $items;
 
@@ -30,6 +30,11 @@ abstract class Collection implements \ArrayAccess, \IteratorAggregate
         }
 
         return $this;
+    }
+
+    public function count(): int
+    {
+        return count($this->items);
     }
 
     public function each(\Closure $closure): static

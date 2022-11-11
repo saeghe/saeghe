@@ -88,3 +88,23 @@ test(
         }
     }
 );
+
+test(
+    title: 'it should return count of the items',
+    case: function () {
+        $collection = new class(['foo', 'bar', 'baz', 'qux']) extends Collection {
+            public function key_is_valid(mixed $key): bool
+            {
+                return true;
+            }
+
+            public function value_is_valid(mixed $value): bool
+            {
+                return true;
+            }
+        };
+
+        assert_true($collection instanceof \Countable);
+        assert_true(4 === count($collection));
+    }
+);
