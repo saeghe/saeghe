@@ -288,7 +288,7 @@ function should_compile_files_and_directories(Project $project, Config $config):
         function ($excluded_path) use ($project) {
             return $project->root->append($excluded_path)->stringify();
         },
-        $config->excludes->append(['builds', '.git', '.idea', $config->packages_directory])->items()
+        $config->excludes->append(['builds', '.git', '.idea', $config->packages_directory->string()])->items()
     );
 
     return $project->root

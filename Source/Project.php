@@ -22,8 +22,8 @@ class Project
      *  DO NOT modify them!
      */
     public function __construct(
-        public Directory   $root,
-        public string      $environment,
+        public Directory $root,
+        public string $environment,
         public File $config,
         public File $config_lock,
         public File $credentials,
