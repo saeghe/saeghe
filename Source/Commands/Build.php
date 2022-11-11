@@ -6,6 +6,7 @@ use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\Config;
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\Saeghe\FileManager\Filesystem\File;
+use Saeghe\Saeghe\FileManager\Filesystem\FilesystemCollection;
 use Saeghe\Saeghe\FileManager\Filesystem\Symlink;
 use Saeghe\Saeghe\Meta;
 use Saeghe\Saeghe\Package;
@@ -72,32 +73,18 @@ function compile_packages(Project $project, Config $config, Package $package, ar
 {
     $project->build_root->subdirectory("{$config->packages_directory}/{$package->owner}/{$package->repo}")->renew_recursive();
 
-    $files_and_directories = should_compile_files_and_directories_for_package($project, $config, $package);
-
-    foreach ($files_and_directories as $file_or_directory) {
-        compile(
-            $package->config($project, $config),
-            $file_or_directory,
-            $package->root($project, $config),
-            $package->build_root($project, $config),
-            $replace_map
+    should_compile_files_and_directories_for_package($project, $config, $package)
+        ->each(fn (Directory|File|Symlink $filesystem)
+            => compile($package->config($project, $config), $filesystem, $package->root($project, $config), $package->build_root($project, $config), $replace_map)
         );
-    }
 }
 
 function compile_project_files(Project $project, Config $config, array $replace_map): void
 {
-    $files_and_directories = should_compile_files_and_directories($project, $config);
-
-    foreach ($files_and_directories as $file_or_directory) {
-        compile(
-            $config,
-            $file_or_directory,
-            $project->root,
-            $project->build_root,
-            $replace_map
+    should_compile_files_and_directories($project, $config)
+        ->each(fn (Directory|File|Symlink $filesystem)
+            => compile( $config, $filesystem, $project->root, $project->build_root, $replace_map)
         );
-    }
 }
 
 function compile(Config $config, Directory|File|Symlink $address, Directory $origin, Directory $destination, array $replace_map): void
@@ -108,17 +95,9 @@ function compile(Config $config, Directory|File|Symlink $address, Directory $ori
         $destination_directory = new Directory($destination_address);
         $address->preserve_copy($destination_directory);
 
-        $sub_files_and_directories = $address->ls_all();
-
-        foreach ($sub_files_and_directories as $sub_file_or_directory) {
-            compile(
-                $config,
-                $sub_file_or_directory,
-                $origin->subdirectory($address->leaf()),
-                $destination->subdirectory($address->leaf()),
-                $replace_map
-            );
-        }
+        $address->ls_all()->each(fn (Directory|File|Symlink $filesystem)
+            => compile($config, $filesystem, $origin->subdirectory($address->leaf()), $destination->subdirectory($address->leaf()), $replace_map)
+        );
 
         return;
     }
@@ -145,8 +124,7 @@ function compile(Config $config, Directory|File|Symlink $address, Directory $ori
 
 function compile_file(File $origin, File $destination, array $replace_map): void
 {
-    $modified_file_content = apply_file_modifications($origin, $replace_map);
-    $destination->create($modified_file_content, $origin->permission());
+    $destination->create(apply_file_modifications($origin, $replace_map), $origin->permission());
 }
 
 function apply_file_modifications(File $origin, array $replace_map): string
@@ -286,7 +264,7 @@ function make_replace_map(Project $project, Config $config, Meta $meta): array
     return $replace_map;
 }
 
-function should_compile_files_and_directories_for_package(Project $project, Config $config, Package $package): array
+function should_compile_files_and_directories_for_package(Project $project, Config $config, Package $package): FilesystemCollection
 {
     $package_config = $package->config($project, $config);
     $package_root = $package->root($project, $config);
@@ -298,15 +276,13 @@ function should_compile_files_and_directories_for_package(Project $project, Conf
         array_merge(['.git'], $package_config->excludes)
     );
 
-    return array_filter(
-        $package->root($project, $config)->ls_all(),
-        function (Directory|File|Symlink $file_or_directory) use ($package, $excluded_paths, $package_root) {
-            return ! in_array($file_or_directory->stringify(), $excluded_paths);
-        },
-    );
+    return $package->root($project, $config)->ls_all()
+        ->except(fn (Directory|File|Symlink $file_or_directory)
+            => in_array($file_or_directory->stringify(), $excluded_paths)
+        );
 }
 
-function should_compile_files_and_directories(Project $project, Config $config): array
+function should_compile_files_and_directories(Project $project, Config $config): FilesystemCollection
 {
     $excluded_paths = array_map(
         function ($excluded_path) use ($project) {
@@ -315,12 +291,11 @@ function should_compile_files_and_directories(Project $project, Config $config):
         array_merge(['builds', '.git', '.idea', $config->packages_directory], $config->excludes)
     );
 
-    return array_filter(
-        $project->root->ls_all(),
-        function (Directory|File|Symlink $file_or_directory) use ($project, $excluded_paths) {
-            return ! in_array($file_or_directory->stringify(), $excluded_paths);
-        },
-    );
+    return $project->root
+        ->ls_all()
+        ->except(fn (Directory|File|Symlink $filesystem)
+            => in_array($filesystem->stringify(), $excluded_paths)
+        );
 }
 
 function file_needs_modification(File $file, Config $config): bool

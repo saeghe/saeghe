@@ -4,6 +4,7 @@ namespace Tests\FileManager\Filesystem\Directory\ListTest;
 
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\Saeghe\FileManager\Filesystem\File;
+use Saeghe\Saeghe\FileManager\Filesystem\FilesystemCollection;
 use Saeghe\Saeghe\FileManager\Filesystem\Symlink;
 
 test(
@@ -11,6 +12,7 @@ test(
     case: function (Directory $source, Directory $directory, File $file, Symlink $symlink) {
         [$expectedDirectory, $expectedFile, $expectedSymlink] = $source->ls();
 
+        assert_true($source->ls() instanceof FilesystemCollection);
         assert_true($expectedDirectory instanceof Directory, 'Directory type does not detected');
         assert_true($expectedDirectory->stringify() === $directory->stringify(), 'Directory not passed');
         assert_true($expectedFile instanceof File, 'File type does not detected');

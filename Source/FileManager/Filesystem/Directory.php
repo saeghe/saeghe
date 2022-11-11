@@ -73,28 +73,26 @@ class Directory
         return $path->as_file();
     }
 
-    public function ls(): array
+    public function ls(): FilesystemCollection
     {
-        $list = ls($this->stringify());
-        $results = [];
+        $result = new FilesystemCollection();
 
-        foreach ($list as $item) {
-            $results[] = $this->item($item);
+        foreach (ls($this->stringify()) as $item) {
+            $result->put($this->item($item));
         }
 
-        return $results;
+        return $result;
     }
 
-    public function ls_all(): array
+    public function ls_all(): FilesystemCollection
     {
-        $list = ls_all($this->stringify());
-        $results = [];
+        $result = new FilesystemCollection();
 
-        foreach ($list as $item) {
-            $results[] = $this->item($item);
+        foreach (ls_all($this->stringify()) as $item) {
+            $result->put($this->item($item));
         }
 
-        return $results;
+        return $result;
     }
 
     public function make(int $permission = 0775): self

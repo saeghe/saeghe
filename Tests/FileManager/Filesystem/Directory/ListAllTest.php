@@ -3,12 +3,14 @@
 namespace Tests\FileManager\Filesystem\Directory\ListAllTest;
 
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
+use Saeghe\Saeghe\FileManager\Filesystem\FilesystemCollection;
 
 test(
     title: 'it should return list of files and sub directories in the given directory contain hidden files',
     case: function (Directory $directory) {
         $results = $directory->ls_all();
 
+        assert_true($directory->ls_all() instanceof FilesystemCollection);
         assert_true($results[0]->stringify() === $directory->file('.hidden.txt')->stringify());
         assert_true($results[1]->stringify() === $directory->file('sample.txt')->stringify());
         assert_true($results[2]->stringify() === $directory->file('sub-directory')->stringify());
@@ -35,7 +37,7 @@ test(
     title: 'it should return empty array when directory is empty',
     case: function (Directory $directory) {
         assert_true(
-            [] === $directory->ls_all(),
+            [] === $directory->ls_all()->items(),
             'Directory list all is not working properly.'
         );
 
