@@ -8,7 +8,7 @@ use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\Saeghe\FileManager\Filesystem\File;
 use Saeghe\Saeghe\FileManager\Filesystem\FilesystemCollection;
 use Saeghe\Saeghe\FileManager\Filesystem\Symlink;
-use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Config\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\PhpFile;

@@ -4,7 +4,6 @@ namespace Saeghe\Saeghe\Config;
 
 use Saeghe\Saeghe\DataType\Collection;
 use Saeghe\Saeghe\Package;
-use Traversable;
 
 class Packages extends Collection
 {

@@ -10,6 +10,7 @@ spl_autoload_register(function ($class) {
         'Saeghe\Saeghe\Config\Excludes' => \realpath(__DIR__ . '/Source/Config/Excludes.php'),
         'Saeghe\Saeghe\Config\Executables' => \realpath(__DIR__ . '/Source/Config/Executables.php'),
         'Saeghe\Saeghe\Config\Map' => \realpath(__DIR__ . '/Source/Config/Map.php'),
+        'Saeghe\Saeghe\Config\Meta' => \realpath(__DIR__ . '/Source/Config/Meta.php'),
         'Saeghe\Saeghe\Config\Packages' => \realpath(__DIR__ . '/Source/Config/Packages.php'),
         'Saeghe\Saeghe\DataType\ArrayCollection' => \realpath(__DIR__ . '/Source/DataType/ArrayCollection.php'),
         'Saeghe\Saeghe\DataType\Collection' => \realpath(__DIR__ . '/Source/DataType/Collection.php'),
@@ -19,7 +20,6 @@ spl_autoload_register(function ($class) {
         'Saeghe\Saeghe\FileManager\Filesystem\File' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/File.php'),
         'Saeghe\Saeghe\FileManager\Filesystem\FilesystemCollection' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/FilesystemCollection.php'),
         'Saeghe\Saeghe\FileManager\Filesystem\Symlink' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Symlink.php'),
-        'Saeghe\Saeghe\Meta' => \realpath(__DIR__ . '/Source/Meta.php'),
         'Saeghe\Saeghe\Package' => \realpath(__DIR__ . '/Source/Package.php'),
         'Saeghe\Saeghe\Project' => \realpath(__DIR__ . '/Source/Project.php'),
     ];

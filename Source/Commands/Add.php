@@ -3,7 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Add;
 
 use Saeghe\Saeghe\Config\Config;
-use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Config\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
 use Saeghe\Saeghe\FileManager\FileType\Json;
@@ -72,7 +72,7 @@ function add(Project $project, Config $config, Package $package, $package_url)
         ? Meta::from_array(Json\to_array($project->config_lock->stringify()))
         : Meta::init();
 
-    $is_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($package), false);
+    $is_in_meta = $meta->packages->reduce(fn ($carry, Package $installed_package) => $carry || $installed_package->is($package), false);
 
     if (! $is_in_meta) {
         $meta->packages[$package_url] = $package;
@@ -82,7 +82,7 @@ function add(Project $project, Config $config, Package $package, $package_url)
     $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->stringify()));
 
     foreach ($package_config->packages as $sub_package_url => $sub_package) {
-        $is_sub_package_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($sub_package), false);
+        $is_sub_package_in_meta = $meta->packages->reduce(fn ($carry, Package $installed_package) => $carry || $installed_package->is($sub_package), false);
 
         if (! $is_sub_package_in_meta) {
             $sub_package->detect_hash();

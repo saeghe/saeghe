@@ -3,7 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Remove;
 
 use Saeghe\Saeghe\Config\Config;
-use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Config\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
 use Saeghe\Saeghe\FileManager\FileType\Json;

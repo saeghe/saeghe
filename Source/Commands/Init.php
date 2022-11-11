@@ -3,7 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Init;
 
 use Saeghe\Saeghe\Config\Config;
-use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Config\Meta;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Write\success;

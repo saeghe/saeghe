@@ -1,16 +1,18 @@
 <?php
 
-namespace Saeghe\Saeghe;
+namespace Saeghe\Saeghe\Config;
+
+use Saeghe\Saeghe\Package;
 
 class Meta
 {
     public function __construct(
-        public array $packages,
+        public Packages $packages,
     ) {}
 
     public static function init(): static
     {
-        return new static([]);
+        return new static(new Packages());
     }
 
     public static function from_array(array $meta): static
@@ -20,7 +22,7 @@ class Meta
             $packages[$package_url] = Package::from_meta($meta);
         }
 
-        return new static($packages);
+        return new static(new Packages($packages));
     }
 
     public function to_array(): array
