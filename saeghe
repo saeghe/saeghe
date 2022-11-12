@@ -1,28 +1,26 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__ . DIRECTORY_SEPARATOR . 'Import.php';
+require \realpath(__DIR__ . '/Import.php');
+require \realpath(__DIR__ . '/Source/Commands/Add.php');
+require \realpath(__DIR__ . '/Source/Commands/Build.php');
+require \realpath(__DIR__ . '/Source/Commands/Credential.php');
+require \realpath(__DIR__ . '/Source/Commands/Flush.php');
+require \realpath(__DIR__ . '/Source/Commands/Help.php');
+require \realpath(__DIR__ . '/Source/Commands/Init.php');
+require \realpath(__DIR__ . '/Source/Commands/Install.php');
+require \realpath(__DIR__ . '/Source/Commands/Man.php');
+require \realpath(__DIR__ . '/Source/Commands/Migrate.php');
+require \realpath(__DIR__ . '/Source/Commands/Remove.php');
+require \realpath(__DIR__ . '/Source/Commands/Update.php');
+require \realpath(__DIR__ . '/Source/Commands/Version.php');
+require \realpath(__DIR__ . '/Source/Commands/Watch.php');
 
 use Saeghe\Cli\IO\Read;
-use Saeghe\Exception\CredentialCanNotBeSetException;
-use Saeghe\Saeghe\FileManager\Address;
-use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use Saeghe\Saeghe\Project;
-use function Saeghe\Cli\IO\Write\error;
+use function Saeghe\Saeghe\Exception\register_exception_handler;
 
-require Address::from_string(__DIR__ . '/Source/Commands/Add.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Build.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Credential.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Flush.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Help.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Init.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Install.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Man.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Migrate.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Remove.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Update.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Version.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Commands/Watch.php')->to_string();
+register_exception_handler();
 
 $command = Read\command() ?? Read\parameter('command');
 
@@ -32,20 +30,11 @@ if (is_null($command)) {
 
 $project = Read\parameter('project', '');
 
-$project = makeProject(
+$project = Project::make(
     strlen($project) ? getcwd() . '/' . $project . '/' : getcwd() . '/',
-    $command === 'build' ? Read\argument(2, 'development') : 'development'
+    $command === 'build' ? Read\argument(2, 'development') : 'development',
+    \Saeghe\Saeghe\FileManager\Resolver\realpath(__DIR__ .'/credentials.json'),
 );
-
-set_exception_handler(function (\Throwable $exception) {
-    if ($exception instanceof InvalidTokenException) {
-        error('The GitHub token is not valid. Either, you didn\'t set one yet, or it is not valid. Please use the `credential` command to set a valid token.');
-    }
-
-    if ($exception instanceof CredentialCanNotBeSetException) {
-        error($exception->getMessage());
-    }
-});
 
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run($project),
@@ -62,14 +51,3 @@ match ($command) {
     'watch' => \Saeghe\Saeghe\Commands\Watch\run($project),
     default => \Saeghe\Saeghe\Commands\Help\run($project),
 };
-
-function makeProject($projectRoot, $environment): Project
-{
-    return new Project(
-        root: Address::from_string($projectRoot),
-        environment: $environment,
-        config_file_path: Address::from_string($projectRoot . 'saeghe.config.json'),
-        config_lock_file_path: Address::from_string($projectRoot . 'saeghe.config-lock.json'),
-        credentials_path: Address::from_string(__DIR__ .'/credentials.json'),
-    );
-}

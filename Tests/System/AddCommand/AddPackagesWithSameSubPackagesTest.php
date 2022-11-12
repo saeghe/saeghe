@@ -5,7 +5,7 @@ namespace Tests\System\AddCommand\AddPackagesWithSameSubPackagesTest;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 
 test(
     title: 'it should not stuck if two packages using the same dependencies',

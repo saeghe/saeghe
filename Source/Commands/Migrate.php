@@ -3,9 +3,9 @@
 namespace Saeghe\Saeghe\Commands\Migrate;
 
 use Saeghe\Cli\IO\Write;
-use Saeghe\Saeghe\Config;
-use Saeghe\Saeghe\Meta;
-use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\Config\Config;
+use Saeghe\Saeghe\FileManager\Filesystem\Directory;
+use Saeghe\Saeghe\Config\Meta;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\Project;
 
@@ -15,15 +15,15 @@ function run(Project $project)
     $config['excludes'] = ['vendor'];
     $meta = Meta::init()->to_array();
 
-    $composer_file = $project->root->directory() . 'composer.json';
-    $composer_lock_file = $project->root->directory() . 'composer.lock';
+    $composer_file = $project->root->file('composer.json');
+    $composer_lock_file = $project->root->file('composer.lock');
 
-    if (! file_exists($composer_file)) {
+    if (! $composer_file->exists()) {
         Write\error('There is no composer.json file in this project!');
         return;
     }
 
-    if (! file_exists($composer_lock_file)) {
+    if (! $composer_lock_file->exists()) {
         Write\error('There is no composer.lock file in this project!');
         return;
     }
@@ -69,28 +69,28 @@ function run(Project $project)
             'repo' => $owner_and_repo['repo'],
         ];
 
-        migrate_package($project, $project->root->append($config['packages-directory']), $name, $package, $meta['packages'][$package]);
+        migrate_package($project, $project->root->subdirectory($config['packages-directory']), $name, $package, $meta['packages'][$package]);
     }
 
-    Json\write($project->config_file_path->to_string(), $config);
-    Json\write($project->config_lock_file_path->to_string(), $meta);
+    Json\write($project->config, $config);
+    Json\write($project->config_lock, $meta);
 
     Write\success('Project migrated successfully.');
 }
 
-function migrate_package(Project $project, Address $packages_directory, $name, $package, $package_meta)
+function migrate_package(Project $project, Directory $packages_directory, $name, $package, $package_meta)
 {
-    $package_vendor_directory = $project->root->append('vendor/' . $name)->to_string();
+    $package_vendor_directory = $project->root->subdirectory('vendor/' . $name);
 
-    $package_directory = $packages_directory->append($package_meta['owner'] . '/' . $package_meta['repo']);
+    $package_directory = $packages_directory->subdirectory($package_meta['owner'] . '/' . $package_meta['repo']);
 
-    if (! file_exists($package_directory->to_string())) {
-        mkdir($package_directory->to_string(), 0755, true);
+    if (! $packages_directory->exists()) {
+        $packages_directory->make_recursive(0755);
     }
 
-    recursive_copy($package_vendor_directory, $package_directory->to_string());
+    recursive_copy($package_vendor_directory, $package_directory);
 
-    $package_composer_settings = Json\to_array($package_directory->append('composer.json')->to_string());
+    $package_composer_settings = Json\to_array($package_directory->file('composer.json'));
 
     $config = ['map' => []];
 
@@ -105,8 +105,8 @@ function migrate_package(Project $project, Address $packages_directory, $name, $
         }
     }
 
-    Json\write($package_directory->append('saeghe.config.json')->to_string(), $config);
-    Json\write($package_directory->append( 'saeghe.config-lock.json')->to_string(), []);
+    Json\write($package_directory->file('saeghe.config.json'), $config);
+    Json\write($package_directory->file( 'saeghe.config-lock.json'), []);
 }
 
 function get_meta_from_package($package)
@@ -126,7 +126,7 @@ function get_meta_from_package($package)
     return $meta;
 }
 
-function recursive_copy($source, $destination)
+function recursive_copy(string $source, string $destination)
 {
     $dir = opendir($source);
     @mkdir($destination, 0755, true);

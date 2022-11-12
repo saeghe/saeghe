@@ -3,7 +3,7 @@
 namespace Tests\System\WatchCommandTest;
 
 use function Saeghe\Saeghe\FileManager\Directory\clean;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 
 test(
     title: 'it should watch for changes',

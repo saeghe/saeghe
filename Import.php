@@ -1,31 +1,44 @@
 <?php
 
-require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'DataType' . DIRECTORY_SEPARATOR . 'Str.php';
-require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Path.php';
-require __DIR__ . DIRECTORY_SEPARATOR . 'Source' . DIRECTORY_SEPARATOR . 'FileManager' . DIRECTORY_SEPARATOR . 'Address.php';
-
-use Saeghe\Saeghe\FileManager\Address;
-
 spl_autoload_register(function ($class) {
     $classMap = [
-        'Saeghe\Exception\CredentialCanNotBeSetException' => Address::from_string(__DIR__ . '/Source/Exception/CredentialCanNotBeSetException.php')->to_string(),
-        'Saeghe\Saeghe\Git\Repository' => Address::from_string(__DIR__ . '/Source/Git/Repository.php')->to_string(),
-        'Saeghe\Saeghe\Git\Exception\InvalidTokenException' => Address::from_string(__DIR__ . '/Source/Git/Exception/InvalidTokenException.php')->to_string(),
-        'Saeghe\Saeghe\Config' => Address::from_string(__DIR__ . '/Source/Config.php')->to_string(),
-        'Saeghe\Saeghe\Meta' => Address::from_string(__DIR__ . '/Source/Meta.php')->to_string(),
-        'Saeghe\Saeghe\Package' => Address::from_string(__DIR__ . '/Source/Package.php')->to_string(),
-        'Saeghe\Saeghe\Project' => Address::from_string(__DIR__ . '/Source/Project.php')->to_string(),
+        'Saeghe\Saeghe\Exception\CredentialCanNotBeSetException' => \realpath(__DIR__ . '/Source/Exception/CredentialCanNotBeSetException.php'),
+        'Saeghe\Saeghe\Git\Repository' => \realpath(__DIR__ . '/Source/Git/Repository.php'),
+        'Saeghe\Saeghe\Git\Exception\InvalidTokenException' => \realpath(__DIR__ . '/Source/Git/Exception/InvalidTokenException.php'),
+        'Saeghe\Saeghe\Config\Config' => \realpath(__DIR__ . '/Source/Config/Config.php'),
+        'Saeghe\Saeghe\Config\EntryPoints' => \realpath(__DIR__ . '/Source/Config/EntryPoints.php'),
+        'Saeghe\Saeghe\Config\Excludes' => \realpath(__DIR__ . '/Source/Config/Excludes.php'),
+        'Saeghe\Saeghe\Config\Executables' => \realpath(__DIR__ . '/Source/Config/Executables.php'),
+        'Saeghe\Saeghe\Config\Map' => \realpath(__DIR__ . '/Source/Config/Map.php'),
+        'Saeghe\Saeghe\Config\Meta' => \realpath(__DIR__ . '/Source/Config/Meta.php'),
+        'Saeghe\Saeghe\Config\Packages' => \realpath(__DIR__ . '/Source/Config/Packages.php'),
+        'Saeghe\Saeghe\Datatype\ArrayCollection' => \realpath(__DIR__ . '/Source/Datatype/ArrayCollection.php'),
+        'Saeghe\Saeghe\Datatype\Collection' => \realpath(__DIR__ . '/Source/Datatype/Collection.php'),
+        'Saeghe\Saeghe\Datatype\AnyText' => \realpath(__DIR__ . '/Source/Datatype/AnyText.php'),
+        'Saeghe\Saeghe\Datatype\Text' => \realpath(__DIR__ . '/Source/Datatype/Text.php'),
+        'Saeghe\Saeghe\FileManager\Path' => \realpath(__DIR__ . '/Source/FileManager/Path.php'),
+        'Saeghe\Saeghe\FileManager\Filesystem\Address' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Address.php'),
+        'Saeghe\Saeghe\FileManager\Filesystem\Directory' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Directory.php'),
+        'Saeghe\Saeghe\FileManager\Filesystem\File' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/File.php'),
+        'Saeghe\Saeghe\FileManager\Filesystem\Filename' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Filename.php'),
+        'Saeghe\Saeghe\FileManager\Filesystem\FilesystemCollection' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/FilesystemCollection.php'),
+        'Saeghe\Saeghe\FileManager\Filesystem\Symlink' => \realpath(__DIR__ . '/Source/FileManager/Filesystem/Symlink.php'),
+        'Saeghe\Saeghe\Package' => \realpath(__DIR__ . '/Source/Package.php'),
+        'Saeghe\Saeghe\Project' => \realpath(__DIR__ . '/Source/Project.php'),
     ];
 
     require_once $classMap[$class];
 });
 
-require Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php')->to_string();
-require Address::from_string(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/DataType/Arr.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/PhpFile.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/FileManager/File.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/FileManager/Symlink.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/FileManager/Directory.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/FileManager/FileType/Json.php')->to_string();
-require Address::from_string(__DIR__ . '/Source/Git/GitHub.php')->to_string();
+require \realpath(__DIR__ . '/Packages/saeghe/cli/Source/IO/Read.php');
+require \realpath(__DIR__ . '/Packages/saeghe/cli/Source/IO/Write.php');
+require \realpath(__DIR__ . '/Source/Datatype/Arr.php');
+require \realpath(__DIR__ . '/Source/Datatype/Str.php');
+require \realpath(__DIR__ . '/Source/Exception/Handler.php');
+require \realpath(__DIR__ . '/Source/FileManager/Resolver.php');
+require \realpath(__DIR__ . '/Source/FileManager/File.php');
+require \realpath(__DIR__ . '/Source/FileManager/Symlink.php');
+require \realpath(__DIR__ . '/Source/FileManager/Directory.php');
+require \realpath(__DIR__ . '/Source/FileManager/FileType/Json.php');
+require \realpath(__DIR__ . '/Source/PhpFile.php');
+require \realpath(__DIR__ . '/Source/Git/GitHub.php');

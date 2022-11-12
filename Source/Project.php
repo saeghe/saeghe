@@ -2,8 +2,9 @@
 
 namespace Saeghe\Saeghe;
 
-use Saeghe\Exception\CredentialCanNotBeSetException;
-use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\Exception\CredentialCanNotBeSetException;
+use Saeghe\Saeghe\FileManager\Filesystem\Directory;
+use Saeghe\Saeghe\FileManager\Filesystem\File;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
@@ -14,20 +15,31 @@ class Project
      * $buildRoot is readonly.
      *  DO NOT modify it!
      */
-    public Address $build_root;
+    public Directory $build_root;
 
     /**
-     * $root, $environment, $configFilePath, $configLockFilePath, $credentialsPath are readonly.
+     * $root, $environment, $config, $config_lock, $credentials are readonly.
      *  DO NOT modify them!
      */
     public function __construct(
-        public Address $root,
-        public string  $environment,
-        public Address $config_file_path,
-        public Address $config_lock_file_path,
-        public Address $credentials_path,
+        public Directory $root,
+        public string $environment,
+        public File $config,
+        public File $config_lock,
+        public File $credentials,
     ) {
-        $this->build_root = $this->root->append('builds/' . $this->environment);
+        $this->build_root = $this->root->subdirectory('builds/' . $this->environment);
+    }
+
+    public static function make(string $projectRoot, string $environment, string $credential_path): self
+    {
+        return new static(
+            root: Directory::from_string($projectRoot),
+            environment: $environment,
+            config: File::from_string($projectRoot . 'saeghe.config.json'),
+            config_lock: File::from_string($projectRoot . 'saeghe.config-lock.json'),
+            credentials: File::from_string($credential_path),
+        );
     }
 
     public function set_env_credentials(): void
@@ -38,11 +50,11 @@ class Project
             return;
         }
 
-        if (! $this->credentials_path->exists()) {
+        if (! $this->credentials->exists()) {
             throw new CredentialCanNotBeSetException('There is no credential file. Please use the `credential` command to add your token.');
         }
 
-        $credential = Json\to_array($this->credentials_path->to_string());
+        $credential = Json\to_array($this->credentials);
         github_token($credential[GITHUB_DOMAIN]['token'] ?? '');
     }
 }

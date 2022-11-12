@@ -4,7 +4,7 @@ namespace Tests\System\BuildCommand\BuildProjectWithComplexPackageTest;
 
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\FileManager\File\delete;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 
 test(
     title: 'it should build project with complex package',

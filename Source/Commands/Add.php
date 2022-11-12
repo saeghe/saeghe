@@ -2,12 +2,10 @@
 
 namespace Saeghe\Saeghe\Commands\Add;
 
-use Saeghe\Saeghe\Config;
-use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Config\Config;
+use Saeghe\Saeghe\Config\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
-use Saeghe\Saeghe\FileManager\Directory;
-use Saeghe\Saeghe\FileManager\File;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
@@ -21,20 +19,20 @@ function run(Project $project)
     $package_url = argument(2);
     $version = parameter('version');
 
-    if (! file_exists($project->config_file_path->to_string())) {
+    if (! $project->config->exists()) {
         error('Project is not initialized. Please try to initialize using the init command.');
         return;
     }
 
-    $config = Config::from_array(Json\to_array($project->config_file_path->to_string()));
+    $config = Config::from_array(Json\to_array($project->config));
 
-    $package = array_reduce(
-        $config->packages,
-        function ($carry, Package $package) {
-            return $package->is($carry) ? $package : $carry;
-        },
-        Package::from_url($package_url)
-    );
+    $package = $config->packages
+        ->reduce(
+            function ($carry, Package $package) {
+                return $package->is($carry) ? $package : $carry;
+            },
+            Package::from_url($package_url)
+        );
 
     if (isset($package->version)) {
         error("Package $package_url is already exists");
@@ -43,8 +41,9 @@ function run(Project $project)
 
     $version ? $package->version($version) : $package->latest_version();
 
-    if (! file_exists($project->root->append($config->packages_directory)->to_string())) {
-        Directory\make_recursive($project->root->append($config->packages_directory)->to_string());
+    $packages_directory = $project->root->subdirectory($config->packages_directory);
+    if (! $packages_directory->exists()) {
+        $packages_directory->make_recursive();
     }
 
     $package->detect_hash();
@@ -56,8 +55,9 @@ function run(Project $project)
 
     add($project, $config, $package, $package_url);
 
-    $config->packages[$package_url] = $package;
-    Json\write($project->config_file_path->to_string(), $config->to_array());
+    $config->packages->put($package, $package_url);
+
+    Json\write($project->config, $config->to_array());
 
     success("Package $package_url has been added successfully.");
 }
@@ -65,24 +65,24 @@ function run(Project $project)
 function add(Project $project, Config $config, Package $package, $package_url)
 {
     if (! $package->is_downloaded($project, $config)) {
-        $package->download($package->root($project, $config)->to_string());
+        $package->download($package->root($project, $config));
     }
 
-    $meta = File\exists($project->config_lock_file_path->to_string())
-        ? Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()))
+    $meta = $project->config_lock->exists()
+        ? Meta::from_array(Json\to_array($project->config_lock))
         : Meta::init();
 
-    $is_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($package), false);
+    $is_in_meta = $meta->packages->reduce(fn ($carry, Package $installed_package) => $carry || $installed_package->is($package), false);
 
     if (! $is_in_meta) {
         $meta->packages[$package_url] = $package;
-        Json\write($project->config_lock_file_path->to_string(), $meta->to_array());
+        Json\write($project->config_lock, $meta->to_array());
     }
 
-    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)->to_string()));
+    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)));
 
     foreach ($package_config->packages as $sub_package_url => $sub_package) {
-        $is_sub_package_in_meta = array_reduce($meta->packages, fn ($carry, Package $installed_package) => $carry || $installed_package->is($sub_package), false);
+        $is_sub_package_in_meta = $meta->packages->reduce(fn ($carry, Package $installed_package) => $carry || $installed_package->is($sub_package), false);
 
         if (! $is_sub_package_in_meta) {
             $sub_package->detect_hash();

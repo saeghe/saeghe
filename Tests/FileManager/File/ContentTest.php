@@ -2,24 +2,24 @@
 
 namespace Tests\FileManager\File\ContentTest;
 
-use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\Path;
 use function Saeghe\Saeghe\FileManager\File\content;
 use function Saeghe\Saeghe\FileManager\File\delete;
 
 test(
-    title: 'it should create file',
-    case: function (Address $file) {
-        assert_true('sample text' === content($file->to_string()));
+    title: 'it should get file content',
+    case: function (Path $file) {
+        assert_true('sample text' === content($file));
 
         return $file;
     },
     before: function () {
-        $file = Address::from_string(root() . 'Tests/PlayGround/sample.txt');
-        file_put_contents($file->to_string(), 'sample text');
+        $file = Path::from_string(root() . 'Tests/PlayGround/sample.txt');
+        file_put_contents($file, 'sample text');
 
         return $file;
     },
-    after: function (Address $file) {
-        delete($file->to_string());
+    after: function (Path $file) {
+        delete($file);
     }
 );

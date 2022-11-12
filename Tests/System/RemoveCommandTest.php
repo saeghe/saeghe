@@ -6,7 +6,7 @@ use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 
 test(
     title: 'it should remove a package',

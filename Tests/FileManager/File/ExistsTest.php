@@ -2,51 +2,51 @@
 
 namespace Tests\FileManager\File\ExistsTest;
 
-use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\Path;
 use function Saeghe\Saeghe\FileManager\File\exists;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
 
 test(
     title: 'it should return false when file is not exists',
     case: function () {
-        $file = Address::from_string(root() . 'Tests/PlayGround/IsExists');
-        assert_false(exists($file->to_string()), 'File/exists is not working!');
+        $file = Path::from_string(root() . 'Tests/PlayGround/IsExists');
+        assert_false(exists($file), 'File/exists is not working!');
     }
 );
 
 test(
     title: 'it should return false when given path is a directory',
-    case: function (Address $file) {
-        assert_false(exists($file->to_string()), 'File/exists is not working!');
+    case: function (Path $file) {
+        assert_false(exists($file), 'File/exists is not working!');
 
         return $file;
     },
     before: function () {
-        $file = Address::from_string(root() . 'Tests/PlayGround/file');
+        $file = Path::from_string(root() . 'Tests/PlayGround/file');
 
-        mkdir($file->to_string());
+        mkdir($file);
 
         return $file;
     },
-    after: function (Address $file) {
-        clean($file->parent()->to_string());
+    after: function (Path $file) {
+        clean($file->parent());
     }
 );
 
 test(
     title: 'it should return true when file is exist and is a file',
-    case: function (Address $file) {
-        assert_true(exists($file->to_string()), 'File/exists is not working!');
+    case: function (Path $file) {
+        assert_true(exists($file), 'File/exists is not working!');
 
         return $file;
     },
     before: function () {
-        $file = Address::from_string(root() . 'Tests/PlayGround/File');
-        file_put_contents($file->to_string(), 'content');
+        $file = Path::from_string(root() . 'Tests/PlayGround/File');
+        file_put_contents($file, 'content');
 
         return $file;
     },
-    after: function (Address $file) {
-        clean($file->parent()->to_string());
+    after: function (Path $file) {
+        clean($file->parent());
     }
 );

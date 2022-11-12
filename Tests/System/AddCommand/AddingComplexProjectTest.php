@@ -5,7 +5,7 @@ namespace Tests\System\AddCommand\AddingComplexProjectTest;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\Saeghe\FileManager\File\delete;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 
 test(
     title: 'it should add a complex project',

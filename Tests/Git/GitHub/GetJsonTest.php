@@ -4,7 +4,7 @@ namespace Tests\Git\GitHub\GetJsonTest;
 
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\Saeghe\Providers\GitHub\get_json;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;

@@ -2,42 +2,42 @@
 
 namespace Tests\FileManager\Directory\RenewTest;
 
-use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\Path;
 use Saeghe\Saeghe\FileManager\Directory;
 use Saeghe\Saeghe\FileManager\File;
 
 test(
     title: 'it should clean directory when directory exists',
-    case: function (Address $directory) {
-        Directory\renew($directory->to_string());
-        assert_true(Directory\exists($directory->to_string()));
-        assert_false(File\exists($directory->append('file.txt')->to_string()));
+    case: function (Path $directory) {
+        Directory\renew($directory);
+        assert_true(Directory\exists($directory));
+        assert_false(File\exists($directory->append('file.txt')));
 
         return $directory;
     },
     before: function () {
-        $directory = Address::from_string(root() . 'Tests/PlayGround/Renew');
-        Directory\make($directory->to_string());
-        file_put_contents($directory->append('file.txt')->to_string(), 'content');
+        $directory = Path::from_string(root() . 'Tests/PlayGround/Renew');
+        Directory\make($directory);
+        file_put_contents($directory->append('file.txt'), 'content');
 
         return $directory;
     },
-    after: function (Address $directory) {
-        Directory\delete_recursive($directory->to_string());
+    after: function (Path $directory) {
+        Directory\delete_recursive($directory);
     }
 );
 
 test(
     title: 'it should create the directory when directory not exists',
     case: function () {
-        $directory = Address::from_string(root() . 'Tests/PlayGround/Renew');
+        $directory = Path::from_string(root() . 'Tests/PlayGround/Renew');
 
-        Directory\renew($directory->to_string());
-        assert_true(Directory\exists($directory->to_string()));
+        Directory\renew($directory);
+        assert_true(Directory\exists($directory));
 
         return $directory;
     },
-    after: function (Address $directory) {
-        Directory\delete_recursive($directory->to_string());
+    after: function (Path $directory) {
+        Directory\delete_recursive($directory);
     }
 );

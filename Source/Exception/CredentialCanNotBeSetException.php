@@ -1,6 +1,6 @@
 <?php
 
-namespace Saeghe\Exception;
+namespace Saeghe\Saeghe\Exception;
 
 class CredentialCanNotBeSetException extends \Exception
 {

@@ -7,7 +7,7 @@ use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
@@ -84,7 +84,7 @@ test(
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
         rename(root() . 'credentials.json', root() . 'credentials.json.back');
-        shell_exec('php ' . root() . 'saeghe credential github.vom not-valid');
+        shell_exec('php ' . root() . 'saeghe credential github.com not-valid');
         github_token('');
     },
     after: function () {

@@ -2,8 +2,8 @@
 
 namespace Saeghe\Saeghe\Commands\Install;
 
-use Saeghe\Saeghe\Config;
-use Saeghe\Saeghe\Meta;
+use Saeghe\Saeghe\Config\Config;
+use Saeghe\Saeghe\Config\Meta;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
 use Saeghe\Saeghe\FileManager\FileType\Json;
@@ -13,13 +13,10 @@ function run(Project $project)
 {
     $project->set_env_credentials();
 
-    $config = Config::from_array(Json\to_array($project->config_file_path->to_string()));
-    $meta = Meta::from_array(Json\to_array($project->config_lock_file_path->to_string()));
+    $config = Config::from_array(Json\to_array($project->config));
+    $meta = Meta::from_array(Json\to_array($project->config_lock));
 
-    array_walk(
-        $meta->packages,
-        fn (Package $package) => $package->download($package->root($project, $config)->to_string())
-    );
+    $meta->packages->each(fn (Package $package) => $package->download($package->root($project, $config)));
 
     success('Packages has been installed successfully.');
 }

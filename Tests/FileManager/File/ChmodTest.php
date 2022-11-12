@@ -2,27 +2,27 @@
 
 namespace Tests\FileManager\File\ChmodTest;
 
-use Saeghe\Saeghe\FileManager\Address;
+use Saeghe\Saeghe\FileManager\Path;
 use Saeghe\Saeghe\FileManager\File;
 
 test(
     title: 'it should change file\'s permission',
     case: function () {
-        $playGround = Address::from_string(root() . 'Tests/PlayGround');
+        $playGround = Path::from_string(root() . 'Tests/PlayGround');
         $regular = $playGround->append('regular');
-        File\create($regular->to_string(), 'content');
-        assert_true(File\chmod($regular->to_string(), 0664));
-        assert_true(0664 === File\permission($regular->to_string()));
+        File\create($regular, 'content');
+        assert_true(File\chmod($regular, 0664));
+        assert_true(0664 === File\permission($regular));
 
         $full = $playGround->append('full');
-        File\create($full->to_string(), 'full');
-        assert_true(File\chmod($full->to_string(), 0777));
-        assert_true(0777 === File\permission($full->to_string()));
+        File\create($full, 'full');
+        assert_true(File\chmod($full, 0777));
+        assert_true(0777 === File\permission($full));
 
         return [$regular, $full];
     },
-    after: function (Address $regular, Address $full) {
-        File\delete($regular->to_string());
-        File\delete($full->to_string());
+    after: function (Path $regular, Path $full) {
+        File\delete($regular);
+        File\delete($full);
     }
 );

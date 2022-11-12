@@ -5,7 +5,7 @@ namespace Tests\System\AddComand\AddReleasedPackageTest;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
-use function Saeghe\Saeghe\FileManager\Path\realpath;
+use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 
 test(
     title: 'it should add released package to the project',
