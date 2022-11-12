@@ -2,12 +2,27 @@
 
 namespace Saeghe\Saeghe\FileManager\Filesystem;
 
+use Saeghe\Saeghe\FileManager\Path;
 use function Saeghe\Saeghe\FileManager\Symlink\delete;
 use function Saeghe\Saeghe\FileManager\Symlink\exists;
 use function Saeghe\Saeghe\FileManager\Symlink\link;
 
-class Symlink extends Filesystem
+class Symlink implements \Stringable
 {
+    use Address;
+
+    public function __construct(public Path $path) {}
+
+    public static function from_string(string $path_string): static
+    {
+        return new static(Path::from_string($path_string));
+    }
+
+    public function __toString(): string
+    {
+        return $this->path->string();
+    }
+
     public function delete(): self
     {
         delete($this->path);

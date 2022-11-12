@@ -2,6 +2,7 @@
 
 namespace Saeghe\Saeghe\FileManager\Filesystem;
 
+use Saeghe\Saeghe\FileManager\Path;
 use function Saeghe\Saeghe\FileManager\Directory\chmod;
 use function Saeghe\Saeghe\FileManager\Directory\delete;
 use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
@@ -16,8 +17,22 @@ use function Saeghe\Saeghe\FileManager\Directory\preserve_copy;
 use function Saeghe\Saeghe\FileManager\Directory\renew;
 use function Saeghe\Saeghe\FileManager\Directory\renew_recursive;
 
-class Directory extends Filesystem
+class Directory implements \Stringable
 {
+    use Address;
+
+    public function __construct(public Path $path) {}
+
+    public static function from_string(string $path_string): static
+    {
+        return new static(Path::from_string($path_string));
+    }
+
+    public function __toString(): string
+    {
+        return $this->path->string();
+    }
+
     public function chmod(int $permission): self
     {
         chmod($this->path, $permission);
