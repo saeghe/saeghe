@@ -280,3 +280,14 @@ test(
         }
     }
 );
+
+test(
+    title: 'it should relocate path directory',
+    case: function () {
+        $path = new Path('/home/user1/directory/filename');
+        $relocate = $path->relocate('/home/user1/directory', '/home/user2/directory/../another-directory');
+
+        assert_true($relocate instanceof Path);
+        assert_true('/home/user2/another-directory/filename');
+    }
+);

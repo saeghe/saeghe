@@ -7,9 +7,9 @@ use Saeghe\Saeghe\FileManager\Path;
 
 trait Address
 {
-    public function append(string $path_string): Path
+    public function append(string $path): Path
     {
-        return Path::from_string($this . DIRECTORY_SEPARATOR . $path_string);
+        return Path::from_string($this . DIRECTORY_SEPARATOR . $path);
     }
 
     public function exists(): bool
@@ -31,6 +31,13 @@ trait Address
     public function parent(): Directory
     {
         return Directory::from_string(Str\before_last_occurrence($this, DIRECTORY_SEPARATOR));
+    }
+
+    public function relocate(string $origin, string $destination): Path
+    {
+        $path = Str\replace_first_occurrence($this, $origin, $destination);
+
+        return Path::from_string($path);
     }
 
     public function sibling(string $path): Path

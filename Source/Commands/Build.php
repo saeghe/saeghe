@@ -89,11 +89,10 @@ function compile_project_files(Project $project, Config $config, array $replace_
 
 function compile(Config $config, Directory|File|Symlink $address, Directory $origin, Directory $destination, array $replace_map): void
 {
-    $destination_address = Str\replace_first_occurrence($address, $origin, $destination);
+    $destination_path = $address->relocate($origin, $destination);
 
     if ($address instanceof Directory) {
-        $destination_directory = Directory::from_string($destination_address);
-        $address->preserve_copy($destination_directory);
+        $address->preserve_copy($destination_path->as_directory());
 
         $address->ls_all()->each(fn (Directory|File|Symlink $filesystem)
             => compile($config, $filesystem, $origin->subdirectory($address->leaf()), $destination->subdirectory($address->leaf()), $replace_map)
@@ -104,22 +103,18 @@ function compile(Config $config, Directory|File|Symlink $address, Directory $ori
 
     if ($address instanceof Symlink) {
         $source_link = $address->parent()->file(readlink($address));
-        Symlink::from_string($destination_address)->link($source_link);
+        $destination_path->as_symlink()->link($source_link);
 
         return;
     }
 
     if (file_needs_modification($address, $config)) {
-        compile_file(
-            File::from_string($address),
-            File::from_string($destination_address),
-            $replace_map
-        );
+        compile_file($address, $destination_path->as_file(), $replace_map);
 
         return;
     }
 
-    $address->preserve_copy($destination->file($address->leaf()));
+    $address->preserve_copy($destination_path->as_file());
 }
 
 function compile_file(File $origin, File $destination, array $replace_map): void
