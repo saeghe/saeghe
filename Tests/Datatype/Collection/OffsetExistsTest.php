@@ -3,6 +3,8 @@
 namespace Tests\Datatype\Collection\OffsetExistsTest;
 
 use Saeghe\Saeghe\Datatype\Collection;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
 
 test(
     title: 'it should implement offsetExists',

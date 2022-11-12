@@ -6,6 +6,7 @@ use Saeghe\Saeghe\FileManager\Path;
 use function Saeghe\Saeghe\FileManager\Symlink\link;
 use function Saeghe\Saeghe\FileManager\File\create;
 use function Saeghe\Saeghe\FileManager\File\delete;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should create a link to the given source',

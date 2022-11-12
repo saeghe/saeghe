@@ -2,6 +2,8 @@
 
 namespace Tests\System\ManCommandTest;
 
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+
 $man_content = <<<EOD
 usage: saeghe [-v | --version] [-h | --help] [--man]
            <command> [<args>]

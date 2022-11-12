@@ -4,6 +4,8 @@ namespace Tests\FileManager\File\DeleteFileTest;
 
 use Saeghe\Saeghe\FileManager\Path;
 use function Saeghe\Saeghe\FileManager\File\delete;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
 
 test(
     title: 'it should delete file',

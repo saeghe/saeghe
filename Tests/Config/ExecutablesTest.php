@@ -3,6 +3,7 @@
 namespace Tests\Config\ExecutablesTest;
 
 use Saeghe\Saeghe\Config\Executables;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should validate key',

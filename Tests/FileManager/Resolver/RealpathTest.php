@@ -3,6 +3,7 @@
 namespace Tests\FileManager\Resolver\RealpathTest;
 
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should return real path for the given path',

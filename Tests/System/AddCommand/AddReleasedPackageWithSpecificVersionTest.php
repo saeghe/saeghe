@@ -6,6 +6,7 @@ use Saeghe\Saeghe\FileManager\FileType\Json;
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should add released package to the project with the given version',
@@ -28,12 +29,12 @@ test(
 
 function assert_config_file_created_for_released_project($message)
 {
-    File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), $message);
+    File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), $message);
 }
 
 function assert_packages_directory_created_for_empty_project($message)
 {
-    File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'), $message);
+    File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'), $message);
 }
 
 function assert_released_package_cloned($message)

@@ -3,6 +3,7 @@
 namespace Tests\FileManager\Filesystem\File\ModifyTest;
 
 use Saeghe\Saeghe\FileManager\Filesystem\File;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should modify file',

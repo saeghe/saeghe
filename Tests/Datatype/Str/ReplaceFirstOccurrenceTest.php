@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Str\ReplaceFirstOccurrenceTest;
 
 use Saeghe\Saeghe\Datatype\Str;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should replace first occurrence of sub string',

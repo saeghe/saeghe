@@ -48,10 +48,10 @@ test(
 
         $output = shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
 
-        File\assert_exists($config_path, 'Config file does not exists: ' . $output);
-        File\assert_exists($packages_directory, 'Packages directory is not created: ' . $output);
-        File\assert_content($config_path, $initial_content, 'Config file content is not correct after running init!');
-        File\assert_content($meta_file_path, $meta_content, 'Lock file content is not correct after running init!');
+        File\assert_file_exists($config_path, 'Config file does not exists: ' . $output);
+        File\assert_file_exists($packages_directory, 'Packages directory is not created: ' . $output);
+        File\assert_file_content($config_path, $initial_content, 'Config file content is not correct after running init!');
+        File\assert_file_content($meta_file_path, $meta_content, 'Lock file content is not correct after running init!');
         assert_success('Project has been initialized.', $output);
     },
     after: function () {
@@ -68,10 +68,10 @@ test(
 
         $output = shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject --packages-directory=vendor');
 
-        File\assert_exists($packages_directory, 'packages directory has not been created: ' . $output);
-        File\assert_exists($config_path, 'Config file does not exists: ' . $output);
-        File\assert_exists($meta_file_path, 'Config lock file does not exists: ' . $output);
-        File\assert_content($config_path, $initial_content_with_packages_directory, 'Config file content is not correct after running init!');
+        File\assert_file_exists($packages_directory, 'packages directory has not been created: ' . $output);
+        File\assert_file_exists($config_path, 'Config file does not exists: ' . $output);
+        File\assert_file_exists($meta_file_path, 'Config lock file does not exists: ' . $output);
+        File\assert_file_content($config_path, $initial_content_with_packages_directory, 'Config file content is not correct after running init!');
     },
     after: function () {
         clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));

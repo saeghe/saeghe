@@ -7,6 +7,7 @@ use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\FileManager\File\delete;
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\Saeghe\FileManager\File\move;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should set credential for github.com',

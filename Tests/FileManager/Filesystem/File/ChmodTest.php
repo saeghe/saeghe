@@ -4,6 +4,7 @@ namespace Tests\FileManager\Filesystem\File\ChmodTest;
 
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\Saeghe\FileManager\Filesystem\File;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should change file\'s permission',

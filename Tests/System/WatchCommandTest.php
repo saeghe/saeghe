@@ -4,6 +4,7 @@ namespace Tests\System\WatchCommandTest;
 
 use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should watch for changes',

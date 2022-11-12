@@ -4,6 +4,7 @@ namespace Tests\FileManager\File\LinesTest;
 
 use Saeghe\Saeghe\FileManager\Path;
 use Saeghe\Saeghe\FileManager\File;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should read file\'s lines',

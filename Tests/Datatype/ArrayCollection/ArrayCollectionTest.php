@@ -4,6 +4,7 @@ namespace Tests\Datatype\ArrayCollection\ArrayCollectionTest;
 
 use Saeghe\Saeghe\Datatype\ArrayCollection;
 use Saeghe\Saeghe\Datatype\Collection;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should create a collection instance that accept any value',

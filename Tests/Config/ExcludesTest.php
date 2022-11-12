@@ -3,6 +3,7 @@
 namespace Tests\Config\ExcludesTest;
 
 use Saeghe\Saeghe\Config\Excludes;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should validate key',

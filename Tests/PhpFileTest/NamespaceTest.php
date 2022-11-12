@@ -3,6 +3,7 @@
 namespace Tests\PhpFileTest\NamespaceTest;
 
 use Saeghe\Saeghe\PhpFile;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should return null when there is no namespace',

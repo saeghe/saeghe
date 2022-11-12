@@ -4,6 +4,7 @@ namespace Tests\FileManager\File\PermissionTest;
 
 use Saeghe\Saeghe\FileManager\Path;
 use Saeghe\Saeghe\FileManager\File;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should return file\'s permission',

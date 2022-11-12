@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Collection\KeysTest;
 
 use Saeghe\Saeghe\Datatype\Collection;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should run collection keys',

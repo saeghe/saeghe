@@ -3,6 +3,8 @@
 namespace Tests\FileManager\Filesystem\Directory\ExistsTest;
 
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
 
 test(
     title: 'it should check if directory exists',

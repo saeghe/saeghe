@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Str\AfterLastOccurrenceTest;
 
 use Saeghe\Saeghe\Datatype\Str;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should return empty string when needle is empty',

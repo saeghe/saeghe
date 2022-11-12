@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Text\SetTest;
 
 use Saeghe\Saeghe\Datatype\Text;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should set given text',

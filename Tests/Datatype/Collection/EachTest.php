@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Collection\EachTest;
 
 use Saeghe\Saeghe\Datatype\Collection;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should run the given closure against each item',
