@@ -18,6 +18,8 @@ use function Saeghe\Saeghe\Providers\GitHub\has_release;
 use function Saeghe\Saeghe\Providers\GitHub\is_ssh;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
 
 test(
     title: 'it should detect if url is ssh',

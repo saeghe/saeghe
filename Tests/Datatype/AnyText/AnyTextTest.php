@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Text\AnyTextTest;
 
 use Saeghe\Saeghe\Datatype\AnyText;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it can construct a text without initial data',

@@ -3,6 +3,7 @@
 namespace Tests\PhpFileTest\UsedTraitsTest;
 
 use Saeghe\Saeghe\PhpFile;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should return empty array when there is no trait',

@@ -7,6 +7,7 @@ use function Saeghe\Saeghe\FileManager\Symlink\link;
 use function Saeghe\Saeghe\FileManager\Symlink\target;
 use function Saeghe\Saeghe\FileManager\File\create;
 use function Saeghe\Saeghe\FileManager\File\delete;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should return target path to the link',

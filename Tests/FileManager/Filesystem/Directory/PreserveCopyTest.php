@@ -3,6 +3,7 @@
 namespace Tests\FileManager\Filesystem\Directory\PreserveCopyTest;
 
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should copy directory by preserving permission',

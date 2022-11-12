@@ -3,6 +3,7 @@
 namespace Tests\Config\MapTest;
 
 use Saeghe\Saeghe\Config\Map;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should validate key',

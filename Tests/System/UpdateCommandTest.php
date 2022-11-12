@@ -8,6 +8,7 @@ use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 test(

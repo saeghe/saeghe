@@ -3,6 +3,7 @@
 namespace Tests\Config\EntryPointsTest;
 
 use Saeghe\Saeghe\Config\EntryPoints;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should validate key',

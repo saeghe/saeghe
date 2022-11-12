@@ -4,6 +4,7 @@ namespace Tests\FileManager\Directory\MakeRecursiveTest;
 
 use Saeghe\Saeghe\FileManager\Path;
 use Saeghe\Saeghe\FileManager\Directory;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should create directory recursively with function',

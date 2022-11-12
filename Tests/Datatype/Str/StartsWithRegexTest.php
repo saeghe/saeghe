@@ -3,6 +3,8 @@
 namespace Tests\Datatype\Str\StartsWithRegexTest;
 
 use function Saeghe\Saeghe\Datatype\Str\starts_with_regex;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
 
 test(
     title: 'it should check if string starts with given regex',

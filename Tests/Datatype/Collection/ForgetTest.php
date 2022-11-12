@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Collection\ForgetTest;
 
 use Saeghe\Saeghe\Datatype\Collection;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should forget items from the collection by given key',

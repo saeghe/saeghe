@@ -7,6 +7,8 @@ use function Saeghe\Saeghe\FileManager\Symlink\exists;
 use function Saeghe\Saeghe\FileManager\Symlink\link;
 use function Saeghe\Saeghe\FileManager\File\create;
 use function Saeghe\Saeghe\FileManager\File\delete;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
 
 test(
     title: 'it should detect when link exists',

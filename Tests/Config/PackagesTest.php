@@ -4,6 +4,7 @@ namespace Tests\Config\PackagesTest;
 
 use Saeghe\Saeghe\Config\Packages;
 use Saeghe\Saeghe\Package;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should validate key',

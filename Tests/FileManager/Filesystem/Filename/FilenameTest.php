@@ -3,6 +3,7 @@
 namespace Tests\FileManager\Filesystem\Filename\FilenameTest;
 
 use Saeghe\Saeghe\FileManager\Filesystem\Filename;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'filename should be at least one character',

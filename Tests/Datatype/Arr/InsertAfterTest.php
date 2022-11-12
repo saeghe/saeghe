@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Arr\InsertAfterTest;
 
 use function Saeghe\Saeghe\Datatype\Arr\insert_after;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should put given value after given key in array',

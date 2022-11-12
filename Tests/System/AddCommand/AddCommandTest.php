@@ -9,6 +9,7 @@ use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 test(
@@ -150,20 +151,20 @@ test(
 
 function assert_config_file_created_for_simple_project($message)
 {
-    File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), $message);
+    File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json'), $message);
 }
 
 function assert_packages_directory_created_for_empty_project($message)
 {
-    File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'), $message);
+    File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'), $message);
 }
 
 function assert_simple_package_cloned($message)
 {
     assert_true((
-            File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package'))
-            && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/saeghe.config.json'))
-            && File\assert_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/README.md'))
+            File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package'))
+            && File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/saeghe.config.json'))
+            && File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages/Saeghe/simple-package/README.md'))
         ),
         $message
     );

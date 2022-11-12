@@ -3,6 +3,8 @@
 namespace Tests\FileManager\Filesystem\Directory\RenewRecursiveTest;
 
 use Saeghe\Saeghe\FileManager\Filesystem\Directory;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
 
 test(
     title: 'it should clean directory when directory exists',

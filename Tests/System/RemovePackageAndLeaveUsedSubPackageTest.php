@@ -5,6 +5,7 @@ namespace Tests\System\RemovePackageAndLeaveUsedSubPackageTest;
 use Saeghe\Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should remove the package but leave used subpackage',

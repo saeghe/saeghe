@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Collection\CollectionTest;
 
 use Saeghe\Saeghe\Datatype\Collection;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it can construct a collection without initial data',

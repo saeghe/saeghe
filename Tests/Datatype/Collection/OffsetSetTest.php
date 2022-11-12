@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Collection\OffsetSetTest;
 
 use Saeghe\Saeghe\Datatype\Collection;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should check should implement offsetSet',

@@ -5,6 +5,7 @@ namespace Tests\FileManager\Directory\ListAllTest;
 use Saeghe\Saeghe\FileManager\Path;
 use Saeghe\Saeghe\FileManager\Directory;
 use Saeghe\Saeghe\FileManager\File;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should return list of files and sub directories in the given directory contain hidden files',

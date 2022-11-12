@@ -3,6 +3,7 @@
 namespace Tests\Datatype\Collection\GetIteratorTest;
 
 use Saeghe\Saeghe\Datatype\Collection;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should implement getIterator',

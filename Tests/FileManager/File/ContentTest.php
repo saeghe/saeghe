@@ -5,6 +5,7 @@ namespace Tests\FileManager\File\ContentTest;
 use Saeghe\Saeghe\FileManager\Path;
 use function Saeghe\Saeghe\FileManager\File\content;
 use function Saeghe\Saeghe\FileManager\File\delete;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should get file content',

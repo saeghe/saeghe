@@ -7,6 +7,8 @@ use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
 use function Saeghe\Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\Saeghe\Providers\GitHub\get_json;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 test(

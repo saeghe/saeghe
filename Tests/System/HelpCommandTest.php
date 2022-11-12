@@ -2,6 +2,8 @@
 
 namespace Tests\System\HelpCommandTest;
 
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+
 $help_content = <<<'EOD'
 usage: saeghe [-v | --version] [-h | --help] [--man]
            <command> [<args>]

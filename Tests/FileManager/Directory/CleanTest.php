@@ -4,6 +4,7 @@ namespace Tests\FileManager\Directory\CleanTest;
 
 use Saeghe\Saeghe\FileManager\Path;
 use function Saeghe\Saeghe\FileManager\Directory\clean;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should clean directory',

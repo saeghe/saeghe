@@ -3,6 +3,7 @@
 namespace Tests\PhpFileTest\ImportedClassesTest;
 
 use Saeghe\Saeghe\PhpFile;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
     title: 'it should detect simple classes',
