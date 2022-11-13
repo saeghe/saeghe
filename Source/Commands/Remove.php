@@ -17,6 +17,7 @@ function run(Project $project)
 
     $config = Config::from_array(Json\to_array($project->config));
 
+    /** @var Package $package */
     $package = $config->packages
         ->reduce(function ($carry, Package $package) {
                 return $package->is($carry) ? $package : $carry;

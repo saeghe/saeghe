@@ -35,7 +35,7 @@ class Repository
         return new static($owner, $repo);
     }
 
-    public static function from_meta($meta): static
+    public static function from_meta(array $meta): static
     {
         return (new static($meta['owner'], $meta['repo']))
             ->version($meta['version'])

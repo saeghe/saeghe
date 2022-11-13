@@ -113,25 +113,24 @@ test(
 test(
     title: 'it should download given repository',
     case: function (Path $packages_directory) {
-        assert_true(download($packages_directory, 'saeghe', 'released-package', 'v1.0.5'));
+        assert_true(download($packages_directory, 'saeghe', 'released-package', 'v1.0.5'), 'download failed');
         // Assert latest changes on the latest commit
         assert_true(true ===
             str_contains(
                 file_get_contents($packages_directory->append('saeghe.config-lock.json')),
                 '080478442a9ef1d19f5966edc9bf3c1eccca4848'
-            )
+            ),
+            'config file does not found'
         );
-        assert_false(\file_exists($packages_directory->parent()->append('released-package.zip')));
+        assert_false(\file_exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'saeghe' . DIRECTORY_SEPARATOR . 'released-package.zip'), 'zip file is not deleted');
 
         return $packages_directory;
     },
     before: function () {
         $credentials = Json\to_array(realpath(root() . 'credentials.json'));
         github_token($credentials[GITHUB_DOMAIN]['token']);
-        $packages_directory = Path::from_string(root() . 'Tests/PlayGround/downloads/package');
-        mkdir($packages_directory, 0777, true);
 
-        return $packages_directory;
+        return Path::from_string(root() . 'Tests/PlayGround/downloads/package');
     },
     after: function (Path $packages_directory) {
         $packages_directory->parent()->delete_recursive();

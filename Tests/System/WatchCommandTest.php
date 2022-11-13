@@ -30,6 +30,7 @@ test(
     },
     before: function () {
         mkdir(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Source'));
+        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
     },
     after: function () {
         clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));

@@ -52,9 +52,9 @@ function assert_packages_directory_created_for_empty_project($message)
 function assert_simple_package_cloned($message)
 {
     assert_true((
-            File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package'))
-            && File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/saeghe.config.json'))
-            && File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/vendor/Saeghe/simple-package/README.md'))
+            File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/vendor/saeghe/simple-package'))
+            && File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/vendor/saeghe/simple-package/saeghe.config.json'))
+            && File\assert_file_exists(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/vendor/saeghe/simple-package/README.md'))
         ),
         $message
     );
