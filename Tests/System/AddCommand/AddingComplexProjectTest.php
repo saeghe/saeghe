@@ -69,12 +69,12 @@ function delete_packages_directory()
 function assert_pacakges_added_to_packages_directory($message)
 {
     assert_true((
-            file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package')
-            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/saeghe.config.json')
-            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/simple-package/README.md')
-            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package')
-            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/saeghe.config.json')
-            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/Saeghe/complex-package/saeghe.config-lock.json')
+            file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/saeghe/simple-package')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/saeghe/simple-package/saeghe.config.json')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/saeghe/simple-package/README.md')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/saeghe/complex-package')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/saeghe/complex-package/saeghe.config.json')
+            && file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/saeghe/complex-package/saeghe.config-lock.json')
         ),
         $message
     );
