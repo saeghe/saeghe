@@ -33,7 +33,7 @@ $project = Read\parameter('project', '');
 $project = Project::make(
     strlen($project) ? getcwd() . '/' . $project . '/' : getcwd() . '/',
     $command === 'build' ? Read\argument(2, 'development') : 'development',
-    \Saeghe\Saeghe\FileManager\Resolver\realpath(__DIR__ .'/credentials.json'),
+    \Saeghe\FileManager\Resolver\realpath(__DIR__ .'/credentials.json'),
 );
 
 match ($command) {

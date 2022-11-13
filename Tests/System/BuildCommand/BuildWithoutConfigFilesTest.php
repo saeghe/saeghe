@@ -3,9 +3,10 @@
 namespace Tests\System\BuildCommand\BuildWithoutConfigFilesTest;
 
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
-use function Saeghe\Saeghe\FileManager\File\delete;
-use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\FileManager\File\delete;
+use function Saeghe\FileManager\Resolver\root;
+use function Saeghe\FileManager\Resolver\realpath;
 
 test(
     title: 'it should build project without config files',

@@ -3,9 +3,9 @@
 namespace Saeghe\Saeghe;
 
 use Saeghe\Saeghe\Config\Config;
-use Saeghe\Saeghe\FileManager\Filesystem\Directory;
-use Saeghe\Saeghe\FileManager\Filesystem\File;
-use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\FileManager\Filesystem\Directory;
+use Saeghe\FileManager\Filesystem\File;
+use Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\Git\Repository;
 
 class Package extends Repository

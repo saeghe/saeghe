@@ -4,18 +4,18 @@ namespace Saeghe\Saeghe\Commands\Build;
 
 use Saeghe\Cli\IO\Write;
 use Saeghe\Saeghe\Config\Config;
-use Saeghe\Saeghe\FileManager\Filesystem\Directory;
-use Saeghe\Saeghe\FileManager\Filesystem\File;
-use Saeghe\Saeghe\FileManager\Filesystem\FilesystemCollection;
-use Saeghe\Saeghe\FileManager\Filesystem\Symlink;
+use Saeghe\FileManager\Filesystem\Directory;
+use Saeghe\FileManager\Filesystem\File;
+use Saeghe\FileManager\Filesystem\FilesystemCollection;
+use Saeghe\FileManager\Filesystem\Symlink;
 use Saeghe\Saeghe\Config\Meta;
 use Saeghe\Saeghe\Package;
-use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
-use Saeghe\Saeghe\Datatype\Arr;
-use Saeghe\Saeghe\Datatype\Str;
-use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use Saeghe\Datatype\Arr;
+use Saeghe\Datatype\Str;
+use function Saeghe\FileManager\Resolver\realpath;
 
 $autoloads = [];
 

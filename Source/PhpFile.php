@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe;
 
-use Saeghe\Saeghe\Datatype\Str;
+use Saeghe\Datatype\Str;
 
 class PhpFile
 {

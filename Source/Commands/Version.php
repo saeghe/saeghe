@@ -7,5 +7,5 @@ use Saeghe\Saeghe\Project;
 
 function run(Project $project)
 {
-    Write\success('Saeghe version 1.7.2');
+    Write\success('Saeghe version 1.8.0');
 }

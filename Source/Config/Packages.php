@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Config;
 
-use Saeghe\Saeghe\Datatype\Collection;
+use Saeghe\Datatype\Collection;
 use Saeghe\Saeghe\Package;
 
 class Packages extends Collection

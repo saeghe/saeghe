@@ -7,7 +7,7 @@ use Saeghe\Saeghe\Config\Meta;
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Write\success;
-use function Saeghe\Saeghe\FileManager\FileType\Json\write;
+use function Saeghe\FileManager\FileType\Json\write;
 
 function run(Project $project)
 {

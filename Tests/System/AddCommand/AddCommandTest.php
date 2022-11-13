@@ -2,12 +2,13 @@
 
 namespace Tests\System\AddCommand\AddCommandTest;
 
-use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\FileManager\FileType\Json;
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\Cli\IO\Write\assert_error;
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\Saeghe\FileManager\Directory\clean;
-use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\FileManager\Directory\clean;
+use function Saeghe\FileManager\Resolver\root;
+use function Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;

@@ -3,8 +3,9 @@
 namespace Tests\System\MigrateCommand\MigrateCommandWithoutProjectTest;
 
 use Saeghe\Cli\IO\Write;
-use function Saeghe\Saeghe\FileManager\Directory\delete_recursive;
-use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\FileManager\Resolver\root;
 
 test(
     title: 'it should show proper message when there is no composer.json file',

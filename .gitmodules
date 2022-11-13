@@ -4,3 +4,9 @@
 [submodule "Packages/saeghe/cli"]
 	path = Packages/saeghe/cli
 	url = git@github.com:saeghe/cli.git
+[submodule "Packages/saeghe/datatype"]
+	path = Packages/saeghe/datatype
+	url = https://github.com/saeghe/datatype.git
+[submodule "Packages/saeghe/file-manager"]
+	path = Packages/saeghe/file-manager
+	url = git@github.com:saeghe/file-manager.git

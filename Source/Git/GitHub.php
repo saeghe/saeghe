@@ -3,7 +3,7 @@
 namespace Saeghe\Saeghe\Providers\GitHub;
 
 use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
-use function Saeghe\Saeghe\FileManager\File\delete;
+use function Saeghe\FileManager\File\delete;
 
 const GITHUB_DOMAIN = 'github.com';
 const GITHUB_URL = 'https://github.com/';

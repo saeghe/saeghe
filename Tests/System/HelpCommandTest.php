@@ -2,6 +2,7 @@
 
 namespace Tests\System\HelpCommandTest;
 
+use function Saeghe\FileManager\Resolver\root;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 $help_content = <<<'EOD'

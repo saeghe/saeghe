@@ -3,7 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Credential;
 
 use Saeghe\Saeghe\Project;
-use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\success;
 

@@ -3,9 +3,9 @@
 namespace Saeghe\Saeghe;
 
 use Saeghe\Saeghe\Exception\CredentialCanNotBeSetException;
-use Saeghe\Saeghe\FileManager\Filesystem\Directory;
-use Saeghe\Saeghe\FileManager\Filesystem\File;
-use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\FileManager\Filesystem\Directory;
+use Saeghe\FileManager\Filesystem\File;
+use Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
