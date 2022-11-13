@@ -15,7 +15,7 @@ function is_ssh(string $package_url): bool
     return str_starts_with($package_url, 'git@');
 }
 
-function extract_owner($package_url): string
+function extract_owner(string $package_url): string
 {
     if (is_ssh($package_url)) {
         $owner_and_repo = str_replace(GITHUB_SSH_URL, '', $package_url);
@@ -30,7 +30,7 @@ function extract_owner($package_url): string
     return explode('/', $owner_and_repo)[0];
 }
 
-function extract_repo($package_url): string
+function extract_repo(string $package_url): string
 {
     if (is_ssh($package_url)) {
         $owner_and_repo = str_replace(GITHUB_SSH_URL, '', $package_url);
@@ -77,35 +77,35 @@ function get_json(string $api_sub_url): array
     return $response;
 }
 
-function has_release($owner, $repo): bool
+function has_release(string $owner, string $repo): bool
 {
     $json = get_json("repos/$owner/$repo/releases/latest");
 
     return isset($json['tag_name']);
 }
 
-function find_latest_version($owner, $repo): string
+function find_latest_version(string $owner, string $repo): string
 {
     $json = get_json("repos/$owner/$repo/releases/latest");
 
     return $json['tag_name'];
 }
 
-function find_version_hash($owner, $repo, $version): string
+function find_version_hash(string $owner, string $repo, string $version): string
 {
     $json = get_json("repos/$owner/$repo/git/ref/tags/$version");
 
     return $json['object']['sha'];
 }
 
-function find_latest_commit_hash($owner, $repo): string
+function find_latest_commit_hash(string $owner, string $repo): string
 {
     $json = get_json("repos/$owner/$repo/commits");
 
     return $json[0]['sha'];
 }
 
-function download($destination, $owner, $repo, $version): bool
+function download(string $destination, string $owner, string $repo, string $version): bool
 {
     $token = github_token();
     $parent_directory = dirname($destination);
@@ -149,7 +149,7 @@ function download($destination, $owner, $repo, $version): bool
     return rename($parent_directory . $directory, $destination);
 }
 
-function clone_to($destination, $owner, $repo): bool
+function clone_to(string $destination, string $owner, string $repo): bool
 {
     $github_ssh_url = GITHUB_SSH_URL;
     $output = passthru("git clone $github_ssh_url$owner/$repo.git $destination");
