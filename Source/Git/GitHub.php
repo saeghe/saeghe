@@ -3,6 +3,10 @@
 namespace Saeghe\Saeghe\Providers\GitHub;
 
 use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
+use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\FileManager\Directory\ls;
+use function Saeghe\FileManager\Directory\preserve_copy_recursively;
+use function Saeghe\FileManager\Directory\renew_recursive;
 use function Saeghe\FileManager\File\delete;
 
 const GITHUB_DOMAIN = 'github.com';
@@ -108,15 +112,10 @@ function find_latest_commit_hash(string $owner, string $repo): string
 function download(string $destination, string $owner, string $repo, string $version): bool
 {
     $token = github_token();
-    $parent_directory = dirname($destination);
+    $temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $owner . DIRECTORY_SEPARATOR;
+    renew_recursive($temp);
 
-    if (! \file_exists($parent_directory)) {
-        mkdir($parent_directory, 0755, true);
-    }
-
-    $parent_directory = $parent_directory . '/';
-
-    $zip_file = $parent_directory . $repo . '.zip';
+    $zip_file = $temp . $repo . '.zip';
 
     $fp = fopen ($zip_file, 'w+');
     $ch = curl_init(GITHUB_URL . "$owner/$repo/zipball/$version");
@@ -132,7 +131,7 @@ function download(string $destination, string $owner, string $repo, string $vers
     $res = $zip->open($zip_file);
 
     if ($res === TRUE) {
-        $zip->extractTo($parent_directory);
+        $zip->extractTo($temp);
         $zip->close();
     } else {
         var_dump($res);
@@ -140,13 +139,15 @@ function download(string $destination, string $owner, string $repo, string $vers
 
     delete($zip_file);
 
-    $files = scandir($parent_directory);
-
+    $files = ls($temp);
     $directory = array_reduce($files, function ($carry, $filename) use ($owner, $repo) {
         return str_starts_with($filename, "$owner-$repo-") ? $filename : $carry;
     });
+    $unzip_directory = $temp . $directory;
 
-    return rename($parent_directory . $directory, $destination);
+    renew_recursive($destination);
+
+    return  preserve_copy_recursively($unzip_directory, $destination) && delete_recursive($unzip_directory);
 }
 
 function clone_to(string $destination, string $owner, string $repo): bool
