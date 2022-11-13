@@ -2,10 +2,11 @@
 
 namespace Tests\System\AddCommand\AddPackagesWithSameSubPackagesTest;
 
-use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\Saeghe\FileManager\Directory\clean;
-use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\FileManager\Directory\clean;
+use function Saeghe\FileManager\Resolver\root;
+use function Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(

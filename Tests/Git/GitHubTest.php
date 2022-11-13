@@ -2,9 +2,8 @@
 
 namespace Tests\GitTest\GitHubTest;
 
-use Saeghe\Saeghe\FileManager\Path;
-use Saeghe\Saeghe\FileManager\FileType\Json;
-use function Saeghe\Saeghe\FileManager\Directory\clean;
+use Saeghe\FileManager\Path;
+use Saeghe\FileManager\FileType\Json;
 use function Saeghe\Saeghe\Providers\GitHub\clone_to;
 use function Saeghe\Saeghe\Providers\GitHub\download;
 use function Saeghe\Saeghe\Providers\GitHub\extract_owner;
@@ -16,10 +15,11 @@ use function Saeghe\Saeghe\Providers\GitHub\find_version_hash;
 use function Saeghe\Saeghe\Providers\GitHub\github_token;
 use function Saeghe\Saeghe\Providers\GitHub\has_release;
 use function Saeghe\Saeghe\Providers\GitHub\is_ssh;
-use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
-use function Saeghe\Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\FileManager\Resolver\root;
+use function Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
+use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 test(
     title: 'it should detect if url is ssh',
@@ -134,7 +134,7 @@ test(
         return $packages_directory;
     },
     after: function (Path $packages_directory) {
-        clean($packages_directory->parent()->parent());
+        $packages_directory->parent()->delete_recursive();
     }
 );
 
@@ -159,7 +159,7 @@ test(
         return $packages_directory;
     },
     after: function (Path $packages_directory) {
-        clean($packages_directory->parent()->parent());
+        $packages_directory->parent()->delete_recursive();
     }
 );
 

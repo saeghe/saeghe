@@ -2,6 +2,7 @@
 
 namespace Tests\System\ManCommandTest;
 
+use function Saeghe\FileManager\Resolver\root;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 $man_content = <<<EOD

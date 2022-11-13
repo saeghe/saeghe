@@ -6,8 +6,3 @@ require_once \realpath(__DIR__ . '/Packages/saeghe/test-runner/Source/Assertions
 require_once \realpath(__DIR__ . '/Packages/saeghe/test-runner/Source/Assertions/Str.php');
 require_once \realpath(__DIR__ . '/Packages/saeghe/test-runner/Source/Assertions/File.php');
 require_once \realpath(__DIR__ . '/Packages/saeghe/test-runner/run');
-
-function root(): string
-{
-    return getcwd() . DIRECTORY_SEPARATOR;
-}

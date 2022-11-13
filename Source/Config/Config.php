@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Config;
 
-use Saeghe\Saeghe\FileManager\Filesystem\Filename;
+use Saeghe\FileManager\Filesystem\Filename;
 use Saeghe\Saeghe\Package;
 
 class Config

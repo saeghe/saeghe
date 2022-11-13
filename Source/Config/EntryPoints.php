@@ -2,7 +2,7 @@
 
 namespace Saeghe\Saeghe\Config;
 
-use Saeghe\Saeghe\Datatype\Collection;
+use Saeghe\Datatype\Collection;
 
 class EntryPoints extends Collection
 {

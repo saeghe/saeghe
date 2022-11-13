@@ -5,7 +5,7 @@ namespace Saeghe\Saeghe\Commands\Update;
 use Saeghe\Saeghe\Config\Config;
 use Saeghe\Saeghe\Package;
 use Saeghe\Saeghe\Project;
-use Saeghe\Saeghe\FileManager\FileType\Json;
+use Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;

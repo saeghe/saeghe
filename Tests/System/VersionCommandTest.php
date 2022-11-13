@@ -2,6 +2,7 @@
 
 namespace Tests\System\VersionCommandTest;
 
+use function Saeghe\FileManager\Resolver\root;
 use function Saeghe\Cli\IO\Write\assert_success;
 
 test(
