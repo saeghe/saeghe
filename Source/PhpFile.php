@@ -389,8 +389,13 @@ class PhpFile
         $used_instantiated_classes_in_file = array_map(function ($used_instantiated_class) use ($imported_classes) {
             $used_instantiated_class = Str\replace_first_occurrence($used_instantiated_class[0], 'new ', '');
 
-            $class = Str\after_last_occurrence($used_instantiated_class, '\\');
-            $path = Str\before_last_occurrence($used_instantiated_class, '\\');
+            if (str_contains($used_instantiated_class, '\\')) {
+                $class = Str\after_last_occurrence($used_instantiated_class, '\\');
+                $path = Str\before_last_occurrence($used_instantiated_class, '\\');
+            } else {
+                $class = '';
+                $path = $used_instantiated_class;
+            }
 
             foreach ($imported_classes as $imported_class => $alias) {
                 if ($path === $imported_class || $path === $alias) {
