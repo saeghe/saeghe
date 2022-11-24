@@ -127,21 +127,30 @@ function apply_file_modifications(File $origin, array $replace_map): string
     global $autoloads;
 
     $content = $origin->content();
-    $php_file = new PhpFile($content);
 
-    $imports = array_merge(
-        $php_file->used_constants(),
-        array_keys($php_file->imported_constants()),
-        $php_file->used_functions(),
-        array_keys($php_file->imported_functions()),
-    );
-    $autoload = array_merge(
-        $php_file->extended_classes(),
-        $php_file->implemented_interfaces(),
-        $php_file->used_traits(),
-        $php_file->used_classes(),
-        array_keys($php_file->imported_classes()),
-    );
+    $php_file = PhpFile::from_content($content);
+    $file_imports = $php_file->imports();
+
+    $autoload = $file_imports['classes'];
+
+    foreach ($autoload as $import => $alias) {
+        $used_functions = $php_file->used_functions($alias);
+        $used_constants = $php_file->used_constants($alias);
+
+        if (count($used_functions) > 0 || count($used_constants) > 0) {
+            foreach ($used_constants as $constant) {
+                $file_imports['constants'][$import . '\\' . $constant] = $constant;
+            }
+            foreach ($used_functions as $function) {
+                $file_imports['functions'][$import . '\\' . $function] = $function;
+            }
+
+            unset($autoload[$import]);
+        }
+    }
+
+    $imports = array_keys(array_merge($file_imports['constants'], $file_imports['functions']));
+    $autoload = array_keys($autoload);
 
     $require_statements = [];
 

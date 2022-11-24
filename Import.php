@@ -1,5 +1,9 @@
 <?php
 
+if (PHP_VERSION_ID < 80100) {
+    define('T_ENUM', 336);
+}
+
 spl_autoload_register(function ($class) {
     $classMap = [
         'Saeghe\Datatype\ArrayCollection' => \realpath(__DIR__ . '/Packages/saeghe/datatype/Source/ArrayCollection.php'),
@@ -24,6 +28,7 @@ spl_autoload_register(function ($class) {
         'Saeghe\Saeghe\Config\Meta' => \realpath(__DIR__ . '/Source/Config/Meta.php'),
         'Saeghe\Saeghe\Config\Packages' => \realpath(__DIR__ . '/Source/Config/Packages.php'),
         'Saeghe\Saeghe\Package' => \realpath(__DIR__ . '/Source/Package.php'),
+        'Saeghe\Saeghe\PhpFile' => \realpath(__DIR__ . '/Source/PhpFile.php'),
         'Saeghe\Saeghe\Project' => \realpath(__DIR__ . '/Source/Project.php'),
     ];
 
@@ -40,5 +45,4 @@ require \realpath(__DIR__ . '/Packages/saeghe/file-manager/Source/Symlink.php');
 require \realpath(__DIR__ . '/Packages/saeghe/file-manager/Source/Directory.php');
 require \realpath(__DIR__ . '/Packages/saeghe/file-manager/Source/FileType/Json.php');
 require \realpath(__DIR__ . '/Source/Exception/Handler.php');
-require \realpath(__DIR__ . '/Source/PhpFile.php');
 require \realpath(__DIR__ . '/Source/Git/GitHub.php');
