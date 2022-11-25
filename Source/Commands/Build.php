@@ -15,7 +15,6 @@ use Saeghe\Saeghe\Package;
 use Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
-use Saeghe\Datatype\Arr;
 use Saeghe\Datatype\Str;
 
 function run(Project $project)
@@ -251,66 +250,59 @@ function file_needs_modification(File $file, Config $config): bool
 
 function add_autoloads(Project $project, File $target): void
 {
-    $autoload_lines = [];
+    $content = <<<'EOD'
+spl_autoload_register(function ($class) {
+    $classes = [
 
-    $autoload_lines = array_merge($autoload_lines, [
-        '',
-        'spl_autoload_register(function ($class) {',
-        '    $classes = [',
-    ]);
+EOD;
 
     foreach ($project->imported_classes as $class => $path) {
-        $autoload_lines[] = "        '$class' => '$path',";
+        $content .= <<<EOD
+        '$class' => '$path',
+
+EOD;
     }
 
-    $autoload_lines = array_merge($autoload_lines, [
-        '    ];',
-        '',
-        '    if (array_key_exists($class, $classes)) {',
-        '        require $classes[$class];',
-        '    }',
-        '',
-        '}, true, true);',
-    ]);
+    $content .= <<<'EOD'
+    ];
 
-    $autoload_lines = array_merge($autoload_lines, [
-        '',
-        'spl_autoload_register(function ($class) {',
-        '    $namespaces = [',
-    ]);
+    if (array_key_exists($class, $classes)) {
+        require $classes[$class];
+    }
+
+}, true, true);
+
+spl_autoload_register(function ($class) {
+    $namespaces = [
+
+EOD;
 
     foreach ($project->namespaces as $namespace => $path) {
-        $autoload_lines[] = "        '$namespace' => '$path',";
+        $content .= <<<EOD
+        '$namespace' => '$path',
+
+EOD;
     }
+    $content .= <<<'EOD'
+    ];
 
-    $autoload_lines = array_merge($autoload_lines, [
-        '    ];',
-        '',
-        '    $realpath = null;',
-        '',
-        '    foreach ($namespaces as $namespace => $path) {',
-        '        if (str_starts_with($class, $namespace)) {',
-        '            $pos = strpos($class, $namespace);',
-        '            if ($pos !== false) {',
-        '                $realpath = substr_replace($class, $path, $pos, strlen($namespace));',
-        '            }',
-        '            $realpath = str_replace("\\\", DIRECTORY_SEPARATOR, $realpath) . \'.php\';',
-        '            require $realpath;',
-        '            return ;',
-        '        }',
-        '    }',
-        '});',
-    ]);
+    $realpath = null;
 
-    $lines = explode(PHP_EOL, $target->content());
-    $number = 1;
-    foreach ($lines as $line_number => $line) {
-        if (str_contains($line, '<?php')) {
-            $number = $line_number;
-            break;
+    foreach ($namespaces as $namespace => $path) {
+        if (str_starts_with($class, $namespace)) {
+            $pos = strpos($class, $namespace);
+            if ($pos !== false) {
+                $realpath = substr_replace($class, $path, $pos, strlen($namespace));
+            }
+            $realpath = str_replace("\\", DIRECTORY_SEPARATOR, $realpath) . '.php';
+            require $realpath;
+            return ;
         }
     }
+});
+EOD;
 
-    $lines = Arr\insert_after($lines, $number, $autoload_lines);
-    $target->modify(implode(PHP_EOL, $lines));
+    $php_file = PhpFile::from_content($target->content());
+    $php_file = $php_file->add_after_opening_tag(PHP_EOL . $content . PHP_EOL);
+    $target->modify($php_file->code());
 }
