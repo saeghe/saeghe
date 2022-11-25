@@ -66,7 +66,7 @@ function compile_packages(Project $project, Config $config, Package $package): v
 {
     $project->build_root->subdirectory("{$config->packages_directory}/{$package->owner}/{$package->repo}")->renew_recursive();
 
-    should_compile_files_and_directories_for_package($project, $config, $package)
+    package_compilable_files_and_directories($project, $config, $package)
         ->each(
             fn (Directory|File|Symlink $filesystem)
                 => compile(
@@ -81,7 +81,7 @@ function compile_packages(Project $project, Config $config, Package $package): v
 
 function compile_project_files(Project $project, Config $config): void
 {
-    should_compile_files_and_directories($project, $config)
+    compilable_files_and_directories($project, $config)
         ->each(fn (Directory|File|Symlink $filesystem)
             => compile($project, $config, $filesystem, $project->root, $project->build_root)
         );
@@ -132,9 +132,7 @@ function compile_file(Project $project, File $origin, File $destination): void
 
 function apply_file_modifications(Project $project, File $origin): string
 {
-    $content = $origin->content();
-
-    $php_file = PhpFile::from_content($content);
+    $php_file = PhpFile::from_content($origin->content());
     $file_imports = $php_file->imports();
 
     $autoload = $file_imports['classes'];
@@ -173,48 +171,18 @@ function apply_file_modifications(Project $project, File $origin): string
     });
 
     if ($paths->count() === 0) {
-        return $content;
+        return $php_file->code();
     }
 
     $require_statements = array_map(fn(Path $path) => "require_once '$path';", $paths->items());
 
-    return add_requires_and_autoload($require_statements, $origin);
-}
-
-function add_requires_and_autoload(array $require_statements, File $file): string
-{
-    $content = '';
-
-    $requires_added = false;
-
-    foreach ($file->lines() as $line) {
-        $content .= $line;
-
-        if (str_starts_with($line, 'namespace')) {
-            $requires_added = true;
-            if (count($require_statements) > 0) {
-                $content .= PHP_EOL;
-                $content .= implode(PHP_EOL, $require_statements);
-                $content .= PHP_EOL;
-            }
-        }
+    if ($php_file->has_namespace()) {
+        $php_file = $php_file->add_after_namespace(PHP_EOL . PHP_EOL . implode(PHP_EOL, $require_statements));
+    } else {
+        $php_file = $php_file->add_after_opening_tag(PHP_EOL . implode(PHP_EOL, $require_statements) . PHP_EOL);
     }
 
-    if (! $requires_added) {
-        $content = '';
-        foreach ($file->lines() as $line) {
-            $content .= $line;
-
-            if (! $requires_added && str_starts_with($line, '<?php')) {
-                $requires_added = true;
-                $content .= PHP_EOL;
-                $content .= implode(PHP_EOL, $require_statements);
-                $content .= PHP_EOL;
-            }
-        }
-    }
-
-    return $content;
+    return $php_file->code();
 }
 
 function make_replace_map(Project $project, Config $config, Meta $meta): void
@@ -237,7 +205,7 @@ function make_replace_map(Project $project, Config $config, Meta $meta): void
     }
 }
 
-function should_compile_files_and_directories_for_package(Project $project, Config $config, Package $package): FilesystemCollection
+function package_compilable_files_and_directories(Project $project, Config $config, Package $package): FilesystemCollection
 {
     $package_config = $package->config($project, $config);
     $package_root = $package->root($project, $config);
@@ -255,7 +223,7 @@ function should_compile_files_and_directories_for_package(Project $project, Conf
         );
 }
 
-function should_compile_files_and_directories(Project $project, Config $config): FilesystemCollection
+function compilable_files_and_directories(Project $project, Config $config): FilesystemCollection
 {
     $excluded_paths = array_map(
         function ($excluded_path) use ($project) {

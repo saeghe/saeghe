@@ -24,6 +24,62 @@ class PhpFile
         return $content;
     }
 
+    public function add_after_namespace(string $addition): static
+    {
+        $reached_namespace = false;
+        $namespace_finished_at = 0;
+        foreach ($this->tokens as $key => $token) {
+            if ($reached_namespace) {
+                if ($token === ';') {
+                    $namespace_finished_at = $key + 1;
+                    break;
+                }
+            } else if (is_array($token)) {
+                $reached_namespace = $token[0] === T_NAMESPACE;
+            }
+        }
+
+        return new static(array_merge(
+            array_slice($this->tokens, 0, $namespace_finished_at),
+            token_get_all($addition),
+            array_slice($this->tokens, $namespace_finished_at),
+        ));
+    }
+
+    public function add_after_opening_tag(string $addition): static
+    {
+        $opening_tag_position = 0;
+        foreach ($this->tokens as $key => $token) {
+            if (is_array($token)) {
+                if ($token[0] === T_OPEN_TAG) {
+                    $opening_tag_position = $key + 1;
+                    break;
+                }
+                if ($token[0] === T_OPEN_TAG_WITH_ECHO) {
+                    break;
+                }
+            }
+        }
+
+        $addition = $opening_tag_position === 0 ? '<?php ' . $addition . ' ?>' : $addition;
+
+        return new static(array_merge(
+            array_slice($this->tokens, 0, $opening_tag_position),
+            token_get_all($addition),
+            array_slice($this->tokens, $opening_tag_position),
+        ));
+    }
+
+    public function has_namespace(): bool
+    {
+        foreach ($this->tokens as $token) {
+            if (is_array($token) && $token[0] === T_NAMESPACE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function ignore(\Closure $filter, ?bool $initial = false): static
     {
         $tokens = [];
@@ -45,9 +101,7 @@ class PhpFile
                 return false;
             }
 
-            [$id] = $token;
-
-            return in_array($id, [T_INLINE_HTML, T_OPEN_TAG, T_COMMENT, T_DOC_COMMENT, T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE]);
+            return in_array($token[0], [T_INLINE_HTML, T_OPEN_TAG, T_COMMENT, T_DOC_COMMENT, T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE]);
         });
     }
 
@@ -58,9 +112,7 @@ class PhpFile
                 return $initial && !($token === ';');
             }
 
-            [$id] = $token;
-
-            return $initial || $id === T_USE;
+            return $initial || $token[0] === T_USE;
         });
     }
 
@@ -71,9 +123,7 @@ class PhpFile
                 return $initial && !($token === '{');
             }
 
-            [$id] = $token;
-
-            return $initial || in_array($id, [T_CLASS, T_TRAIT, T_INTERFACE, T_FINAL, T_ABSTRACT, T_ENUM]);
+            return $initial || in_array($token[0], [T_CLASS, T_TRAIT, T_INTERFACE, T_FINAL, T_ABSTRACT, T_ENUM]);
         });
     }
 
@@ -84,9 +134,7 @@ class PhpFile
                 return $initial && !($token === ';');
             }
 
-            [$id] = $token;
-
-            return $initial || $id === T_NAMESPACE;
+            return $initial || $token[0] === T_NAMESPACE;
         });
     }
 
@@ -96,14 +144,12 @@ class PhpFile
         $is_import = false;
 
         foreach ($this->ignore_any_string()->tokens as $token) {
-            if (! is_string($token)) {
-                [$id] = $token;
-
-                if (in_array($id, [T_CLASS, T_TRAIT, T_INTERFACE, T_FINAL, T_ABSTRACT, T_ENUM])) {
+            if (is_array($token)) {
+                if (in_array($token[0], [T_CLASS, T_TRAIT, T_INTERFACE, T_FINAL, T_ABSTRACT, T_ENUM])) {
                     break;
                 }
 
-                $is_import = $is_import || $id === T_USE;
+                $is_import = $is_import || $token[0] === T_USE;
             }
 
             if ($is_import) {
