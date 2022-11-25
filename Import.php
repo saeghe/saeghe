@@ -27,6 +27,7 @@ spl_autoload_register(function ($class) {
         'Saeghe\Saeghe\Config\Map' => \realpath(__DIR__ . '/Source/Config/Map.php'),
         'Saeghe\Saeghe\Config\Meta' => \realpath(__DIR__ . '/Source/Config/Meta.php'),
         'Saeghe\Saeghe\Config\Packages' => \realpath(__DIR__ . '/Source/Config/Packages.php'),
+        'Saeghe\Saeghe\Map' => \realpath(__DIR__ . '/Source/Map.php'),
         'Saeghe\Saeghe\Package' => \realpath(__DIR__ . '/Source/Package.php'),
         'Saeghe\Saeghe\PhpFile' => \realpath(__DIR__ . '/Source/PhpFile.php'),
         'Saeghe\Saeghe\Project' => \realpath(__DIR__ . '/Source/Project.php'),
