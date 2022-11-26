@@ -40,9 +40,6 @@ jobs:
           git submodule init
           git submodule update
 
-      - name: Add saeghe path
-        run: echo "${HOME}/saeghe/saeghe" >> $GITHUB_PATH
-
       - name: Set Credentials
         run: php saeghe credential github.com ${{ secrets.GITHUB_TOKEN }}
 

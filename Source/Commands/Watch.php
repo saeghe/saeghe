@@ -7,12 +7,15 @@ use function Saeghe\Cli\IO\Read\parameter;
 
 function run(Project $project)
 {
-    $seconds = (int) parameter('wait', 3);
+    global $argv;
 
-    chdir($project->root);
+    $seconds = (int) parameter('wait', 3);
+    $project = parameter('project');
+    $command = "php $argv[0] build";
+    $command = $project ? $command . ' --project=' . $project : $command;
 
     while (true) {
-        echo shell_exec("saeghe build");
+        echo shell_exec($command);
 
         sleep($seconds);
     }
