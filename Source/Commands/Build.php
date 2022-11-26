@@ -3,21 +3,19 @@
 namespace Saeghe\Saeghe\Commands\Build;
 
 use Saeghe\Cli\IO\Write;
+use Saeghe\FileManager\Path;
 use Saeghe\Saeghe\Config\Config;
 use Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\FileManager\Filesystem\File;
 use Saeghe\FileManager\Filesystem\FilesystemCollection;
 use Saeghe\FileManager\Filesystem\Symlink;
 use Saeghe\Saeghe\Config\Meta;
+use Saeghe\Saeghe\Map;
 use Saeghe\Saeghe\Package;
 use Saeghe\FileManager\FileType\Json;
 use Saeghe\Saeghe\PhpFile;
 use Saeghe\Saeghe\Project;
-use Saeghe\Datatype\Arr;
 use Saeghe\Datatype\Str;
-use function Saeghe\FileManager\Resolver\realpath;
-
-$autoloads = [];
 
 function run(Project $project)
 {
@@ -32,71 +30,80 @@ function run(Project $project)
     $project->build_root->renew_recursive();
     $project->build_root->subdirectory($config->packages_directory)->exists_or_create();
 
-    $replace_map = make_replace_map($project, $config, $meta);
+    make_replace_map($project, $config, $meta);
 
     foreach ($meta->packages as $package) {
-        compile_packages($project, $config, $package, $replace_map);
+        compile_packages($project, $config, $package);
     }
 
-    compile_project_files($project, $config, $replace_map);
+    compile_project_files($project, $config);
 
-    global $autoloads;
-    make_entry_points($project, $config, $replace_map, $autoloads);
+    foreach ($config->entry_points as $entry_point) {
+        add_autoloads($project, $project->build_root->file($entry_point));
+    }
 
     foreach ($meta->packages as $package) {
-        add_executables($project, $config, $package, $replace_map, $autoloads);
+        add_executables($project, $config, $package);
     }
 
     Write\success('Build finished successfully.');
 }
 
-function make_entry_points(Project $project, Config $config, array $replace_map, array $autoloads): void
-{
-    foreach ($config->entry_points as $entry_point) {
-        add_autoloads($project->build_root->file($entry_point), $replace_map, $autoloads);
-    }
-}
-
-function add_executables(Project $project, Config $config, Package $package, array $replace_map, array $autoloads): void
+function add_executables(Project $project, Config $config, Package $package): void
 {
     $package_config = $package->config($project, $config);
     foreach ($package_config->executables as $link_name => $source) {
         $target = $package->build_root($project, $config)->file($source);
         $link = $project->build_root->symlink($link_name);
         $link->link($target);
-        add_autoloads($target, $replace_map, $autoloads);
+        add_autoloads($project, $target);
         $target->chmod(0774);
     }
 }
 
-function compile_packages(Project $project, Config $config, Package $package, array $replace_map): void
+function compile_packages(Project $project, Config $config, Package $package): void
 {
     $project->build_root->subdirectory("{$config->packages_directory}/{$package->owner}/{$package->repo}")->renew_recursive();
 
-    should_compile_files_and_directories_for_package($project, $config, $package)
-        ->each(fn (Directory|File|Symlink $filesystem)
-            => compile($package->config($project, $config), $filesystem, $package->root($project, $config), $package->build_root($project, $config), $replace_map)
+    package_compilable_files_and_directories($project, $config, $package)
+        ->each(
+            fn (Directory|File|Symlink $filesystem)
+                => compile(
+                    $project,
+                    $package->config($project, $config),
+                    $filesystem,
+                    $package->root($project, $config),
+                    $package->build_root($project, $config)
+                )
         );
 }
 
-function compile_project_files(Project $project, Config $config, array $replace_map): void
+function compile_project_files(Project $project, Config $config): void
 {
-    should_compile_files_and_directories($project, $config)
+    compilable_files_and_directories($project, $config)
         ->each(fn (Directory|File|Symlink $filesystem)
-            => compile( $config, $filesystem, $project->root, $project->build_root, $replace_map)
+            => compile($project, $config, $filesystem, $project->root, $project->build_root)
         );
 }
 
-function compile(Config $config, Directory|File|Symlink $address, Directory $origin, Directory $destination, array $replace_map): void
+function compile(Project $project, Config $config, Directory|File|Symlink $address, Directory $origin, Directory $destination): void
 {
     $destination_path = $address->relocate($origin, $destination);
 
     if ($address instanceof Directory) {
         $address->preserve_copy($destination_path->as_directory());
 
-        $address->ls_all()->each(fn (Directory|File|Symlink $filesystem)
-            => compile($config, $filesystem, $origin->subdirectory($address->leaf()), $destination->subdirectory($address->leaf()), $replace_map)
-        );
+        $address->ls_all()
+            ->each(
+                fn (Directory|File|Symlink $filesystem)
+                => compile(
+                    $project,
+                    $config,
+                    $filesystem,
+                    $origin->subdirectory($address->leaf()),
+                    $destination->subdirectory($address->leaf())
+                )
+            );
 
         return;
     }
@@ -109,7 +116,7 @@ function compile(Config $config, Directory|File|Symlink $address, Directory $ori
     }
 
     if (file_needs_modification($address, $config)) {
-        compile_file($address, $destination_path->as_file(), $replace_map);
+        compile_file($project, $address, $destination_path->as_file());
 
         return;
     }
@@ -117,134 +124,74 @@ function compile(Config $config, Directory|File|Symlink $address, Directory $ori
     $address->preserve_copy($destination_path->as_file());
 }
 
-function compile_file(File $origin, File $destination, array $replace_map): void
+function compile_file(Project $project, File $origin, File $destination): void
 {
-    $destination->create(apply_file_modifications($origin, $replace_map), $origin->permission());
+    $destination->create(apply_file_modifications($project, $origin), $origin->permission());
 }
 
-function apply_file_modifications(File $origin, array $replace_map): string
+function apply_file_modifications(Project $project, File $origin): string
 {
-    global $autoloads;
+    $php_file = PhpFile::from_content($origin->content());
+    $file_imports = $php_file->imports();
 
-    $content = $origin->content();
-    $php_file = new PhpFile($content);
+    $autoload = $file_imports['classes'];
 
-    $imports = array_merge(
-        $php_file->used_constants(),
-        array_keys($php_file->imported_constants()),
-        $php_file->used_functions(),
-        array_keys($php_file->imported_functions()),
-    );
-    $autoload = array_merge(
-        $php_file->extended_classes(),
-        $php_file->implemented_interfaces(),
-        $php_file->used_traits(),
-        $php_file->used_classes(),
-        array_keys($php_file->imported_classes()),
-    );
+    foreach ($autoload as $import => $alias) {
+        $used_functions = $php_file->used_functions($alias);
+        $used_constants = $php_file->used_constants($alias);
 
-    $require_statements = [];
+        if (count($used_functions) > 0 || count($used_constants) > 0) {
+            foreach ($used_constants as $constant) {
+                $file_imports['constants'][$import . '\\' . $constant] = $constant;
+            }
+            foreach ($used_functions as $function) {
+                $file_imports['functions'][$import . '\\' . $function] = $function;
+            }
 
-     array_walk($imports, function ($import) use ($replace_map, &$require_statements) {
-        $path = path_finder($replace_map, $import, true);
-        if (! $path) {
-            $path = path_finder($replace_map, Str\before_last_occurrence($import, '\\'), false);
+            unset($autoload[$import]);
         }
+    }
 
-        $require_statements[$import] = $path;
+    $imports = array_keys(array_merge($file_imports['constants'], $file_imports['functions']));
+    $autoload = array_keys($autoload);
+
+    $paths = new Map([]);
+
+     array_walk($imports, function ($import) use ($project, $paths) {
+        $path = $project->namespaces->find($import, true);
+        $import = $path ? $import : Str\before_last_occurrence($import, '\\');
+        $path = $path ?: $project->namespaces->find($import, false);
+        $path ? $paths->put($path, $import) : null;
     });
 
-    $autoload_map = [];
-    array_walk($autoload, function ($import) use ($replace_map, &$autoload_map) {
-        $path = path_finder($replace_map, $import, false);
-        $autoload_map[$import] = $path;
+    array_walk($autoload, function ($import) use ($project) {
+        $path = $project->namespaces->find($import, false);
+        $path ? $project->imported_classes->put($path, $import) : null;
     });
 
-    $autoloads = array_merge(
-        $autoloads,
-        array_unique(array_filter($autoload_map))
-    );
-
-    $require_statements = array_unique(array_filter($require_statements));
-
-    if (count($require_statements)) {
-        $require_statements = array_map(fn($path) => "require_once '$path';", $require_statements);
-
-        return add_requires_and_autoload($require_statements, $origin);
+    if ($paths->count() === 0) {
+        return $php_file->code();
     }
 
-    return $content;
+    $require_statements = array_map(fn(Path $path) => "require_once '$path';", $paths->items());
+
+    if ($php_file->has_namespace()) {
+        $php_file = $php_file->add_after_namespace(PHP_EOL . PHP_EOL . implode(PHP_EOL, $require_statements));
+    } else {
+        $php_file = $php_file->add_after_opening_tag(PHP_EOL . implode(PHP_EOL, $require_statements) . PHP_EOL);
+    }
+
+    return $php_file->code();
 }
 
-function path_finder(array $replace_map, string $import, bool $absolute): ?string
+function make_replace_map(Project $project, Config $config, Meta $meta): void
 {
-    $realpath = null;
-
-    foreach ($replace_map as $namespace => $path) {
-        if ($absolute) {
-            if ($import === $namespace && str_ends_with($path, '.php')) {
-                return $path;
-            }
-        } else {
-            if (str_starts_with($import, $namespace)) {
-                $pos = strpos($import, $namespace);
-                if ($pos !== false) {
-                    $realpath = substr_replace($import, $path, $pos, strlen($namespace));
-                }
-                $realpath = str_replace('\\', '/', $realpath) . '.php';
-            }
-        }
-    }
-
-    return $realpath ? realpath($realpath) : null;
-}
-
-function add_requires_and_autoload(array $require_statements, File $file): string
-{
-    $content = '';
-
-    $requires_added = false;
-
-    foreach ($file->lines() as $line) {
-        $content .= $line;
-
-        if (str_starts_with($line, 'namespace')) {
-            $requires_added = true;
-            if (count($require_statements) > 0) {
-                $content .= PHP_EOL;
-                $content .= implode(PHP_EOL, $require_statements);
-                $content .= PHP_EOL;
-            }
-        }
-    }
-
-    if (! $requires_added) {
-        $content = '';
-        foreach ($file->lines() as $line) {
-            $content .= $line;
-
-            if (! $requires_added && str_starts_with($line, '<?php')) {
-                $requires_added = true;
-                $content .= PHP_EOL;
-                $content .= implode(PHP_EOL, $require_statements);
-                $content .= PHP_EOL;
-            }
-        }
-    }
-
-    return $content;
-}
-
-function make_replace_map(Project $project, Config $config, Meta $meta): array
-{
-    $replace_map = [];
-
-    $map_package_namespaces = function (Package $package) use (&$replace_map, $project, $config) {
+    $map_package_namespaces = function (Package $package) use ($project, $config) {
         $package_config = $package->config($project, $config);
         $package_root = $package->build_root($project, $config);
 
         foreach ($package_config->map as $namespace => $source) {
-            $replace_map[$namespace] = $package_root->append($source);
+            $project->namespaces->put($package_root->append($source), $namespace);
         }
     };
 
@@ -253,13 +200,11 @@ function make_replace_map(Project $project, Config $config, Meta $meta): array
     }
 
     foreach ($config->map as $namespace => $source) {
-        $replace_map[$namespace] = $project->build_root->append($source);
+        $project->namespaces->put($project->build_root->append($source), $namespace);
     }
-
-    return $replace_map;
 }
 
-function should_compile_files_and_directories_for_package(Project $project, Config $config, Package $package): FilesystemCollection
+function package_compilable_files_and_directories(Project $project, Config $config, Package $package): FilesystemCollection
 {
     $package_config = $package->config($project, $config);
     $package_root = $package->root($project, $config);
@@ -277,7 +222,7 @@ function should_compile_files_and_directories_for_package(Project $project, Conf
         );
 }
 
-function should_compile_files_and_directories(Project $project, Config $config): FilesystemCollection
+function compilable_files_and_directories(Project $project, Config $config): FilesystemCollection
 {
     $excluded_paths = array_map(
         function ($excluded_path) use ($project) {
@@ -303,68 +248,61 @@ function file_needs_modification(File $file, Config $config): bool
             );
 }
 
-function add_autoloads(File $target, array $replace_map, array $autoloads): void
+function add_autoloads(Project $project, File $target): void
 {
-    $autoload_lines = [];
+    $content = <<<'EOD'
+spl_autoload_register(function ($class) {
+    $classes = [
 
-    $autoload_lines = array_merge($autoload_lines, [
-        '',
-        'spl_autoload_register(function ($class) {',
-        '    $classes = [',
-    ]);
+EOD;
 
-    foreach ($autoloads as $class => $path) {
-        $autoload_lines[] = "        '$class' => '$path',";
+    foreach ($project->imported_classes as $class => $path) {
+        $content .= <<<EOD
+        '$class' => '$path',
+
+EOD;
     }
 
-    $autoload_lines = array_merge($autoload_lines, [
-        '    ];',
-        '',
-        '    if (array_key_exists($class, $classes)) {',
-        '        require $classes[$class];',
-        '    }',
-        '',
-        '}, true, true);',
-    ]);
+    $content .= <<<'EOD'
+    ];
 
-    $autoload_lines = array_merge($autoload_lines, [
-        '',
-        'spl_autoload_register(function ($class) {',
-        '    $namespaces = [',
-    ]);
-
-    foreach ($replace_map as $namespace => $path) {
-        $autoload_lines[] = "        '$namespace' => '$path',";
+    if (array_key_exists($class, $classes)) {
+        require $classes[$class];
     }
 
-    $autoload_lines = array_merge($autoload_lines, [
-        '    ];',
-        '',
-        '    $realpath = null;',
-        '',
-        '    foreach ($namespaces as $namespace => $path) {',
-        '        if (str_starts_with($class, $namespace)) {',
-        '            $pos = strpos($class, $namespace);',
-        '            if ($pos !== false) {',
-        '                $realpath = substr_replace($class, $path, $pos, strlen($namespace));',
-        '            }',
-        '            $realpath = str_replace("\\\", DIRECTORY_SEPARATOR, $realpath) . \'.php\';',
-        '            require $realpath;',
-        '            return ;',
-        '        }',
-        '    }',
-        '});',
-    ]);
+}, true, true);
 
-    $lines = explode(PHP_EOL, $target->content());
-    $number = 1;
-    foreach ($lines as $line_number => $line) {
-        if (str_contains($line, '<?php')) {
-            $number = $line_number;
-            break;
+spl_autoload_register(function ($class) {
+    $namespaces = [
+
+EOD;
+
+    foreach ($project->namespaces as $namespace => $path) {
+        $content .= <<<EOD
+        '$namespace' => '$path',
+
+EOD;
+    }
+    $content .= <<<'EOD'
+    ];
+
+    $realpath = null;
+
+    foreach ($namespaces as $namespace => $path) {
+        if (str_starts_with($class, $namespace)) {
+            $pos = strpos($class, $namespace);
+            if ($pos !== false) {
+                $realpath = substr_replace($class, $path, $pos, strlen($namespace));
+            }
+            $realpath = str_replace("\\", DIRECTORY_SEPARATOR, $realpath) . '.php';
+            require $realpath;
+            return ;
         }
     }
+});
+EOD;
 
-    $lines = Arr\insert_after($lines, $number, $autoload_lines);
-    $target->modify(implode(PHP_EOL, $lines));
+    $php_file = PhpFile::from_content($target->content());
+    $php_file = $php_file->add_after_opening_tag(PHP_EOL . $content . PHP_EOL);
+    $target->modify($php_file->code());
 }

@@ -17,6 +17,10 @@ class Project
      */
     public Directory $build_root;
 
+    public Map $namespaces;
+
+    public Map $imported_classes;
+
     /**
      * $root, $environment, $config, $config_lock, $credentials are readonly.
      *  DO NOT modify them!
@@ -29,6 +33,8 @@ class Project
         public File $credentials,
     ) {
         $this->build_root = $this->root->subdirectory('builds/' . $this->environment);
+        $this->namespaces = new Map();
+        $this->imported_classes = new Map();
     }
 
     public static function make(string $projectRoot, string $environment, string $credential_path): self

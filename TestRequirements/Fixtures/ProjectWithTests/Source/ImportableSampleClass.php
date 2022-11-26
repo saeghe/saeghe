@@ -103,7 +103,7 @@ class ImportableSampleClass extends ParentClass implements ClassInterface, Array
         ClassInSameNamespace::ConstC;
         ClassWithConstant::ConstD;
         CompoundNamespace\ConstInCompoundNamespace::ConstE;
-        PackageConst::ConstF;
+        PackageConst\ConstF;
         \ReflectionProperty\IS_PUBLIC;
         ClassWithConstants::CONSTANT;
     }

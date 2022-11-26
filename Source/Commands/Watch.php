@@ -4,17 +4,18 @@ namespace Saeghe\Saeghe\Commands\Watch;
 
 use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\parameter;
-use function Saeghe\FileManager\Resolver\root;
 
 function run(Project $project)
 {
-    $seconds = (int) parameter('wait', 3);
+    global $argv;
 
-    $saeghe_path = root() . 'saeghe';
-    chdir($project->root);
+    $seconds = (int) parameter('wait', 3);
+    $project = parameter('project');
+    $command = "php $argv[0] build";
+    $command = $project ? $command . ' --project=' . $project : $command;
 
     while (true) {
-        echo shell_exec("php $saeghe_path build");
+        echo shell_exec($command);
 
         sleep($seconds);
     }

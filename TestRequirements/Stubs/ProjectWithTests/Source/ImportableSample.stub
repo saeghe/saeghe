@@ -2,12 +2,9 @@
 
 namespace ProjectWithTests\SampleFile;
 
-require_once '$environment_build_path/Source/SampleFile/ClassInSameNamespace.php';
-require_once '$environment_build_path/Source/Classes/ClassWithConstant.php';
-require_once '$environment_build_path/Source/AnyNamespace/ConstInCompoundNamespace.php';
 require_once '$environment_build_path/Packages/saeghe/simple-package/Source/Classes/PackageConst.php';
-require_once '$environment_build_path/Source/Helper.php';
 require_once '$environment_build_path/Source/AnotherHelper.php';
+require_once '$environment_build_path/Source/Helper.php';
 
 use ProjectWithTests\TypeClasses\InjectedClassInConstructor;
 use ProjectWithTests\TypeClasses\InjectedPublicClassInConstructor;
@@ -105,7 +102,7 @@ function constants_examples()
     ClassInSameNamespace::ConstC;
     ClassWithConstant::ConstD;
     CompoundNamespace\ConstInCompoundNamespace::ConstE;
-    PackageConst::ConstF;
+    PackageConst\ConstF;
     \ReflectionProperty\IS_PUBLIC;
     \PHP_EOL;
     str_pad();

@@ -98,7 +98,7 @@ function constants_examples()
     ClassInSameNamespace::ConstC;
     ClassWithConstant::ConstD;
     CompoundNamespace\ConstInCompoundNamespace::ConstE;
-    PackageConst::ConstF;
+    PackageConst\ConstF;
     \ReflectionProperty\IS_PUBLIC;
     \PHP_EOL;
     str_pad();
