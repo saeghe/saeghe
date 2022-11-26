@@ -1,9 +1,5 @@
 <?php
 
-if (PHP_VERSION_ID < 80100) {
-    define('T_ENUM', 336);
-}
-
 spl_autoload_register(function ($class) {
     $classMap = [
         'Saeghe\Datatype\ArrayCollection' => \realpath(__DIR__ . '/Packages/saeghe/datatype/Source/ArrayCollection.php'),

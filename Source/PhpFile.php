@@ -123,7 +123,7 @@ class PhpFile
                 return $initial && !($token === '{');
             }
 
-            return $initial || in_array($token[0], [T_CLASS, T_TRAIT, T_INTERFACE, T_FINAL, T_ABSTRACT, T_ENUM]);
+            return $initial || in_array($token[0], $this->class_definition_tokens());
         });
     }
 
@@ -145,7 +145,7 @@ class PhpFile
 
         foreach ($this->ignore_any_string()->tokens as $token) {
             if (is_array($token)) {
-                if (in_array($token[0], [T_CLASS, T_TRAIT, T_INTERFACE, T_FINAL, T_ABSTRACT, T_ENUM])) {
+                if (in_array($token[0], $this->class_definition_tokens())) {
                     break;
                 }
 
@@ -274,5 +274,16 @@ class PhpFile
         });
 
         return $used_constants;
+    }
+
+    private function class_definition_tokens(): array
+    {
+        $tokens = [T_CLASS, T_TRAIT, T_INTERFACE, T_FINAL, T_ABSTRACT];
+
+        if (defined('T_ENUM')) {
+            $tokens[] = T_ENUM;
+        }
+
+        return $tokens;
     }
 }
