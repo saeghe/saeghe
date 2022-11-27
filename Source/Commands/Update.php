@@ -21,6 +21,8 @@ function run(Project $project)
 
     line('Updating package ' . $given_package_url . ' to ' . ($version ? 'version ' . $version : 'latest version') . '...');
 
+    $package = Package::from_url($given_package_url);
+
     line('Setting env credential...');
     $project->set_env_credentials();
 
@@ -28,15 +30,8 @@ function run(Project $project)
     $config = Config::from_array(Json\to_array($project->config));
 
     line('Finding package in configs...');
-    /** @var Package $package */
-    $package = $config->packages
-        ->reduce(function ($carry, Package $package) {
-            return $package->is($carry) ? $package : $carry;
-        },
-            Package::from_url($given_package_url)
-        );
 
-    if (! isset($package->version)) {
+    if (! $config->packages->has(fn (Package $installed_package) => $installed_package->is($package))) {
         error("Package $given_package_url does not found in your project!");
         return;
     }
@@ -44,15 +39,8 @@ function run(Project $project)
     line('Setting package version...');
     $version ? $package->version($version) : $package->latest_version();
 
-    $package_url = $given_package_url;
-
     line('Loading package\'s meta...');
-    foreach ($config->packages as $installed_package_url => $config_package) {
-        if ($config_package->is($package)) {
-            $package_url = $installed_package_url;
-            break;
-        }
-    }
+    $package_url = $config->packages->first_key(fn (Package $installed_package) => $installed_package->is($package));
 
     line('Deleting package\'s files...');
     remove($project, $config, $package, $package_url);

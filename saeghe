@@ -51,3 +51,17 @@ match ($command) {
     'watch' => \Saeghe\Saeghe\Commands\Watch\run($project),
     default => \Saeghe\Saeghe\Commands\Help\run($project),
 };
+
+function when(bool $condition, mixed $then, mixed $otherwise = null): mixed
+{
+    if ($condition) {
+        return is_callable($then) ? $then() : $then;
+    }
+
+    return is_callable($otherwise) ? $otherwise() : $otherwise;
+}
+
+function unless(bool $condition, mixed $then, mixed $otherwise = null): mixed
+{
+    return when(! $condition, $then, $otherwise);
+}

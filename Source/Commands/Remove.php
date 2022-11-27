@@ -18,25 +18,17 @@ function run(Project $project)
 
     line('Removing package ' . $given_package_url);
 
+    $package = Package::from_url($given_package_url);
+
     line('Loading configs...');
     $config = Config::from_array(Json\to_array($project->config));
 
     line('Finding package in configs...');
-    /** @var Package $package */
-    $package = $config->packages
-        ->reduce(function ($carry, Package $package) {
-                return $package->is($carry) ? $package : $carry;
-            },
-            Package::from_url($given_package_url)
-        );
 
-    if (! isset($package->version)) {
+    if (! $config->packages->has(fn (Package $installed_package) => $installed_package->is($package))) {
         error("Package $given_package_url does not found in your project!");
-
         return;
     }
-
-    $package_url = $given_package_url;
 
     line('Loading package\'s meta...');
     foreach ($config->packages as $installed_package_url => $config_package) {
