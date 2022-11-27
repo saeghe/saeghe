@@ -9,19 +9,25 @@ use Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
+use function Saeghe\Cli\IO\Write\line;
 use function Saeghe\Saeghe\Commands\Add\add;
 use function Saeghe\Saeghe\Commands\Remove\remove;
 use function Saeghe\Cli\IO\Write\success;
 
 function run(Project $project)
 {
-    $project->set_env_credentials();
-
     $given_package_url = argument(2);
     $version = parameter('version');
 
+    line('Updating package ' . $given_package_url . ' to ' . ($version ? 'version ' . $version : 'latest version') . '...');
+
+    line('Setting env credential...');
+    $project->set_env_credentials();
+
+    line('Loading configs...');
     $config = Config::from_array(Json\to_array($project->config));
 
+    line('Finding package in configs...');
     /** @var Package $package */
     $package = $config->packages
         ->reduce(function ($carry, Package $package) {
@@ -35,10 +41,12 @@ function run(Project $project)
         return;
     }
 
+    line('Setting package version...');
     $version ? $package->version($version) : $package->latest_version();
 
     $package_url = $given_package_url;
 
+    line('Loading package\'s meta...');
     foreach ($config->packages as $installed_package_url => $config_package) {
         if ($config_package->is($package)) {
             $package_url = $installed_package_url;
@@ -46,11 +54,18 @@ function run(Project $project)
         }
     }
 
+    line('Deleting package\'s files...');
     remove($project, $config, $package, $package_url);
+
+    line('Detecting version hash...');
     $package->detect_hash();
+
+    line('Downloading the package with new version...');
     add($project, $config, $package, $package_url);
 
+    line('Updating configs...');
     $config->packages->put($package, $package_url);
+    line('Committing new configs...');
     Json\write($project->config, $config->to_array());
 
     success("Package $given_package_url has been updated.");
