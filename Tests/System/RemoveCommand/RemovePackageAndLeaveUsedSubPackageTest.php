@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\System\RemovePackageAndLeaveUsedSubPackageTest;
+namespace Tests\System\RemoveCommand\RemovePackageAndLeaveUsedSubPackageTest;
 
 use Saeghe\FileManager\FileType\Json;
 use function Saeghe\FileManager\Directory\clean;

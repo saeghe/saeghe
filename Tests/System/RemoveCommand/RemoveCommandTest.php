@@ -1,10 +1,8 @@
 <?php
 
-namespace Tests\System\RemoveCommandTest;
+namespace Tests\System\RemoveCommand\RemoveCommandTest;
 
 use Saeghe\FileManager\FileType\Json;
-use function Saeghe\Cli\IO\Write\assert_error;
-use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\FileManager\Directory\clean;
 use function Saeghe\FileManager\Resolver\root;
 use function Saeghe\FileManager\Resolver\realpath;
@@ -15,14 +13,14 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe remove git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/EmptyProject');
 
-        assert_success('Package git@github.com:saeghe/complex-package.git has been removed successfully.', $output);
+        assert_success_output($output);
         assert_desired_data_in_packages_directory('Package has not been deleted from Packages directory!' . $output);
         assert_config_file_is_clean('Packages has not been deleted from config file!' . $output);
         assert_meta_is_clean('Packages has not been deleted from meta!' . $output);
 
         $output = shell_exec('php ' . root() . 'saeghe remove git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/EmptyProject');
 
-        assert_error("Package git@github.com:saeghe/complex-package.git does not found in your project!", $output);
+        assert_error_output($output);
     },
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
@@ -32,6 +30,36 @@ test(
         clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
+
+function assert_success_output($output)
+{
+    $expected = <<<EOD
+\e[39mRemoving package git@github.com:saeghe/complex-package.git
+\e[39mLoading configs...
+\e[39mFinding package in configs...
+\e[39mLoading package's meta...
+\e[39mDeleting package's files...
+\e[39mRemoving package from config...
+\e[39mCommitting configs...
+\e[92mPackage git@github.com:saeghe/complex-package.git has been removed successfully.\e[39m
+
+EOD;
+
+    assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
+}
+
+function assert_error_output($output)
+{
+    $expected = <<<EOD
+\e[39mRemoving package git@github.com:saeghe/complex-package.git
+\e[39mLoading configs...
+\e[39mFinding package in configs...
+\e[91mPackage git@github.com:saeghe/complex-package.git does not found in your project!\e[39m
+
+EOD;
+
+    assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
+}
 
 function assert_desired_data_in_packages_directory($message)
 {
