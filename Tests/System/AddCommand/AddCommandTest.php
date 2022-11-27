@@ -4,8 +4,6 @@ namespace Tests\System\AddCommand\AddCommandTest;
 
 use Saeghe\FileManager\FileType\Json;
 use Saeghe\TestRunner\Assertions\File;
-use function Saeghe\Cli\IO\Write\assert_error;
-use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\FileManager\Directory\clean;
 use function Saeghe\FileManager\Resolver\root;
 use function Saeghe\FileManager\Resolver\realpath;
@@ -17,7 +15,15 @@ test(
     title: 'it should show error message when project is not initialized',
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
-        assert_error('Project is not initialized. Please try to initialize using the init command.', $output);
+        $expected = <<<EOD
+\e[39mAdding package git@github.com:saeghe/simple-package.git latest version...
+\e[39mSetting env credential...
+\e[39mChecking configs...
+\e[91mProject is not initialized. Please try to initialize using the init command.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
     }
 );
 
@@ -26,7 +32,20 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add https://github.com/symfony/thanks.git --project=TestRequirements/Fixtures/EmptyProject');
 
-        assert_error('Given https://github.com/symfony/thanks.git URL is not a Saeghe package.', $output);
+        $expected = <<<EOD
+\e[39mAdding package https://github.com/symfony/thanks.git latest version...
+\e[39mSetting env credential...
+\e[39mChecking configs...
+\e[39mChecking installed packages...
+\e[39mSetting package version...
+\e[39mCreating package directory...
+\e[39mDetecting version hash...
+\e[39mValidating the package...
+\e[91mGiven https://github.com/symfony/thanks.git URL is not a Saeghe package.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
     },
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
@@ -41,7 +60,14 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
 
-        assert_error('There is no credential file. Please use the `credential` command to add your token.', $output);
+        $expected = <<<EOD
+\e[39mAdding package git@github.com:saeghe/simple-package.git latest version...
+\e[39mSetting env credential...
+\e[91mThere is no credential file. Please use the `credential` command to add your token.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
     },
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
@@ -59,7 +85,23 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
 
-        assert_success('Package git@github.com:saeghe/simple-package.git has been added successfully.', $output);
+        $expected = <<<EOD
+\e[39mAdding package git@github.com:saeghe/simple-package.git latest version...
+\e[39mSetting env credential...
+\e[39mChecking configs...
+\e[39mChecking installed packages...
+\e[39mSetting package version...
+\e[39mCreating package directory...
+\e[39mDetecting version hash...
+\e[39mValidating the package...
+\e[39mDownloading the package...
+\e[39mUpdating configs...
+\e[39mCommitting configs...
+\e[92mPackage git@github.com:saeghe/simple-package.git has been added successfully.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
     },
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
@@ -78,10 +120,17 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
 
-        assert_error(
-            'The GitHub token is not valid. Either, you didn\'t set one yet, or it is not valid. Please use the `credential` command to set a valid token.',
-            $output
-        );
+        $expected = <<<EOD
+\e[39mAdding package git@github.com:saeghe/simple-package.git latest version...
+\e[39mSetting env credential...
+\e[39mChecking configs...
+\e[39mChecking installed packages...
+\e[39mSetting package version...
+\e[91mThe GitHub token is not valid. Either, you didn't set one yet, or it is not valid. Please use the `credential` command to set a valid token.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
     },
     before: function () {
         shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
@@ -100,7 +149,7 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
 
-        assert_success('Package git@github.com:saeghe/simple-package.git has been added successfully.', $output);
+        assert_output($output);
         assert_config_file_created_for_simple_project('Config file is not created!' . $output);
         assert_simple_package_added_to_config('Simple Package does not added to config file properly! ' . $output);
         assert_packages_directory_created_for_empty_project('Package directory does not created.' . $output);
@@ -135,7 +184,17 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add https://github.com/saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
 
-        assert_error('Package https://github.com/saeghe/simple-package.git is already exists', $output);
+        $expected = <<<EOD
+\e[39mAdding package https://github.com/saeghe/simple-package.git latest version...
+\e[39mSetting env credential...
+\e[39mChecking configs...
+\e[39mChecking installed packages...
+\e[91mPackage https://github.com/saeghe/simple-package.git is already exists.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
+
         $config = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config.json');
         $meta = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json');
         assert_true(count($config['packages']) === 1);
@@ -149,6 +208,27 @@ test(
         clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
     }
 );
+
+function assert_output($output)
+{
+    $expected = <<<EOD
+\e[39mAdding package git@github.com:saeghe/simple-package.git latest version...
+\e[39mSetting env credential...
+\e[39mChecking configs...
+\e[39mChecking installed packages...
+\e[39mSetting package version...
+\e[39mCreating package directory...
+\e[39mDetecting version hash...
+\e[39mValidating the package...
+\e[39mDownloading the package...
+\e[39mUpdating configs...
+\e[39mCommitting configs...
+\e[92mPackage git@github.com:saeghe/simple-package.git has been added successfully.\e[39m
+
+EOD;
+
+    assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
+}
 
 function assert_config_file_created_for_simple_project($message)
 {
