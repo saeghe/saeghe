@@ -9,14 +9,19 @@ use Saeghe\Saeghe\Project;
 use Saeghe\FileManager\FileType\Json;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
+use function Saeghe\Cli\IO\Write\line;
 use function Saeghe\Cli\IO\Write\success;
 
 function run(Project $project)
 {
     $given_package_url = argument(2);
 
+    line('Removing package ' . $given_package_url);
+
+    line('Loading configs...');
     $config = Config::from_array(Json\to_array($project->config));
 
+    line('Finding package in configs...');
     /** @var Package $package */
     $package = $config->packages
         ->reduce(function ($carry, Package $package) {
@@ -33,6 +38,7 @@ function run(Project $project)
 
     $package_url = $given_package_url;
 
+    line('Loading package\'s meta...');
     foreach ($config->packages as $installed_package_url => $config_package) {
         if ($config_package->is($package)) {
             $package_url = $installed_package_url;
@@ -40,9 +46,12 @@ function run(Project $project)
         }
     }
 
+    line('Deleting package\'s files...');
     remove($project, $config, $package, $package_url);
 
+    line('Removing package from config...');
     $config->packages->forget($package_url);
+    line('Committing configs...');
     Json\write($project->config, $config->to_array());
 
     success("Package $given_package_url has been removed successfully.");

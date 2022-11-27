@@ -1,20 +1,19 @@
 <?php
 
-namespace Tests\System\BuildCommand\BuildWithoutConfigFilesTest;
+namespace Tests\System\BuildCommand\BuildBeforeInstallTest;
 
-use function Saeghe\Cli\IO\Write\assert_success;
-use function Saeghe\Datatype\Arr\last;
 use function Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\FileManager\File\delete;
 use function Saeghe\FileManager\Resolver\root;
 use function Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
-    title: 'it should build project without config files',
+    title: 'it should show error message when project packages are not installed',
     case: function () {
-        exec('php ' . root() . 'saeghe build --project=TestRequirements/Fixtures/ProjectWithTests', $output);
+        $output = shell_exec('php ' . root() . 'saeghe build --project=TestRequirements/Fixtures/ProjectWithTests');
 
-        assert_success('Build finished successfully.', last($output) . PHP_EOL);
+        assert_output($output);
     },
     before: function () {
         copy(
@@ -22,15 +21,28 @@ test(
             realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json')
         );
         shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/ProjectWithTests');
-        delete(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/saeghe/simple-package/saeghe.config.json'));
+        delete_recursive(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/saeghe/simple-package');
     },
     after: function () {
-        delete_build_directory();
         delete_packages_directory();
         delete(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config.json'));
         delete(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'));
     }
 );
+
+function assert_output($output)
+{
+    $expected = <<<EOD
+\e[39mStart building...
+\e[39mReading configs...
+\e[39mChecking packages...
+\e[39mPackage git@github.com:saeghe/simple-package.git is not installed.
+\e[91mIt seems you didn't run the install command. Please make sure you installed your required packages.\e[39m
+
+EOD;
+
+    assert_true($output === $expected, 'Command output is not correct.' . PHP_EOL . $output . PHP_EOL . $expected);
+}
 
 function delete_build_directory()
 {

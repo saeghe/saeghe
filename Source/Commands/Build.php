@@ -19,6 +19,9 @@ use Saeghe\Datatype\Str;
 
 function run(Project $project)
 {
+    Write\line('Start building...');
+
+    Write\line('Reading configs...');
     $config = $project->config->exists()
         ? Config::from_array(Json\to_array($project->config))
         : Config::init();
@@ -27,38 +30,63 @@ function run(Project $project)
         ? Meta::from_array(Json\to_array($project->config_lock))
         : Meta::init();
 
+    Write\line('Checking packages...');
+    $packages_installed = $meta->packages->reduce(function (bool $carry, Package $package, string $package_url) use ($project, $config) {
+        if (! $package->root($project, $config)->exists()) {
+            Write\line('Package ' . $package_url . ' is not installed.');
+            return false;
+        }
+
+        return $carry;
+    }, true);
+
+    if (! $packages_installed) {
+        Write\error('It seems you didn\'t run the install command. Please make sure you installed your required packages.');
+        return;
+    }
+
+    Write\line('Prepare build directory...');
     $project->build_root->renew_recursive();
     $project->build_root->subdirectory($config->packages_directory)->exists_or_create();
 
+    Write\line('Make namespaces map...');
     make_replace_map($project, $config, $meta);
 
-    foreach ($meta->packages as $package) {
+    Write\line('Building packages...');
+    foreach ($meta->packages as $package_url => $package) {
+        Write\line('Building package ' . $package_url . '...');
         compile_packages($project, $config, $package);
     }
 
+    Write\line('Building the project...');
     compile_project_files($project, $config);
 
+    Write\line('Building entry points...');
     foreach ($config->entry_points as $entry_point) {
+        Write\line('Building entry point ' . $entry_point);
         add_autoloads($project, $project->build_root->file($entry_point));
     }
 
-    foreach ($meta->packages as $package) {
-        add_executables($project, $config, $package);
+    Write\line('Building executables...');
+    foreach ($meta->packages as $package_url => $package) {
+        Write\line('Building executables for package ' . $package_url);
+        $package_config = $package->config($project, $config);
+        foreach ($package_config->executables as $link_name => $source) {
+            Write\line('Building executable file ' . $link_name . ' from ' . $source);
+            add_executables($project, $config, $package, $link_name, $source);
+        }
     }
 
     Write\success('Build finished successfully.');
 }
 
-function add_executables(Project $project, Config $config, Package $package): void
+function add_executables(Project $project, Config $config, Package $package, string $link_name, string $source): void
 {
-    $package_config = $package->config($project, $config);
-    foreach ($package_config->executables as $link_name => $source) {
-        $target = $package->build_root($project, $config)->file($source);
-        $link = $project->build_root->symlink($link_name);
-        $link->link($target);
-        add_autoloads($project, $target);
-        $target->chmod(0774);
-    }
+    $target = $package->build_root($project, $config)->file($source);
+    $link = $project->build_root->symlink($link_name);
+    $link->link($target);
+    add_autoloads($project, $target);
+    $target->chmod(0774);
 }
 
 function compile_packages(Project $project, Config $config, Package $package): void

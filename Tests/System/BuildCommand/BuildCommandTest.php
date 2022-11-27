@@ -2,7 +2,6 @@
 
 namespace Tests\System\BuildCommand\BuildCommandTest;
 
-use function Saeghe\Cli\IO\Write\assert_success;
 use function Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\FileManager\File\delete;
 use function Saeghe\FileManager\Resolver\root;
@@ -14,7 +13,7 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe build --project=TestRequirements/Fixtures/ProjectWithTests');
 
-        assert_success('Build finished successfully.', $output);
+        assert_output($output);
         assert_build_directory_exists('Build directory has not been created!' . $output);
         assert_environment_build_directory_exists('Environment build directory has not been created!' . $output);
         assert_source_has_been_built('Source files has not been built properly!' . $output);
@@ -48,6 +47,29 @@ test(
         delete(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/saeghe.config-lock.json'));
     }
 );
+
+function assert_output($output)
+{
+    $expected = <<<EOD
+\e[39mStart building...
+\e[39mReading configs...
+\e[39mChecking packages...
+\e[39mPrepare build directory...
+\e[39mMake namespaces map...
+\e[39mBuilding packages...
+\e[39mBuilding package git@github.com:saeghe/simple-package.git...
+\e[39mBuilding the project...
+\e[39mBuilding entry points...
+\e[39mBuilding entry point entry-point
+\e[39mBuilding executables...
+\e[39mBuilding executables for package git@github.com:saeghe/simple-package.git
+\e[39mBuilding executable file run-executable from run.php
+\e[92mBuild finished successfully.\e[39m
+
+EOD;
+
+    assert_true($output === $expected, 'Command output is not correct.' . PHP_EOL . $output . PHP_EOL . $expected);
+}
 
 function delete_build_directory()
 {
