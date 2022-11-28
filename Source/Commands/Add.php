@@ -19,6 +19,9 @@ function run(Project $project)
     $version = parameter('version');
 
     line('Adding package ' . $package_url . ($version ? ' version ' . $version : ' latest version') . '...');
+
+    $package = Package::from_url($package_url);
+
     line('Setting env credential...');
     $project->set_env_credentials();
 
@@ -31,16 +34,7 @@ function run(Project $project)
     $config = Config::from_array(Json\to_array($project->config));
 
     line('Checking installed packages...');
-    /** @var Package $package */
-    $package = $config->packages
-        ->reduce(
-            function ($carry, Package $package) {
-                return $package->is($carry) ? $package : $carry;
-            },
-            Package::from_url($package_url)
-        );
-
-    if (isset($package->version)) {
+    if ($config->packages->has(fn (Package $installed_package) => $installed_package->is($package))) {
         error("Package $package_url is already exists.");
         return;
     }
@@ -50,9 +44,7 @@ function run(Project $project)
 
     line('Creating package directory...');
     $packages_directory = $project->root->subdirectory($config->packages_directory);
-    if (! $packages_directory->exists()) {
-        $packages_directory->make_recursive();
-    }
+    unless($packages_directory->exists(), fn () => $packages_directory->make_recursive());
 
     line('Detecting version hash...');
     $package->detect_hash();
@@ -78,17 +70,13 @@ function run(Project $project)
 
 function add(Project $project, Config $config, Package $package, $package_url)
 {
-    if (! $package->is_downloaded($project, $config)) {
-        $package->download($package->root($project, $config));
-    }
+    unless($package->is_downloaded($project, $config), fn () => $package->download($package->root($project, $config)));
 
     $meta = $project->config_lock->exists()
         ? Meta::from_array(Json\to_array($project->config_lock))
         : Meta::init();
 
-    $is_in_meta = $meta->packages->reduce(fn ($carry, Package $installed_package) => $carry || $installed_package->is($package), false);
-
-    if (! $is_in_meta) {
+    if (! $meta->packages->has(fn (Package $installed_package) => $installed_package->is($package))) {
         $meta->packages[$package_url] = $package;
         Json\write($project->config_lock, $meta->to_array());
     }
@@ -96,9 +84,7 @@ function add(Project $project, Config $config, Package $package, $package_url)
     $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)));
 
     foreach ($package_config->packages as $sub_package_url => $sub_package) {
-        $is_sub_package_in_meta = $meta->packages->reduce(fn ($carry, Package $installed_package) => $carry || $installed_package->is($sub_package), false);
-
-        if (! $is_sub_package_in_meta) {
+        if (! $meta->packages->has(fn (Package $installed_package) => $installed_package->is($sub_package))) {
             $sub_package->detect_hash();
             add($project, $config, $sub_package, $sub_package_url);
         }

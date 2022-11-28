@@ -31,14 +31,8 @@ function run(Project $project)
         : Meta::init();
 
     Write\line('Checking packages...');
-    $packages_installed = $meta->packages->reduce(function (bool $carry, Package $package, string $package_url) use ($project, $config) {
-        if (! $package->root($project, $config)->exists()) {
-            Write\line('Package ' . $package_url . ' is not installed.');
-            return false;
-        }
-
-        return $carry;
-    }, true);
+    $packages_installed = $meta->packages
+        ->every(fn (Package $package, string $package_url) => $package->root($project, $config)->exists());
 
     if (! $packages_installed) {
         Write\error('It seems you didn\'t run the install command. Please make sure you installed your required packages.');
@@ -91,7 +85,7 @@ function add_executables(Project $project, Config $config, Package $package, str
 
 function compile_packages(Project $project, Config $config, Package $package): void
 {
-    $project->build_root->subdirectory("{$config->packages_directory}/{$package->owner}/{$package->repo}")->renew_recursive();
+    $project->build_root->subdirectory("$config->packages_directory/$package->owner/$package->repo")->renew_recursive();
 
     package_compilable_files_and_directories($project, $config, $package)
         ->each(
@@ -189,12 +183,12 @@ function apply_file_modifications(Project $project, File $origin): string
         $path = $project->namespaces->find($import, true);
         $import = $path ? $import : Str\before_last_occurrence($import, '\\');
         $path = $path ?: $project->namespaces->find($import, false);
-        $path ? $paths->put($path, $import) : null;
+        unless(is_null($path), fn () => $paths->put($path, $import));
     });
 
     array_walk($autoload, function ($import) use ($project) {
         $path = $project->namespaces->find($import, false);
-        $path ? $project->imported_classes->put($path, $import) : null;
+        unless(is_null($path), fn () => $project->imported_classes->put($path, $import));
     });
 
     if ($paths->count() === 0) {
@@ -203,11 +197,9 @@ function apply_file_modifications(Project $project, File $origin): string
 
     $require_statements = array_map(fn(Path $path) => "require_once '$path';", $paths->items());
 
-    if ($php_file->has_namespace()) {
-        $php_file = $php_file->add_after_namespace(PHP_EOL . PHP_EOL . implode(PHP_EOL, $require_statements));
-    } else {
-        $php_file = $php_file->add_after_opening_tag(PHP_EOL . implode(PHP_EOL, $require_statements) . PHP_EOL);
-    }
+    $php_file = $php_file->has_namespace()
+        ? $php_file->add_after_namespace(PHP_EOL . PHP_EOL . implode(PHP_EOL, $require_statements))
+        : $php_file->add_after_opening_tag(PHP_EOL . implode(PHP_EOL, $require_statements) . PHP_EOL);
 
     return $php_file->code();
 }
@@ -271,9 +263,7 @@ function file_needs_modification(File $file, Config $config): bool
     return str_ends_with($file, '.php')
         || $config->entry_points
             ->append($config->executables->values())
-            ->reduce(fn ($carry, $entry_point)
-                => str_ends_with($file, $entry_point) || $carry, false
-            );
+            ->has(fn (string $entry_point) => str_ends_with($file, $entry_point));
 }
 
 function add_autoloads(Project $project, File $target): void

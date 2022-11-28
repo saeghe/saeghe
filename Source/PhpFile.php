@@ -3,6 +3,7 @@
 namespace Saeghe\Saeghe;
 
 use Saeghe\Datatype\Str;
+use function Saeghe\Datatype\Arr\has;
 
 class PhpFile
 {
@@ -72,12 +73,7 @@ class PhpFile
 
     public function has_namespace(): bool
     {
-        foreach ($this->tokens as $token) {
-            if (is_array($token) && $token[0] === T_NAMESPACE) {
-                return true;
-            }
-        }
-        return false;
+        return has($this->tokens, fn ($token) => is_array($token) && $token[0] === T_NAMESPACE);
     }
 
     public function ignore(\Closure $filter, ?bool $initial = false): static
