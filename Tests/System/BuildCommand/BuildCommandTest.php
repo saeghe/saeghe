@@ -9,6 +9,21 @@ use function Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
+    title: 'it should show error message when the project is not initialized',
+    case: function () {
+        $output = shell_exec('php ' . root() . 'saeghe build --project=TestRequirements/Fixtures/ProjectWithTests');
+
+        $expected = <<<EOD
+\e[39mStart building...
+\e[91mProject is not initialized. Please try to initialize using the init command.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
+    }
+);
+
+test(
     title: 'it should build the project',
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe build --project=TestRequirements/Fixtures/ProjectWithTests');
@@ -52,7 +67,7 @@ function assert_output($output)
 {
     $expected = <<<EOD
 \e[39mStart building...
-\e[39mReading configs...
+\e[39mLoading configs...
 \e[39mChecking packages...
 \e[39mPrepare build directory...
 \e[39mMake namespaces map...

@@ -2,72 +2,88 @@
 
 namespace Saeghe\Saeghe\Commands\Remove;
 
-use Saeghe\Saeghe\Config\Config;
-use Saeghe\Saeghe\Config\Meta;
-use Saeghe\Saeghe\Package;
-use Saeghe\Saeghe\Project;
 use Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Classes\Config\Config;
+use Saeghe\Saeghe\Classes\Config\Library;
+use Saeghe\Saeghe\Classes\Environment\Environment;
+use Saeghe\Saeghe\Classes\Meta\Meta;
+use Saeghe\Saeghe\Classes\Meta\Dependency;
+use Saeghe\Saeghe\Classes\Package\Package;
+use Saeghe\Saeghe\Classes\Project\Project;
+use Saeghe\Saeghe\Git\Repository;
 use function Saeghe\Cli\IO\Read\argument;
+use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\line;
 use function Saeghe\Cli\IO\Write\success;
 
-function run(Project $project)
+function run(Environment $environment): void
 {
-    $given_package_url = argument(2);
+    $package_url = argument(2);
+    $repository = Repository::from_url($package_url);
+    line('Removing package ' . $package_url);
 
-    line('Removing package ' . $given_package_url);
+    $project = new Project($environment->pwd->subdirectory(parameter('project', '')));
 
-    $package = Package::from_url($given_package_url);
-
-    line('Loading configs...');
-    $config = Config::from_array(Json\to_array($project->config));
-
-    line('Finding package in configs...');
-
-    if (! $config->packages->has(fn (Package $installed_package) => $installed_package->is($package))) {
-        error("Package $given_package_url does not found in your project!");
+    if (! $project->config_file->exists()) {
+        error('Project is not initialized. Please try to initialize using the init command.');
         return;
     }
 
-    line('Loading package\'s meta...');
-    foreach ($config->packages as $installed_package_url => $config_package) {
-        if ($config_package->is($package)) {
-            $package_url = $installed_package_url;
-            break;
-        }
+    line('Loading configs...');
+    $project->config(Config::from_array(Json\to_array($project->config_file)));
+    $project->meta = Meta::from_array(Json\to_array($project->meta_file));
+
+    line('Finding package in configs...');
+    $library = $project->config->repositories->first(fn (Library $library) => $library->repository()->is($repository));
+    $dependency = $project->meta->dependencies->first(fn (Dependency $dependency) => $dependency->repository()->is($library->repository()));
+    if (! $library instanceof Library || ! $dependency instanceof Dependency) {
+        error("Package $package_url does not found in your project!");
+        return;
     }
 
-    line('Deleting package\'s files...');
-    remove($project, $config, $package, $package_url);
+    line('Loading package\'s config...');
+    $project->meta->dependencies->each(function (Dependency $dependency) use ($project) {
+        $package = new Package($project->package_directory($dependency->repository()), $dependency->repository());
+        $package->config = Config::from_array(Json\to_array($package->config_file));
+        $project->packages->push($package);
+    });
 
     line('Removing package from config...');
-    $config->packages->forget($package_url);
-    line('Committing configs...');
-    Json\write($project->config, $config->to_array());
+    unless(
+        $project->packages->has(fn (Package $package)
+            => $package->config->repositories->has(fn (Library $library)
+                => $library->repository()->is($dependency->repository()))),
+        fn () => remove($project, $dependency)
+    );
 
-    success("Package $given_package_url has been removed successfully.");
+    $project->config->repositories->forget(fn (Library $installed_library)
+        => $installed_library->repository()->is($library->repository()));
+
+    line('Committing configs...');
+    Json\write($project->config_file, $project->config->to_array());
+    Json\write($project->meta_file, $project->meta->to_array());
+
+    success("Package $package_url has been removed successfully.");
 }
 
-function remove(Project $project, Config $config, Package $package, $package_url)
+function remove(Project $project, Dependency $dependency): void
 {
-    $package_config = Config::from_array(Json\to_array($package->config_path($project, $config)));
+    $package = $project->packages->take(fn (Package $package) => $package->repository->is($dependency->repository()));
 
-    foreach ($package_config->packages as $sub_package_url => $sub_package) {
-        $sub_package_has_been_used = false;
-        foreach ($config->packages as $used_packages) {
-            $sub_package_has_been_used = $sub_package_has_been_used || $used_packages->is($sub_package);
-        }
+    $package->config->repositories->each(function (Library $sub_library) use ($project) {
+        $dependency = $project->meta->dependencies->first(fn (Dependency $dependency) => $dependency->repository()->is($sub_library->repository()));
+        unless(
+            $project->config->repositories->has(fn (Library $library) => $library->repository()->is($dependency->repository())),
+            fn () => remove($project, $dependency)
+        );
+    });
 
-        if (! $sub_package_has_been_used) {
-            remove($project, $config, $sub_package, $sub_package_url);
-        }
-    }
-
-    $package->root($project, $config)->delete_recursive();
-
-    $meta = Meta::from_array(Json\to_array($project->config_lock));
-
-    unset($meta->packages[$package_url]);
-    Json\write($project->config_lock, $meta->to_array());
+    unless(
+        $project->packages->has(fn (Package $package)
+            => $package->repository->is($dependency->repository())),
+        fn () => $package->root->delete_recursive()
+            && $project->meta->dependencies->forget(fn (Dependency $meta_dependency)
+            => $meta_dependency->repository()->is($dependency->repository()))
+    );
 }

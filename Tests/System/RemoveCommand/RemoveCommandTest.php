@@ -9,6 +9,21 @@ use function Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
+    title: 'it should show error message when the project is not initialized',
+    case: function () {
+        $output = shell_exec('php ' . root() . 'saeghe remove git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
+
+        $expected = <<<EOD
+\e[39mRemoving package git@github.com:saeghe/simple-package.git
+\e[91mProject is not initialized. Please try to initialize using the init command.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
+    }
+);
+
+test(
     title: 'it should remove a package',
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe remove git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/EmptyProject');
@@ -37,8 +52,7 @@ function assert_success_output($output)
 \e[39mRemoving package git@github.com:saeghe/complex-package.git
 \e[39mLoading configs...
 \e[39mFinding package in configs...
-\e[39mLoading package's meta...
-\e[39mDeleting package's files...
+\e[39mLoading package's config...
 \e[39mRemoving package from config...
 \e[39mCommitting configs...
 \e[92mPackage git@github.com:saeghe/complex-package.git has been removed successfully.\e[39m

@@ -2,10 +2,9 @@
 
 namespace Saeghe\Saeghe\Commands\Watch;
 
-use Saeghe\Saeghe\Project;
 use function Saeghe\Cli\IO\Read\parameter;
 
-function run(Project $project)
+function run(): void
 {
     global $argv;
 

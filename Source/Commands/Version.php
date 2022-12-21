@@ -3,9 +3,8 @@
 namespace Saeghe\Saeghe\Commands\Version;
 
 use Saeghe\Cli\IO\Write;
-use Saeghe\Saeghe\Project;
 
-function run(Project $project)
+function run(): void
 {
-    Write\success('Saeghe version 1.11.0');
+    Write\success('Saeghe version 1.12.0');
 }

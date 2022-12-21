@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\System\InitCommandTest;
+namespace Tests\System\InitCommand\InitCommandTest;
 
-use function Saeghe\Cli\IO\Write\assert_success;
 use Saeghe\TestRunner\Assertions\File;
 use function Saeghe\FileManager\Directory\clean;
 use function Saeghe\FileManager\Resolver\root;
 use function Saeghe\FileManager\Resolver\realpath;
+use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 $initial_content = <<<EOD
 {
@@ -53,7 +53,12 @@ test(
         File\assert_file_exists($packages_directory, 'Packages directory is not created: ' . $output);
         File\assert_file_content($config_path, $initial_content, 'Config file content is not correct after running init!');
         File\assert_file_content($meta_file_path, $meta_content, 'Lock file content is not correct after running init!');
-        assert_success('Project has been initialized.', $output);
+        $expected = <<<EOD
+\e[39mInit project...
+\e[92mProject has been initialized.\e[39m
+
+EOD;
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
     },
     after: function () {
         clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
