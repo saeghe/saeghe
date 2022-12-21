@@ -2,13 +2,21 @@
 
 namespace Saeghe\Saeghe\Commands\Flush;
 
-use Saeghe\Saeghe\Project;
+use Saeghe\Saeghe\Classes\Build\Build;
+use Saeghe\Saeghe\Classes\Environment\Environment;
+use Saeghe\Saeghe\Classes\Project\Project;
+use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Write\success;
 
-function run(Project $project)
+function run(Environment $environment): void
 {
-    $project->build_root->renew_recursive();
-    $project->build_root->parent()->subdirectory('production')->renew_recursive();
+    $project = new Project($environment->pwd->subdirectory(parameter('project', '')));
+
+    $development_build = new Build($project, 'development');
+    $production_build = new Build($project, 'production');
+
+    $development_build->root()->renew_recursive();
+    $production_build->root()->renew_recursive();
 
     success('Build directory has been flushed.');
 }

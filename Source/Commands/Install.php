@@ -2,29 +2,43 @@
 
 namespace Saeghe\Saeghe\Commands\Install;
 
-use Saeghe\Saeghe\Config\Config;
-use Saeghe\Saeghe\Config\Meta;
-use Saeghe\Saeghe\Package;
-use Saeghe\Saeghe\Project;
 use Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Classes\Config\Config;
+use Saeghe\Saeghe\Classes\Environment\Environment;
+use Saeghe\Saeghe\Classes\Meta\Meta;
+use Saeghe\Saeghe\Classes\Meta\Dependency;
+use Saeghe\Saeghe\Classes\Package\Package;
+use Saeghe\Saeghe\Classes\Project\Project;
+use function Saeghe\Cli\IO\Read\parameter;
+use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\line;
 use function Saeghe\Cli\IO\Write\success;
 
-function run(Project $project)
+function run(Environment $environment): void
 {
     line('Installing packages...');
+
+    $project = new Project($environment->pwd->subdirectory(parameter('project', '')));
+
+    if (! $project->config_file->exists()) {
+        error('Project is not initialized. Please try to initialize using the init command.');
+        return;
+    }
+
     line('Setting env credential...');
-    $project->set_env_credentials();
+    set_credentials($environment);
 
     line('Loading configs...');
-    $config = Config::from_array(Json\to_array($project->config));
-    $meta = Meta::from_array(Json\to_array($project->config_lock));
+    $project->config(Config::from_array(Json\to_array($project->config_file)));
+    $project->meta = Meta::from_array(Json\to_array($project->meta_file));
+
+    $project->packages_directory->exists_or_create();
 
     line('Downloading packages...');
-    $meta->packages->each(function (Package $package, string $package_url) use ($project, $config) {
-        $destination = $package->root($project, $config);
-        line('Downloading package ' . $package_url . ' to ' . $destination);
-        $package->download($destination);
+    $project->meta->dependencies->each(function (Dependency $dependency) use ($project) {
+        $package = new Package($project->package_directory($dependency->repository()), $dependency->repository());
+        line('Downloading package ' . $dependency->key . ' to ' . $package->root);
+        $package->download();
     });
 
     success('Packages has been installed successfully.');

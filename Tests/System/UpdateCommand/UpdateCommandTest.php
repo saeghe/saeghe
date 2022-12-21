@@ -9,6 +9,49 @@ use function Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 
 test(
+    title: 'it should show error message when the project is not initialized',
+    case: function () {
+        $output = shell_exec('php ' . root() . 'saeghe update git@github.com:saeghe/simple-package.git --project=TestRequirements/Fixtures/EmptyProject');
+
+        $expected = <<<EOD
+\e[39mUpdating package git@github.com:saeghe/simple-package.git to latest version...
+\e[91mProject is not initialized. Please try to initialize using the init command.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
+    }
+);
+
+test(
+    title: 'it should show error message when project is not installed',
+    case: function () {
+        $output = shell_exec('php ' . root() . 'saeghe update git@github.com:saeghe/released-package.git --project=TestRequirements/Fixtures/EmptyProject');
+
+        $expected = <<<EOD
+\e[39mUpdating package git@github.com:saeghe/released-package.git to latest version...
+\e[39mSetting env credential...
+\e[39mLoading configs...
+\e[39mFinding package in configs...
+\e[39mSetting package version...
+\e[39mLoading package's config...
+\e[91mIt seems you didn't run the install command. Please make sure you installed your required packages.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
+    },
+    before: function () {
+        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/EmptyProject');
+        shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/released-package.git --version=v1.0.3 --project=TestRequirements/Fixtures/EmptyProject');
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject/Packages'));
+    },
+    after: function () {
+        clean(realpath(root() . 'TestRequirements/Fixtures/EmptyProject'));
+    }
+);
+
+test(
     title: 'it should update to the latest version',
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe update git@github.com:saeghe/released-package.git --project=TestRequirements/Fixtures/EmptyProject');
@@ -19,7 +62,7 @@ test(
 \e[39mLoading configs...
 \e[39mFinding package in configs...
 \e[39mSetting package version...
-\e[39mLoading package's meta...
+\e[39mLoading package's config...
 \e[39mDeleting package's files...
 \e[39mDetecting version hash...
 \e[39mDownloading the package with new version...

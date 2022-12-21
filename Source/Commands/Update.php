@@ -2,59 +2,108 @@
 
 namespace Saeghe\Saeghe\Commands\Update;
 
-use Saeghe\Saeghe\Config\Config;
-use Saeghe\Saeghe\Package;
-use Saeghe\Saeghe\Project;
 use Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Classes\Config\Config;
+use Saeghe\Saeghe\Classes\Config\Library;
+use Saeghe\Saeghe\Classes\Meta\Meta;
+use Saeghe\Saeghe\Classes\Environment\Environment;
+use Saeghe\Saeghe\Classes\Meta\Dependency;
+use Saeghe\Saeghe\Classes\Package\Package;
+use Saeghe\Saeghe\Classes\Project\Project;
+use Saeghe\Saeghe\Git\Repository;
 use function Saeghe\Cli\IO\Read\parameter;
 use function Saeghe\Cli\IO\Read\argument;
 use function Saeghe\Cli\IO\Write\error;
 use function Saeghe\Cli\IO\Write\line;
 use function Saeghe\Saeghe\Commands\Add\add;
-use function Saeghe\Saeghe\Commands\Remove\remove;
 use function Saeghe\Cli\IO\Write\success;
 
-function run(Project $project)
+function run(Environment $environment): void
 {
-    $given_package_url = argument(2);
+    $package_url = argument(2);
+    $repository = Repository::from_url($package_url);
     $version = parameter('version');
 
-    line('Updating package ' . $given_package_url . ' to ' . ($version ? 'version ' . $version : 'latest version') . '...');
+    line('Updating package ' . $package_url . ' to ' . ($version ? 'version ' . $version : 'latest version') . '...');
 
-    $package = Package::from_url($given_package_url);
+    $project = new Project($environment->pwd->subdirectory(parameter('project', '')));
+
+    if (! $project->config_file->exists()) {
+        error('Project is not initialized. Please try to initialize using the init command.');
+        return;
+    }
 
     line('Setting env credential...');
-    $project->set_env_credentials();
+    set_credentials($environment);
 
     line('Loading configs...');
-    $config = Config::from_array(Json\to_array($project->config));
+    $project->config(Config::from_array(Json\to_array($project->config_file)));
+    $project->meta = Meta::from_array(Json\to_array($project->meta_file));
 
     line('Finding package in configs...');
-
-    if (! $config->packages->has(fn (Package $installed_package) => $installed_package->is($package))) {
-        error("Package $given_package_url does not found in your project!");
+    $library = $project->config->repositories->first(fn (Library $library) => $library->repository()->is($repository));
+    $dependency = when(
+        $library instanceof Library,
+        fn () => $project->meta->dependencies->first(fn (Dependency $dependency) => $dependency->repository()->is($library->repository())),
+        fn () => null
+    );
+    if (! $library instanceof Library || ! $dependency instanceof Dependency) {
+        error("Package $package_url does not found in your project!");
         return;
     }
 
     line('Setting package version...');
-    $version ? $package->version($version) : $package->latest_version();
+    $version ? $library->repository()->version($version) : $library->repository()->latest_version();
 
-    line('Loading package\'s meta...');
-    $package_url = $config->packages->first_key(fn (Package $installed_package) => $installed_package->is($package));
+    line('Loading package\'s config...');
+    $packages_installed = $project->meta->dependencies->every(function (Dependency $dependency) use ($project) {
+        $package = new Package($project->package_directory($dependency->repository()), $dependency->repository());
+        $package->config = $package->config_file->exists() ? Config::from_array(Json\to_array($package->config_file)) : Config::init();
+        $project->packages->push($package);
+        return $package->is_downloaded();
+    });
+
+    if (! $packages_installed) {
+        error('It seems you didn\'t run the install command. Please make sure you installed your required packages.');
+        return;
+    }
 
     line('Deleting package\'s files...');
-    remove($project, $config, $package, $package_url);
+    delete($project, $dependency);
 
     line('Detecting version hash...');
-    $package->detect_hash();
+    $library->repository()->detect_hash();
 
     line('Downloading the package with new version...');
-    add($project, $config, $package, $package_url);
+    $dependency = new Dependency($package_url, $library->meta());
+    add($project, $dependency);
 
     line('Updating configs...');
-    $config->packages->put($package, $package_url);
-    line('Committing new configs...');
-    Json\write($project->config, $config->to_array());
+    $project->config->repositories->push($library);
 
-    success("Package $given_package_url has been updated.");
+    line('Committing new configs...');
+    Json\write($project->config_file, $project->config->to_array());
+    Json\write($project->meta_file, $project->meta->to_array());
+
+    success("Package $package_url has been updated.");
+}
+
+function delete(Project $project, Dependency $dependency): void
+{
+    $package = $project->packages->take(fn (Package $package) => $package->repository->is($dependency->repository()));
+
+    if (is_null($package)) {
+        return;
+    }
+
+    $package->config->repositories->each(function (Library $sub_library) use ($project) {
+        $dependency = $project->meta->dependencies->first(fn (Dependency $dependency)
+            => $dependency->repository()->is($sub_library->repository()));
+
+        unless($dependency instanceof Dependency, fn () => delete($project, $dependency));
+    });
+
+    $package->root->delete_recursive();
+    $project->meta->dependencies->forget(fn (Dependency $meta_dependency)
+        => $meta_dependency->repository()->is($dependency->repository()));
 }

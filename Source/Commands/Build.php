@@ -3,36 +3,50 @@
 namespace Saeghe\Saeghe\Commands\Build;
 
 use Saeghe\Cli\IO\Write;
+use Saeghe\Datatype\Map;
+use Saeghe\FileManager\FileType\Json;
+use Saeghe\FileManager\Filesystem\Filename;
 use Saeghe\FileManager\Path;
-use Saeghe\Saeghe\Config\Config;
+use Saeghe\Saeghe\Classes\Build\Build;
+use Saeghe\Saeghe\Classes\Config\Config;
+use Saeghe\Saeghe\Classes\Config\LinkPair;
+use Saeghe\Saeghe\Classes\Config\NamespacePathPair;
+use Saeghe\Saeghe\Classes\Environment\Environment;
+use Saeghe\Saeghe\Classes\Meta\Meta;
+use Saeghe\Saeghe\Classes\Meta\Dependency;
 use Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\FileManager\Filesystem\File;
 use Saeghe\FileManager\Filesystem\FilesystemCollection;
 use Saeghe\FileManager\Filesystem\Symlink;
-use Saeghe\Saeghe\Config\Meta;
-use Saeghe\Saeghe\Map;
-use Saeghe\Saeghe\Package;
-use Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Classes\Package\Package;
+use Saeghe\Saeghe\Classes\Project\Project;
 use Saeghe\Saeghe\PhpFile;
-use Saeghe\Saeghe\Project;
 use Saeghe\Datatype\Str;
+use function Saeghe\Cli\IO\Read\argument;
+use function Saeghe\Cli\IO\Read\parameter;
+use function Saeghe\Datatype\Str\after_first_occurrence;
 
-function run(Project $project)
+function run(Environment $environment): void
 {
     Write\line('Start building...');
+    $project = new Project($environment->pwd->subdirectory(parameter('project', '')));
 
-    Write\line('Reading configs...');
-    $config = $project->config->exists()
-        ? Config::from_array(Json\to_array($project->config))
-        : Config::init();
+    if (! $project->config_file->exists()) {
+        Write\error('Project is not initialized. Please try to initialize using the init command.');
+        return;
+    }
 
-    $meta = $project->config_lock->exists()
-        ? Meta::from_array(Json\to_array($project->config_lock))
-        : Meta::init();
+    Write\line('Loading configs...');
+    $project->config(Config::from_array(Json\to_array($project->config_file)));
+    $project->meta = Meta::from_array(Json\to_array($project->meta_file));
 
     Write\line('Checking packages...');
-    $packages_installed = $meta->packages
-        ->every(fn (Package $package, string $package_url) => $package->root($project, $config)->exists());
+    $packages_installed = $project->meta->dependencies->every(function (Dependency $dependency) use ($project) {
+        $package = new Package($project->package_directory($dependency->repository()), $dependency->repository());
+        $package->config = $package->config_file->exists() ? Config::from_array(Json\to_array($package->config_file)) : Config::init();
+        $project->packages->push($package);
+        return $package->is_downloaded();
+    });
 
     if (! $packages_installed) {
         Write\error('It seems you didn\'t run the install command. Please make sure you installed your required packages.');
@@ -40,75 +54,66 @@ function run(Project $project)
     }
 
     Write\line('Prepare build directory...');
-    $project->build_root->renew_recursive();
-    $project->build_root->subdirectory($config->packages_directory)->exists_or_create();
+    $build = new Build($project, argument(2, 'development'));
+    $build->root()->renew_recursive();
+    $build->packages_directory()->exists_or_create();
 
     Write\line('Make namespaces map...');
-    make_replace_map($project, $config, $meta);
+    $build->load_namespace_map();
 
     Write\line('Building packages...');
-    foreach ($meta->packages as $package_url => $package) {
-        Write\line('Building package ' . $package_url . '...');
-        compile_packages($project, $config, $package);
-    }
+    $project->packages->each(function (Package $package) use ($project, $build) {
+        $key = $project->meta->dependencies->first_key(fn (Dependency $dependency) => $dependency->repository()->is($package->repository));
+        Write\line('Building package ' . $key . '...');
+        compile_packages($package, $build);
+    });
 
     Write\line('Building the project...');
-    compile_project_files($project, $config);
+    compile_project_files($build);
 
     Write\line('Building entry points...');
-    foreach ($config->entry_points as $entry_point) {
+    $project->config->entry_points->each(function (Filename $entry_point) use ($build) {
         Write\line('Building entry point ' . $entry_point);
-        add_autoloads($project, $project->build_root->file($entry_point));
-    }
+        add_autoloads($build, $build->root()->file($entry_point));
+    });
 
     Write\line('Building executables...');
-    foreach ($meta->packages as $package_url => $package) {
-        Write\line('Building executables for package ' . $package_url);
-        $package_config = $package->config($project, $config);
-        foreach ($package_config->executables as $link_name => $source) {
-            Write\line('Building executable file ' . $link_name . ' from ' . $source);
-            add_executables($project, $config, $package, $link_name, $source);
-        }
-    }
+    $project->packages->each(function (Package $package)  use ($project, $build) {
+        $key = $project->meta->dependencies->first_key(fn (Dependency $dependency) => $dependency->repository()->is($package->repository));
+        Write\line('Building executables for package ' . $key);
+        $package->config->executables->each(function (LinkPair $executable) use ($build, $package) {
+            Write\line('Building executable file ' . $executable->symlink() . ' from ' . $executable->source());
+            add_executables($build, $build->package_root($package)->file($executable->source()), $build->root()->symlink($executable->symlink()));
+        });
+    });
 
     Write\success('Build finished successfully.');
 }
 
-function add_executables(Project $project, Config $config, Package $package, string $link_name, string $source): void
+function add_executables(Build $build, File $source, Symlink $symlink): void
 {
-    $target = $package->build_root($project, $config)->file($source);
-    $link = $project->build_root->symlink($link_name);
-    $link->link($target);
-    add_autoloads($project, $target);
-    $target->chmod(0774);
+    $symlink->link($source);
+    add_autoloads($build, $source);
+    $source->chmod(0774);
 }
 
-function compile_packages(Project $project, Config $config, Package $package): void
+function compile_packages(Package $package, Build $build): void
 {
-    $project->build_root->subdirectory("$config->packages_directory/$package->owner/$package->repo")->renew_recursive();
-
-    package_compilable_files_and_directories($project, $config, $package)
-        ->each(
-            fn (Directory|File|Symlink $filesystem)
-                => compile(
-                    $project,
-                    $package->config($project, $config),
-                    $filesystem,
-                    $package->root($project, $config),
-                    $package->build_root($project, $config)
-                )
-        );
-}
-
-function compile_project_files(Project $project, Config $config): void
-{
-    compilable_files_and_directories($project, $config)
+    $build->package_root($package)->renew_recursive();
+    package_compilable_files_and_directories($package)
         ->each(fn (Directory|File|Symlink $filesystem)
-            => compile($project, $config, $filesystem, $project->root, $project->build_root)
+            => compile($filesystem, $package->root, $build->package_root($package), $build, $package->config));
+}
+
+function compile_project_files(Build $build): void
+{
+    compilable_files_and_directories($build->project)
+        ->each(fn (Directory|File|Symlink $filesystem)
+            => compile($filesystem, $build->project->root, $build->root(), $build, $build->project->config)
         );
 }
 
-function compile(Project $project, Config $config, Directory|File|Symlink $address, Directory $origin, Directory $destination): void
+function compile(Directory|File|Symlink $address, Directory $origin, Directory $destination, Build $build, Config $config): void
 {
     $destination_path = $address->relocate($origin, $destination);
 
@@ -119,11 +124,11 @@ function compile(Project $project, Config $config, Directory|File|Symlink $addre
             ->each(
                 fn (Directory|File|Symlink $filesystem)
                 => compile(
-                    $project,
-                    $config,
                     $filesystem,
                     $origin->subdirectory($address->leaf()),
-                    $destination->subdirectory($address->leaf())
+                    $destination->subdirectory($address->leaf()),
+                    $build,
+                    $config,
                 )
             );
 
@@ -138,7 +143,7 @@ function compile(Project $project, Config $config, Directory|File|Symlink $addre
     }
 
     if (file_needs_modification($address, $config)) {
-        compile_file($project, $address, $destination_path->as_file());
+        compile_file($build, $address, $destination_path->as_file());
 
         return;
     }
@@ -146,12 +151,12 @@ function compile(Project $project, Config $config, Directory|File|Symlink $addre
     $address->preserve_copy($destination_path->as_file());
 }
 
-function compile_file(Project $project, File $origin, File $destination): void
+function compile_file(Build $build, File $origin, File $destination): void
 {
-    $destination->create(apply_file_modifications($project, $origin), $origin->permission());
+    $destination->create(apply_file_modifications($build, $origin), $origin->permission());
 }
 
-function apply_file_modifications(Project $project, File $origin): string
+function apply_file_modifications(Build $build, File $origin): string
 {
     $php_file = PhpFile::from_content($origin->content());
     $file_imports = $php_file->imports();
@@ -179,23 +184,31 @@ function apply_file_modifications(Project $project, File $origin): string
 
     $paths = new Map([]);
 
-     array_walk($imports, function ($import) use ($project, $paths) {
-        $path = $project->namespaces->find($import, true);
-        $import = $path ? $import : Str\before_last_occurrence($import, '\\');
-        $path = $path ?: $project->namespaces->find($import, false);
-        unless(is_null($path), fn () => $paths->put($path, $import));
+     array_walk($imports, function ($import) use ($build, $paths) {
+         $path = $build->namespace_map->first(fn (NamespacePathPair $namespace_path) => $namespace_path->namespace() === $import)?->path();
+         $import = $path ? $import : Str\before_last_occurrence($import, '\\');
+         $path = $path ?: $build->namespace_map->reduce(function (?Path $carry, NamespacePathPair $namespace_path) use ($import) {
+             return str_starts_with($import, $namespace_path->namespace())
+                 ? $namespace_path->path()->append(after_first_occurrence($import, $namespace_path->namespace()) . '.php')
+                 : $carry;
+         });
+         unless(is_null($path), fn () => $paths->push(new NamespacePathPair($import, $path)));
     });
 
-    array_walk($autoload, function ($import) use ($project) {
-        $path = $project->namespaces->find($import, false);
-        unless(is_null($path), fn () => $project->imported_classes->put($path, $import));
+    array_walk($autoload, function ($import) use ($build) {
+        $path = $build->namespace_map->reduce(function (?Path $carry, NamespacePathPair $namespace_path) use ($import) {
+            return str_starts_with($import, $namespace_path->namespace())
+                ? $namespace_path->path()->append(after_first_occurrence($import, $namespace_path->namespace()) . '.php')
+                : $carry;
+        });
+        unless(is_null($path), fn () => $build->import_map->push(new NamespacePathPair($import, $path)));
     });
 
     if ($paths->count() === 0) {
         return $php_file->code();
     }
 
-    $require_statements = array_map(fn(Path $path) => "require_once '$path';", $paths->items());
+    $require_statements = $paths->map(fn(NamespacePathPair $namespace_path) => "require_once '{$namespace_path->path()->string()}';");
 
     $php_file = $php_file->has_namespace()
         ? $php_file->add_after_namespace(PHP_EOL . PHP_EOL . implode(PHP_EOL, $require_statements))
@@ -204,69 +217,41 @@ function apply_file_modifications(Project $project, File $origin): string
     return $php_file->code();
 }
 
-function make_replace_map(Project $project, Config $config, Meta $meta): void
+function package_compilable_files_and_directories(Package $package): FilesystemCollection
 {
-    $map_package_namespaces = function (Package $package) use ($project, $config) {
-        $package_config = $package->config($project, $config);
-        $package_root = $package->build_root($project, $config);
+    $excluded_paths = new FilesystemCollection();
+    $excluded_paths->push($package->root->subdirectory('.git'));
+    $package->config->excludes
+        ->each(fn (Filename $exclude) => $excluded_paths->push($this->root->subdirectory($exclude)));
 
-        foreach ($package_config->map as $namespace => $source) {
-            $project->namespaces->put($package_root->append($source), $namespace);
-        }
-    };
-
-    foreach ($meta->packages as $package) {
-        $map_package_namespaces($package);
-    }
-
-    foreach ($config->map as $namespace => $source) {
-        $project->namespaces->put($project->build_root->append($source), $namespace);
-    }
-}
-
-function package_compilable_files_and_directories(Project $project, Config $config, Package $package): FilesystemCollection
-{
-    $package_config = $package->config($project, $config);
-    $package_root = $package->root($project, $config);
-
-    $excluded_paths = array_map(
-        function ($excluded_path) use ($package, $package_root) {
-            return $package_root->append($excluded_path)->string();
-        },
-        $package_config->excludes->put('.git')->items()
-    );
-
-    return $package->root($project, $config)->ls_all()
+    return $package->root->ls_all()
         ->except(fn (Directory|File|Symlink $file_or_directory)
-            => in_array($file_or_directory->path->string(), $excluded_paths)
-        );
+            => $excluded_paths->has(fn (Directory|File|Symlink $excluded) => $excluded->path->string() === $file_or_directory->path->string()));
 }
 
-function compilable_files_and_directories(Project $project, Config $config): FilesystemCollection
+function compilable_files_and_directories(Project $project): FilesystemCollection
 {
-    $excluded_paths = array_map(
-        function ($excluded_path) use ($project) {
-            return $project->root->append($excluded_path)->string();
-        },
-        $config->excludes->append(['builds', '.git', '.idea', $config->packages_directory->string()])->items()
-    );
+    $excluded_paths = new FilesystemCollection();
+    $excluded_paths->push($project->root->subdirectory('.git'));
+    $excluded_paths->push($project->root->subdirectory('.idea'));
+    $excluded_paths->push($project->root->subdirectory('builds'));
+    $excluded_paths->push($project->packages_directory);
+    $project->config->excludes
+        ->each(fn (Filename $exclude) => $excluded_paths->push($project->root->subdirectory($exclude)));
 
-    return $project->root
-        ->ls_all()
-        ->except(fn (Directory|File|Symlink $filesystem)
-            => in_array($filesystem->path->string(), $excluded_paths)
-        );
+    return $project->root->ls_all()
+        ->except(fn (Directory|File|Symlink $file_or_directory)
+        => $excluded_paths->has(fn (Directory|File|Symlink $excluded) => $excluded->path->string() === $file_or_directory->path->string()));
 }
 
 function file_needs_modification(File $file, Config $config): bool
 {
     return str_ends_with($file, '.php')
-        || $config->entry_points
-            ->append($config->executables->values())
-            ->has(fn (string $entry_point) => str_ends_with($file, $entry_point));
+        || $config->entry_points->has(fn (Filename $entry_point) => $entry_point->string() === $file->leaf())
+        || $config->executables->has(fn (LinkPair $executable) => $executable->source()->string() === $file->leaf());
 }
 
-function add_autoloads(Project $project, File $target): void
+function add_autoloads(Build $build, File $target): void
 {
     $content = <<<'EOD'
 spl_autoload_register(function ($class) {
@@ -274,9 +259,9 @@ spl_autoload_register(function ($class) {
 
 EOD;
 
-    foreach ($project->imported_classes as $class => $path) {
+    foreach ($build->import_map as $namespace_path) {
         $content .= <<<EOD
-        '$class' => '$path',
+        '{$namespace_path->namespace()}' => '{$namespace_path->path()}',
 
 EOD;
     }
@@ -295,9 +280,9 @@ spl_autoload_register(function ($class) {
 
 EOD;
 
-    foreach ($project->namespaces as $namespace => $path) {
+    foreach ($build->namespace_map as $namespace_path) {
         $content .= <<<EOD
-        '$namespace' => '$path',
+        '{$namespace_path->namespace()}' => '{$namespace_path->path()}',
 
 EOD;
     }

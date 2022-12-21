@@ -3,14 +3,18 @@
 namespace Saeghe\Saeghe\Commands\Migrate;
 
 use Saeghe\Cli\IO\Write;
-use Saeghe\Saeghe\Config\Config;
+use Saeghe\Saeghe\Classes\Config\Config;
+use Saeghe\Saeghe\Classes\Meta\Meta;
+use Saeghe\Saeghe\Classes\Environment\Environment;
 use Saeghe\FileManager\Filesystem\Directory;
-use Saeghe\Saeghe\Config\Meta;
 use Saeghe\FileManager\FileType\Json;
-use Saeghe\Saeghe\Project;
+use Saeghe\Saeghe\Classes\Project\Project;
+use function Saeghe\Cli\IO\Read\parameter;
 
-function run(Project $project)
+function run(Environment $environment): void
 {
+    $project = new Project($environment->pwd->subdirectory(parameter('project', '')));
+
     $config = Config::init()->to_array();
     $config['excludes'] = ['vendor'];
     $meta = Meta::init()->to_array();
@@ -72,8 +76,10 @@ function run(Project $project)
         migrate_package($project, $project->root->subdirectory($config['packages-directory']), $name, $package, $meta['packages'][$package]);
     }
 
-    Json\write($project->config, $config);
-    Json\write($project->config_lock, $meta);
+    $project->config(Config::from_array($config));
+
+    Json\write($project->config_file, $project->config->to_array());
+    Json\write($project->meta_file, Meta::from_array($meta)->to_array());
 
     Write\success('Project migrated successfully.');
 }

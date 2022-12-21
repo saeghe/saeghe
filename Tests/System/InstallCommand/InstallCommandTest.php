@@ -10,6 +10,21 @@ use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_false;
 
 test(
+    title: 'it should show error message when the project is not initialized',
+    case: function () {
+        $output = shell_exec('php ' . root() . 'saeghe install --project=TestRequirements/Fixtures/EmptyProject');
+
+        $expected = <<<EOD
+\e[39mInstalling packages...
+\e[91mProject is not initialized. Please try to initialize using the init command.\e[39m
+
+EOD;
+
+        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
+    }
+);
+
+test(
     title: 'it should install packages from lock file',
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe install --project=TestRequirements/Fixtures/EmptyProject');

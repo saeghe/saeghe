@@ -1,24 +1,31 @@
 #!/usr/bin/env php
 <?php
 
-require \realpath(__DIR__ . '/Import.php');
-require \realpath(__DIR__ . '/Source/Commands/Add.php');
-require \realpath(__DIR__ . '/Source/Commands/Build.php');
-require \realpath(__DIR__ . '/Source/Commands/Credential.php');
-require \realpath(__DIR__ . '/Source/Commands/Flush.php');
-require \realpath(__DIR__ . '/Source/Commands/Help.php');
-require \realpath(__DIR__ . '/Source/Commands/Init.php');
-require \realpath(__DIR__ . '/Source/Commands/Install.php');
-require \realpath(__DIR__ . '/Source/Commands/Man.php');
-require \realpath(__DIR__ . '/Source/Commands/Migrate.php');
-require \realpath(__DIR__ . '/Source/Commands/Remove.php');
-require \realpath(__DIR__ . '/Source/Commands/Update.php');
-require \realpath(__DIR__ . '/Source/Commands/Version.php');
-require \realpath(__DIR__ . '/Source/Commands/Watch.php');
+require realpath(__DIR__ . '/Import.php');
+require realpath(__DIR__ . '/Source/Commands/Add.php');
+require realpath(__DIR__ . '/Source/Commands/Build.php');
+require realpath(__DIR__ . '/Source/Commands/Credential.php');
+require realpath(__DIR__ . '/Source/Commands/Flush.php');
+require realpath(__DIR__ . '/Source/Commands/Help.php');
+require realpath(__DIR__ . '/Source/Commands/Init.php');
+require realpath(__DIR__ . '/Source/Commands/Install.php');
+require realpath(__DIR__ . '/Source/Commands/Man.php');
+require realpath(__DIR__ . '/Source/Commands/Migrate.php');
+require realpath(__DIR__ . '/Source/Commands/Remove.php');
+require realpath(__DIR__ . '/Source/Commands/Update.php');
+require realpath(__DIR__ . '/Source/Commands/Version.php');
+require realpath(__DIR__ . '/Source/Commands/Watch.php');
 
 use Saeghe\Cli\IO\Read;
-use Saeghe\Saeghe\Project;
+use Saeghe\FileManager\Filesystem\Directory;
+use Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Classes\Credential\Credential;
+use Saeghe\Saeghe\Classes\Credential\Credentials;
+use Saeghe\Saeghe\Classes\Environment\Environment;
+use Saeghe\Saeghe\Exception\CredentialCanNotBeSetException;
 use function Saeghe\Saeghe\Exception\register_exception_handler;
+use function Saeghe\Saeghe\Providers\GitHub\github_token;
+use const Saeghe\Saeghe\Providers\GitHub\GITHUB_DOMAIN;
 
 register_exception_handler();
 
@@ -28,40 +35,54 @@ if (is_null($command)) {
     $command = Read\option('v') || Read\option('version') ? 'version' : (Read\option('man') ? 'man' : 'help');
 }
 
-$project = Read\parameter('project', '');
-
-$project = Project::make(
-    strlen($project) ? getcwd() . '/' . $project . '/' : getcwd() . '/',
-    $command === 'build' ? Read\argument(2, 'development') : 'development',
-    \Saeghe\FileManager\Resolver\realpath(__DIR__ .'/credentials.json'),
-);
+$environment = new Environment(Directory::from_string(__DIR__));
 
 match ($command) {
-    'add' => \Saeghe\Saeghe\Commands\Add\run($project),
-    'build' => \Saeghe\Saeghe\Commands\Build\run($project),
-    'credential' => \Saeghe\Saeghe\Commands\Credential\run($project),
-    'flush' => \Saeghe\Saeghe\Commands\Flush\run($project),
-    'init' => \Saeghe\Saeghe\Commands\Init\run($project),
-    'install' => \Saeghe\Saeghe\Commands\Install\run($project),
-    'man' => \Saeghe\Saeghe\Commands\Man\run($project),
-    'migrate' => \Saeghe\Saeghe\Commands\Migrate\run($project),
-    'remove' => \Saeghe\Saeghe\Commands\Remove\run($project),
-    'update' => \Saeghe\Saeghe\Commands\Update\run($project),
-    'version' => \Saeghe\Saeghe\Commands\Version\run($project),
-    'watch' => \Saeghe\Saeghe\Commands\Watch\run($project),
-    default => \Saeghe\Saeghe\Commands\Help\run($project),
+    'add' => \Saeghe\Saeghe\Commands\Add\run($environment),
+    'build' => \Saeghe\Saeghe\Commands\Build\run($environment),
+    'credential' => \Saeghe\Saeghe\Commands\Credential\run($environment),
+    'flush' => \Saeghe\Saeghe\Commands\Flush\run($environment),
+    'init' => \Saeghe\Saeghe\Commands\Init\run($environment),
+    'install' => \Saeghe\Saeghe\Commands\Install\run($environment),
+    'man' => \Saeghe\Saeghe\Commands\Man\run(),
+    'migrate' => \Saeghe\Saeghe\Commands\Migrate\run($environment),
+    'remove' => \Saeghe\Saeghe\Commands\Remove\run($environment),
+    'update' => \Saeghe\Saeghe\Commands\Update\run($environment),
+    'version' => \Saeghe\Saeghe\Commands\Version\run(),
+    'watch' => \Saeghe\Saeghe\Commands\Watch\run(),
+    default => \Saeghe\Saeghe\Commands\Help\run(),
 };
 
-function when(bool $condition, mixed $then, mixed $otherwise = null): mixed
+function set_credentials(Environment $environment): void
 {
-    if ($condition) {
-        return is_callable($then) ? $then() : $then;
+    $environment_token = github_token();
+
+    if (strlen($environment_token) > 0) {
+        return;
     }
 
-    return is_callable($otherwise) ? $otherwise() : $otherwise;
+    if (! $environment->credential_file->path->exists()) {
+        throw new CredentialCanNotBeSetException('There is no credential file. Please use the `credential` command to add your token.');
+    }
+
+    /** @var Credential $github_credential */
+    $github_credential = Credentials::from_array(Json\to_array($environment->credential_file->path))
+        ->first(fn (Credential $credential) => $credential->provider() === GITHUB_DOMAIN);
+
+    github_token(is_null($github_credential) ? '' : $github_credential->token());
 }
 
-function unless(bool $condition, mixed $then, mixed $otherwise = null): mixed
+function when(bool $condition, Closure $then, Closure $otherwise = null): mixed
+{
+    return $condition ? $then() : (is_null($otherwise) ? null : $otherwise());
+}
+
+function unless(bool $condition, Closure $then, Closure $otherwise = null): mixed
 {
     return when(! $condition, $then, $otherwise);
+}
+
+function pipe(mixed $value, Closure $closure): mixed
+{
+    return is_callable($value) ? $closure($value()) : $closure($value);
 }

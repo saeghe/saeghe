@@ -18,6 +18,7 @@ test(
         assert_success('Build directory has been flushed.', $output);
     },
     before: function () {
+        shell_exec('php ' . root() . 'saeghe init --project=TestRequirements/Fixtures/ProjectWithTests');
         shell_exec('php ' . root() . 'saeghe build --project=TestRequirements/Fixtures/ProjectWithTests');
         shell_exec('php ' . root() . 'saeghe build production --project=TestRequirements/Fixtures/ProjectWithTests');
     },
