@@ -3,6 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Remove;
 
 use Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Classes\Config\PackageAlias;
 use Saeghe\Saeghe\Classes\Config\Config;
 use Saeghe\Saeghe\Classes\Config\Library;
 use Saeghe\Saeghe\Classes\Environment\Environment;
@@ -20,7 +21,6 @@ use function Saeghe\Cli\IO\Write\success;
 function run(Environment $environment): void
 {
     $package_url = argument(2);
-    $repository = Repository::from_url($package_url);
     line('Removing package ' . $package_url);
 
     $project = new Project($environment->pwd->subdirectory(parameter('project', '')));
@@ -33,6 +33,13 @@ function run(Environment $environment): void
     line('Loading configs...');
     $project->config(Config::from_array(Json\to_array($project->config_file)));
     $project->meta = Meta::from_array(Json\to_array($project->meta_file));
+
+    $package_url = when_exists(
+        $project->config->aliases->first(fn (PackageAlias $package_alias) => $package_alias->alias() === $package_url),
+        fn (PackageAlias $package_alias) => $package_alias->package_url(),
+        fn () => $package_url
+    );
+    $repository = Repository::from_url($package_url);
 
     line('Finding package in configs...');
     $library = $project->config->repositories->first(fn (Library $library) => $library->repository()->is($repository));
@@ -70,6 +77,10 @@ function run(Environment $environment): void
 function remove(Project $project, Dependency $dependency): void
 {
     $package = $project->packages->take(fn (Package $package) => $package->repository->is($dependency->repository()));
+
+    if (is_null($package)) {
+        return ;
+    }
 
     $package->config->repositories->each(function (Library $sub_library) use ($project) {
         $dependency = $project->meta->dependencies->first(fn (Dependency $dependency) => $dependency->repository()->is($sub_library->repository()));

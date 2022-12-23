@@ -16,6 +16,7 @@ class Config
         public Map $executables,
         public Filename $packages_directory,
         public Map $repositories,
+        public Map $aliases,
     ) {}
 
     public static function init(): static
@@ -27,6 +28,7 @@ class Config
             new Map(),
             new Filename('Packages'),
             new Map(),
+            new Map(),
         );
     }
 
@@ -37,6 +39,7 @@ class Config
         $config['executables'] = $config['executables'] ?? [];
         $config['entry-points'] = $config['entry-points'] ?? [];
         $config['packages'] = $config['packages'] ?? [];
+        $config['aliases'] = $config['aliases'] ?? [];
 
         $map = new Map();
         $excludes = new Collection();
@@ -44,6 +47,7 @@ class Config
         $entry_points = new Collection();
         $packages_directory = new Filename($config['packages-directory'] ?? 'Packages');
         $repositories = new Map();
+        $aliases = new Map();
 
         foreach ($config['map'] as $namespace => $path) {
             $map->push(new NamespaceFilePair($namespace, new Filename($path)));
@@ -65,7 +69,11 @@ class Config
             $repositories->push(new Library($package_url, Repository::from_url($package_url)->version($version)));
         }
 
-        return new static($map, $excludes, $entry_points, $executables, $packages_directory, $repositories);
+        foreach ($config['aliases'] as $alias => $package_url) {
+            $aliases->push(new PackageAlias($alias, $package_url));
+        }
+
+        return new static($map, $excludes, $entry_points, $executables, $packages_directory, $repositories, $aliases);
     }
 
     public function to_array(): array
@@ -94,6 +102,9 @@ class Config
         $array['packages-directory'] = $this->packages_directory->string();
         $this->repositories->each(function (Library $library) use (&$array) {
             $array['packages'][$library->key] = $library->repository()->version;
+        });
+        $this->aliases->each(function (PackageAlias $package_alias) use (&$array) {
+            $array['aliases'][$package_alias->alias()] = $package_alias->package_url();
         });
             
         return $array;

@@ -3,6 +3,7 @@
 
 require realpath(__DIR__ . '/Import.php');
 require realpath(__DIR__ . '/Source/Commands/Add.php');
+require realpath(__DIR__ . '/Source/Commands/Alias.php');
 require realpath(__DIR__ . '/Source/Commands/Build.php');
 require realpath(__DIR__ . '/Source/Commands/Credential.php');
 require realpath(__DIR__ . '/Source/Commands/Flush.php');
@@ -39,6 +40,7 @@ $environment = new Environment(Directory::from_string(__DIR__));
 
 match ($command) {
     'add' => \Saeghe\Saeghe\Commands\Add\run($environment),
+    'alias' => \Saeghe\Saeghe\Commands\Alias\run($environment),
     'build' => \Saeghe\Saeghe\Commands\Build\run($environment),
     'credential' => \Saeghe\Saeghe\Commands\Credential\run($environment),
     'flush' => \Saeghe\Saeghe\Commands\Flush\run($environment),
@@ -85,4 +87,9 @@ function unless(bool $condition, Closure $then, Closure $otherwise = null): mixe
 function pipe(mixed $value, Closure $closure): mixed
 {
     return is_callable($value) ? $closure($value()) : $closure($value);
+}
+
+function when_exists(mixed $value, Closure $then, Closure $otherwise = null): mixed
+{
+    return pipe($value, is_null($value) ? (is_null($otherwise) ? fn () => null : $otherwise) : $then);
 }

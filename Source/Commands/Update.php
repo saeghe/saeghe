@@ -3,6 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Update;
 
 use Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Classes\Config\PackageAlias;
 use Saeghe\Saeghe\Classes\Config\Config;
 use Saeghe\Saeghe\Classes\Config\Library;
 use Saeghe\Saeghe\Classes\Meta\Meta;
@@ -21,7 +22,6 @@ use function Saeghe\Cli\IO\Write\success;
 function run(Environment $environment): void
 {
     $package_url = argument(2);
-    $repository = Repository::from_url($package_url);
     $version = parameter('version');
 
     line('Updating package ' . $package_url . ' to ' . ($version ? 'version ' . $version : 'latest version') . '...');
@@ -40,13 +40,19 @@ function run(Environment $environment): void
     $project->config(Config::from_array(Json\to_array($project->config_file)));
     $project->meta = Meta::from_array(Json\to_array($project->meta_file));
 
+    $package_url = when_exists(
+        $project->config->aliases->first(fn (PackageAlias $package_alias) => $package_alias->alias() === $package_url),
+        fn (PackageAlias $package_alias) => $package_alias->package_url(),
+        fn () => $package_url
+    );
+    $repository = Repository::from_url($package_url);
+
     line('Finding package in configs...');
     $library = $project->config->repositories->first(fn (Library $library) => $library->repository()->is($repository));
-    $dependency = when(
-        $library instanceof Library,
-        fn () => $project->meta->dependencies->first(fn (Dependency $dependency) => $dependency->repository()->is($library->repository())),
-        fn () => null
-    );
+    $dependency = when_exists($library, fn (Library $library)
+        => $project->meta->dependencies->first(fn (Dependency $dependency)
+            => $dependency->repository()->is($library->repository())));
+
     if (! $library instanceof Library || ! $dependency instanceof Dependency) {
         error("Package $package_url does not found in your project!");
         return;
@@ -97,10 +103,11 @@ function delete(Project $project, Dependency $dependency): void
     }
 
     $package->config->repositories->each(function (Library $sub_library) use ($project) {
-        $dependency = $project->meta->dependencies->first(fn (Dependency $dependency)
-            => $dependency->repository()->is($sub_library->repository()));
-
-        unless($dependency instanceof Dependency, fn () => delete($project, $dependency));
+        when_exists(
+            $project->meta->dependencies->first(fn (Dependency $dependency)
+                => $dependency->repository()->is($sub_library->repository())),
+            fn (Dependency $dependency) => delete($project, $dependency)
+        );
     });
 
     $package->root->delete_recursive();

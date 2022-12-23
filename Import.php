@@ -19,6 +19,7 @@ spl_autoload_register(function ($class) {
         'Saeghe\Saeghe\Classes\Config\LinkPair' => realpath(__DIR__ . '/Source/Classes/Config/LinkPair.php'),
         'Saeghe\Saeghe\Classes\Config\NamespaceFilePair' => realpath(__DIR__ . '/Source/Classes/Config/NamespaceFilePair.php'),
         'Saeghe\Saeghe\Classes\Config\NamespacePathPair' => realpath(__DIR__ . '/Source/Classes/Config/NamespacePathPair.php'),
+        'Saeghe\Saeghe\Classes\Config\PackageAlias' => realpath(__DIR__ . '/Source/Classes/Config/PackageAlias.php'),
         'Saeghe\Saeghe\Classes\Credential\Credential' => realpath(__DIR__ . '/Source/Classes/Credential/Credential.php'),
         'Saeghe\Saeghe\Classes\Credential\Credentials' => realpath(__DIR__ . '/Source/Classes/Credential/Credentials.php'),
         'Saeghe\Saeghe\Classes\Environment\Environment' => realpath(__DIR__ . '/Source/Classes/Environment/Environment.php'),
