@@ -3,6 +3,7 @@
 namespace Saeghe\Saeghe\Commands\Add;
 
 use Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Classes\Config\PackageAlias;
 use Saeghe\Saeghe\Classes\Config\Config;
 use Saeghe\Saeghe\Classes\Config\Library;
 use Saeghe\Saeghe\Classes\Environment\Environment;
@@ -21,7 +22,6 @@ function run(Environment $environment): void
 {
     $package_url = argument(2);
     $version = parameter('version');
-    $repository = Repository::from_url($package_url);
 
     line('Adding package ' . $package_url . ($version ? ' version ' . $version : ' latest version') . '...');
 
@@ -38,6 +38,13 @@ function run(Environment $environment): void
     line('Loading configs...');
     $project->config(Config::from_array(Json\to_array($project->config_file)));
     $project->meta = $project->meta_file->exists() ? Meta::from_array(Json\to_array($project->meta_file)) : Meta::init();
+
+    $package_url = when_exists(
+        $project->config->aliases->first(fn (PackageAlias $package_alias) => $package_alias->alias() === $package_url),
+        fn (PackageAlias $package_alias) => $package_alias->package_url(),
+        fn () => $package_url
+    );
+    $repository = Repository::from_url($package_url);
 
     line('Checking installed packages...');
     if ($project->config->repositories->has(fn (Library $library) => $library->repository()->is($repository))) {
@@ -58,7 +65,6 @@ function run(Environment $environment): void
     line('Validating the package...');
     if (! $library->repository()->file_exists('saeghe.config.json')) {
         error("Given $package_url URL is not a Saeghe package.");
-
         return;
     }
 
