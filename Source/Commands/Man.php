@@ -18,11 +18,15 @@ start a working area
                     `packages-directory` as an option. If passed, then your packages will be added under the given
                     directory instead of the default `Packages` directory.
     migrate  
-                    Migrate from a Composer project to a Saeghe project.
+                    Migrates from a Composer project to a Saeghe project.
 
 work with packages
     credential <provider> <token>
                     Add given `token` for the given `provider` in credential file.
+    alias <alias> <package>
+                    Defines the given alias as an alias for the given package. After defining an alias, you can use the
+                    alias in other commands where a package URL is required.
+
     add <package> {--version=}
                     Adds the given package to your project. This command needs a required `package` argument. You can 
                     pass an optional `version` option, then Saeghe will add the given version of the given package, 

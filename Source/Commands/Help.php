@@ -17,7 +17,8 @@ start a working area
     migrate             Migrate from a composer project
 
 work with packages
-    credential          Add credential for given provider 
+    credential          Add credential for given provider
+    alias               Define an alias for a package 
     add                 Add a git repository as a package
     remove              Remove a git repository from packages
     update              Update the version of given package
