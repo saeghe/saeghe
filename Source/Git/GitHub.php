@@ -8,6 +8,7 @@ use function Saeghe\FileManager\Directory\ls;
 use function Saeghe\FileManager\Directory\preserve_copy_recursively;
 use function Saeghe\FileManager\Directory\renew_recursive;
 use function Saeghe\FileManager\File\delete;
+use function Saeghe\FileManager\Resolver\realpath;
 
 const GITHUB_DOMAIN = 'github.com';
 const GITHUB_URL = 'https://github.com/';
@@ -112,7 +113,8 @@ function find_latest_commit_hash(string $owner, string $repo): string
 function download(string $destination, string $owner, string $repo, string $version): bool
 {
     $token = github_token();
-    $temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $owner . DIRECTORY_SEPARATOR;
+    $temp = realpath(sys_get_temp_dir(). "/saeghe/installer/cache/$owner/$repo/") . DIRECTORY_SEPARATOR;
+
     renew_recursive($temp);
 
     $zip_file = $temp . $repo . '.zip';
