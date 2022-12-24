@@ -122,7 +122,7 @@ test(
             ),
             'config file does not found'
         );
-        assert_false(\file_exists(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'saeghe' . DIRECTORY_SEPARATOR . 'released-package.zip'), 'zip file is not deleted');
+        assert_false(\file_exists(realpath(sys_get_temp_dir(). '/saeghe/installer/cache/saeghe/released-package.zip/')), 'zip file is not deleted');
 
         return $packages_directory;
     },

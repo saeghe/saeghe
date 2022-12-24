@@ -27,6 +27,10 @@ work on an existing project
     build               Build the project
     watch               Watch file changes and build the project for each change
     flush               Flush files in build directory
+
+global access
+    run                 Run a project on the fly
+    version             Print current version number
 EOD;
 
 test(

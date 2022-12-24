@@ -26,19 +26,22 @@ work with packages
                     Defines the given alias as an alias for the given package. After defining an alias, you can use the
                     alias in other commands where a package URL is required.
 
-    add <package> {--version=}
-                    Adds the given package to your project. This command needs a required `package` argument. You can 
-                    pass an optional `version` option, then Saeghe will add the given version of the given package, 
+    add <package|alias> {--version=}
+                    Adds the given package to your project. This command needs a required `package` argument that should
+                    be a valid git URL (SSH or HTTPS) or a registered alias using the `alias` command.
+                    You can pass an optional `version` option, then Saeghe will add the given version of the given package, 
                     otherwise, it adds the latest released version on the package. The package’s source code will be 
                     added under your package’s directory, the package's path and installed version will be added to your
                      `saeghe.config.json` file and its metadata will be added to the `saeghe.config-lock.json` file.
-    remove <package>
-                    Removes the given package from your project. This command needs a required `package` argument. It 
-                    deleted given package's source files from your packages directory and also removes the package from
+    remove <package|alias>
+                    Removes the given package from your project. This command needs a required `package` argument that 
+                    should be a valid git URL (SSH or HTTPS) or a registered alias using the `alias` command. It deleted
+                    given package's source files from your packages directory and also removes the package from
                     `saeghe.config.json` and its metadata from `saeghe.config-lock.json`.
-    update <package> {--version=}
+    update <package|alias> {--version=}
                     If you need to get the latest version of an added package, you can run the update command. This 
-                    command needs a required `package` argument. You can also path an optional `version` option, if 
+                    command needs a required `package` argument that should be a valid git URL (SSH or HTTPS) or a 
+                    registered alias using the `alias` command. You can also path an optional `version` option, if 
                     passed, then Saeghe will download the exact version number, if not passed, it downloads the latest 
                     available version.
     install
@@ -55,6 +58,13 @@ work on an existing project
                     always builds files under the `development` environment.
     flush
                     If you need to delete any built files, running this command will give you a fresh `builds` directory.
+
+global access
+    run <package>
+                    Downloads, builds and runs the given package on the fly. You need to pass a valid git URL (SSH or HTTPS)
+                    to this command.
+    version
+                    Prints current version number.
 EOD;
 
 
