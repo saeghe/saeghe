@@ -1,5 +1,12 @@
 {
     "map": {
         "Psr\\Log": "src"
-    }
+    },
+    "entry-points": [],
+    "excludes": [
+        "vendor"
+    ],
+    "executables": [],
+    "packages-directory": "Packages",
+    "packages": []
 }

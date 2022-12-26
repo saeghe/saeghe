@@ -1,5 +1,12 @@
 {
     "map": {
         "Symfony\\Thanks": "src"
-    }
+    },
+    "entry-points": [],
+    "excludes": [
+        "vendor"
+    ],
+    "executables": [],
+    "packages-directory": "Packages",
+    "packages": []
 }

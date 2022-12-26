@@ -4,10 +4,26 @@ namespace Tests\System\MigrateCommand\MigrateCommandTest;
 
 use Saeghe\Cli\IO\Write;
 use function Saeghe\FileManager\Directory\delete_recursive;
+use function Saeghe\FileManager\Directory\make;
 use function Saeghe\FileManager\File\delete;
 use function Saeghe\FileManager\Resolver\realpath;
 use function Saeghe\FileManager\Resolver\root;
 use function Saeghe\TestRunner\Assertions\Boolean\assert_true;
+
+test(
+    title: 'it should show error messages when there is a Packages directory',
+    case: function () {
+        $output = shell_exec('php ' . root() . 'saeghe migrate --project=TestRequirements/Fixtures/composer-package');
+
+        Write\assert_error('There is a Packages directory in your project.', $output);
+    },
+    before: function () {
+        make(root() . 'TestRequirements/Fixtures/composer-package/Packages');
+    },
+    after: function () {
+        delete_recursive(root() . 'TestRequirements/Fixtures/composer-package/Packages');
+    }
+);
 
 test(
     title: 'it should migrate symfony package',
