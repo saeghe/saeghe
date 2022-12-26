@@ -159,8 +159,3 @@ function clone_to(string $destination, string $owner, string $repo): bool
 
     return  $output === null;
 }
-
-function file_exists(string $owner, string $repo, string $hash, string $path): bool
-{
-    return false !== @file_get_contents("https://raw.githubusercontent.com/$owner/$repo/$hash/$path");
-}

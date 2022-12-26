@@ -62,12 +62,6 @@ function run(Environment $environment): void
     line('Detecting version hash...');
     $library->repository()->detect_hash();
 
-    line('Validating the package...');
-    if (! $library->repository()->file_exists('saeghe.config.json')) {
-        error("Given $package_url URL is not a Saeghe package.");
-        return;
-    }
-
     line('Downloading the package...');
     $dependency = new Dependency($package_url, $library->meta());
     add($project, $dependency);
@@ -88,7 +82,7 @@ function add(Project $project, Dependency $dependency): void
 
     unless($package->is_downloaded(), fn () => $package->download() && $project->meta->dependencies->push($dependency));
 
-    $package->config = Config::from_array(Json\to_array($package->config_file));
+    $package->config = $package->config_file->exists() ? Config::from_array(Json\to_array($package->config_file)) : Config::init();
 
     $package->config->repositories
         ->except(fn (Library $library)

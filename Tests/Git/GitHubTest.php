@@ -8,7 +8,6 @@ use function Saeghe\Saeghe\Providers\GitHub\clone_to;
 use function Saeghe\Saeghe\Providers\GitHub\download;
 use function Saeghe\Saeghe\Providers\GitHub\extract_owner;
 use function Saeghe\Saeghe\Providers\GitHub\extract_repo;
-use function Saeghe\Saeghe\Providers\GitHub\file_exists;
 use function Saeghe\Saeghe\Providers\GitHub\find_latest_commit_hash;
 use function Saeghe\Saeghe\Providers\GitHub\find_latest_version;
 use function Saeghe\Saeghe\Providers\GitHub\find_version_hash;
@@ -159,13 +158,5 @@ test(
     },
     after: function (Path $packages_directory) {
         $packages_directory->parent()->delete_recursive();
-    }
-);
-
-test(
-    title: 'it should check if file exists on the git repository',
-    case: function () {
-        assert_false(file_exists('saeghe', 'saeghe', 'e71c51fa95f9e13fd854958ea97629a9172b746c', 'saeghe'));
-        assert_true(file_exists('saeghe', 'saeghe', 'e71c51fa95f9e13fd854958ea97629a9172b746c', 'LICENSE'));
     }
 );
