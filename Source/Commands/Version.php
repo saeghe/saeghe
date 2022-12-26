@@ -6,5 +6,5 @@ use Saeghe\Cli\IO\Write;
 
 function run(): void
 {
-    Write\success('Saeghe version 1.14.0');
+    Write\success('Saeghe version 1.15.0');
 }

@@ -1,5 +1,12 @@
 {
     "map": {
         "Monolog": "src\/Monolog"
-    }
+    },
+    "entry-points": [],
+    "excludes": [
+        "vendor"
+    ],
+    "executables": [],
+    "packages-directory": "Packages",
+    "packages": []
 }

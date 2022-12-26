@@ -3,21 +3,25 @@
 namespace Saeghe\Saeghe\Commands\Migrate;
 
 use Saeghe\Cli\IO\Write;
+use Saeghe\Datatype\Map;
+use Saeghe\FileManager\Filesystem\Filename;
 use Saeghe\Saeghe\Classes\Config\Config;
+use Saeghe\Saeghe\Classes\Config\Library;
+use Saeghe\Saeghe\Classes\Config\NamespaceFilePair;
+use Saeghe\Saeghe\Classes\Config\PackageAlias;
+use Saeghe\Saeghe\Classes\Meta\Dependency;
 use Saeghe\Saeghe\Classes\Meta\Meta;
 use Saeghe\Saeghe\Classes\Environment\Environment;
-use Saeghe\FileManager\Filesystem\Directory;
 use Saeghe\FileManager\FileType\Json;
+use Saeghe\Saeghe\Classes\Package\Package;
 use Saeghe\Saeghe\Classes\Project\Project;
+use Saeghe\Saeghe\Git\Repository;
 use function Saeghe\Cli\IO\Read\parameter;
+use function Saeghe\FileManager\Directory\preserve_copy_recursively;
 
 function run(Environment $environment): void
 {
     $project = new Project($environment->pwd->subdirectory(parameter('project', '')));
-
-    $config = Config::init()->to_array();
-    $config['excludes'] = ['vendor'];
-    $meta = Meta::init()->to_array();
 
     $composer_file = $project->root->file('composer.json');
     $composer_lock_file = $project->root->file('composer.lock');
@@ -35,15 +39,28 @@ function run(Environment $environment): void
     $composer_setting = Json\to_array($composer_file);
     $composer_lock_setting = Json\to_array($composer_lock_file);
 
-    if (isset($composer_setting['autoload']['psr-4'])) {
-        $config['map'] = [];
-        foreach ($composer_setting['autoload']['psr-4'] as $namespace => $path) {
-            $namespace = str_ends_with($namespace, '\\') ? substr_replace($namespace, '', -1) : $namespace;
-            $path = str_ends_with($path, '/') ? substr_replace($path, '', -1) : $path;
+    $config = Config::init();
+    $config->excludes->push(new Filename('vendor'));
+    $meta = Meta::init();
 
-            $config['map'][$namespace] = $path;
-        }
+    $project->config($config);
+    $project->meta = $meta;
+
+    if ($project->packages_directory->exists()) {
+        Write\error('There is a Packages directory in your project.');
+        return;
     }
+
+    $project->packages_directory->make();
+
+    migrate($project, $composer_setting, $composer_lock_setting);
+
+    Write\success('Project migrated successfully.');
+}
+
+function migrate(Project $project, array $composer_setting, array $composer_lock_setting): void
+{
+    $project->config->map = psr4_to_map($composer_setting['autoload']['psr-4'] ?? []);
 
     $requires = array_merge(
         $composer_setting['require'] ?? [],
@@ -56,101 +73,52 @@ function run(Environment $environment): void
     );
 
     foreach ($installed_packages as $package_meta) {
-        $name = $package_meta['name'];
-        $package = $package_meta['source']['url'];
-        $version = $package_meta['version'];
-        $hash = $package_meta['source']['reference'];
-        $owner_and_repo = get_meta_from_package($package);
+        $alias = $package_meta['name'];
+        $package_url = $package_meta['source']['url'];
+        $repository = Repository::from_url($package_url);
+        $repository->version($package_meta['version']);
+        $repository->hash($package_meta['source']['reference']);
+        $library = new Library($package_url, $repository);
 
-        if (isset($requires[$name])) {
-            $config['packages'][$package] = $version;
+        if (isset($requires[$alias])) {
+            $project->config->repositories->push($library);
+            $project->config->aliases->push(new PackageAlias($alias, $package_url));
         }
 
-        $meta['packages'][$package] = [
-            'version' => $version,
-            'hash' => $hash,
-            'owner' => $owner_and_repo['owner'],
-            'repo' => $owner_and_repo['repo'],
-        ];
-
-        migrate_package($project, $project->root->subdirectory($config['packages-directory']), $name, $package, $meta['packages'][$package]);
+        $project->meta->dependencies->push(new Dependency($package_url, $library->meta()));
+        $project->packages->put(new Package($project->package_directory($repository), $repository), $alias);
     }
 
-    $project->config(Config::from_array($config));
+    $project->packages->each(function (Package $package, string $alias) use ($project) {
+        $package_vendor_directory = $project->root->subdirectory('vendor/' . $alias);
+        $package->root->make_recursive();
+        preserve_copy_recursively($package_vendor_directory, $package->root);
+
+        $package_config = Config::init();
+        $package_config->excludes->push(new Filename('vendor'));
+        $package_composer_settings = Json\to_array($package->root->file('composer.json'));
+        $package_config->map = psr4_to_map($package_composer_settings['autoload']['psr-4'] ?? []);
+
+        Json\write($package->config_file, $package_config->to_array());
+        Json\write($package->root->file( 'saeghe.config-lock.json'), []);
+    });
 
     Json\write($project->config_file, $project->config->to_array());
-    Json\write($project->meta_file, Meta::from_array($meta)->to_array());
-
-    Write\success('Project migrated successfully.');
+    Json\write($project->meta_file, $project->meta->to_array());
 }
 
-function migrate_package(Project $project, Directory $packages_directory, $name, $package, $package_meta)
+function psr4_to_map(array $psr4): Map
 {
-    $package_vendor_directory = $project->root->subdirectory('vendor/' . $name);
+    $map = new Map();
 
-    $package_directory = $packages_directory->subdirectory($package_meta['owner'] . '/' . $package_meta['repo']);
+    foreach ($psr4 as $namespace => $path) {
+        if (! is_array($namespace) && ! is_array($path)) {
+            $namespace = str_ends_with($namespace, '\\') ? substr_replace($namespace, '', -1) : $namespace;
+            $path = str_ends_with($path, '/') ? substr_replace($path, '', -1) : $path;
 
-    if (! $packages_directory->exists()) {
-        $packages_directory->make_recursive(0755);
-    }
-
-    recursive_copy($package_vendor_directory, $package_directory);
-
-    $package_composer_settings = Json\to_array($package_directory->file('composer.json'));
-
-    $config = ['map' => []];
-
-    if (isset($package_composer_settings['autoload']['psr-4'])) {
-        foreach ($package_composer_settings['autoload']['psr-4'] as $namespace => $path) {
-            if (! is_array($namespace) && ! is_array($path)) {
-                $namespace = str_ends_with($namespace, '\\') ? substr_replace($namespace, '', -1) : $namespace;
-                $path = str_ends_with($path, '/') ? substr_replace($path, '', -1) : $path;
-
-                $config['map'][$namespace] = $path;
-            }
+            $map->push(new NamespaceFilePair($namespace, new Filename($path)));
         }
     }
 
-    Json\write($package_directory->file('saeghe.config.json'), $config);
-    Json\write($package_directory->file( 'saeghe.config-lock.json'), []);
-}
-
-function get_meta_from_package($package)
-{
-    if (str_starts_with($package, 'https:')) {
-        $owner_and_repo = str_replace('https://github.com/', '', $package);
-    } else {
-        $owner_and_repo = str_replace('git@github.com:', '', $package);
-    }
-
-    if (str_ends_with($owner_and_repo, '.git')) {
-        $owner_and_repo = substr_replace($owner_and_repo, '', -4);
-    }
-
-    [$meta['owner'], $meta['repo']] = explode('/', $owner_and_repo);
-
-    return $meta;
-}
-
-function recursive_copy(string $source, string $destination)
-{
-    $dir = opendir($source);
-    @mkdir($destination, 0755, true);
-
-    while (($file = readdir($dir)) ) {
-        if (in_array($file, ['.', '..' ])) {
-            continue;
-        }
-
-        $next_source = $source . DIRECTORY_SEPARATOR . $file;
-        $next_destination = $destination . DIRECTORY_SEPARATOR . $file;
-
-        if (is_dir($next_source)) {
-            recursive_copy($next_source, $next_destination);
-        } else {
-            copy($next_source, $next_destination);
-        }
-    }
-
-    closedir($dir);
+    return $map;
 }
