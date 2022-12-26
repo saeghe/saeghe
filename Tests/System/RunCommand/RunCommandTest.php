@@ -15,20 +15,6 @@ test(
 );
 
 test(
-    title: 'it should show error message when the package is not a Saeghe package',
-    case: function () {
-        $output = shell_exec('php ' . root() . 'saeghe run https://github.com/symfony/thanks.git');
-
-        $expected = <<<EOD
-\e[91mGiven https://github.com/symfony/thanks.git URL is not a Saeghe package.\e[39m
-
-EOD;
-
-        assert_true($expected === $output, 'Output is not correct:' . PHP_EOL . $expected . PHP_EOL . $output);
-    }
-);
-
-test(
     title: 'it should show error message when the entry point is not defined',
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe run https://github.com/saeghe/chuck-norris.git not-exists.php');

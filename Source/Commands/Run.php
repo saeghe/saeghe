@@ -31,16 +31,11 @@ function run(Environment $environment): void
 
     $root = Directory::from_string(sys_get_temp_dir())->subdirectory('saeghe/runner/' . $repository->owner . '/' . $repository->repo);
 
-    if (! $repository->file_exists('saeghe.config.json')) {
-        error("Given $package_url URL is not a Saeghe package.");
-        return;
-    }
-
     $repository->download($root);
 
     $project = new Project($root);
 
-    $project->config(Config::from_array(Json\to_array($project->config_file)));
+    $project->config($project->config_file->exists() ? Config::from_array(Json\to_array($project->config_file)) : Config::init());
     $project->meta = Meta::from_array(Json\to_array($project->meta_file));
 
     $project->packages_directory->exists_or_create();
@@ -48,6 +43,8 @@ function run(Environment $environment): void
     $project->meta->dependencies->each(function (Dependency $dependency) use ($project) {
         $package = new Package($project->package_directory($dependency->repository()), $dependency->repository());
         $package->download();
+        $package->config = $package->config_file->exists() ? Config::from_array(Json\to_array($package->config_file)) : Config::init();
+        $project->packages->push($package);
     });
 
     $build = new Build($project, 'production');

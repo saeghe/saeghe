@@ -6,7 +6,6 @@ use function Saeghe\Saeghe\Providers\GitHub\clone_to;
 use function Saeghe\Saeghe\Providers\GitHub\download;
 use function Saeghe\Saeghe\Providers\GitHub\extract_owner;
 use function Saeghe\Saeghe\Providers\GitHub\extract_repo;
-use function Saeghe\Saeghe\Providers\GitHub\file_exists;
 use function Saeghe\Saeghe\Providers\GitHub\find_latest_commit_hash;
 use function Saeghe\Saeghe\Providers\GitHub\find_latest_version;
 use function Saeghe\Saeghe\Providers\GitHub\find_version_hash;
@@ -86,10 +85,5 @@ class Repository
     public function is(self $repository): bool
     {
         return $repository->owner === $this->owner && $repository->repo === $this->repo;
-    }
-
-    public function file_exists(string $path): bool
-    {
-        return file_exists($this->owner, $this->repo, $this->hash, $path);
     }
 }

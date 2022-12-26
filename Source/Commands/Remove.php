@@ -52,7 +52,7 @@ function run(Environment $environment): void
     line('Loading package\'s config...');
     $project->meta->dependencies->each(function (Dependency $dependency) use ($project) {
         $package = new Package($project->package_directory($dependency->repository()), $dependency->repository());
-        $package->config = Config::from_array(Json\to_array($package->config_file));
+        $package->config = $package->config_file->exists() ? Config::from_array(Json\to_array($package->config_file)) : Config::init();
         $project->packages->push($package);
     });
 
