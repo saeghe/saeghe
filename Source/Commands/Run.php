@@ -77,5 +77,6 @@ function run(Environment $environment): void
         return;
     }
 
-    include_once $entry_point_path->string();
+    $process = proc_open('php ' . $entry_point_path->string(), [STDIN, STDOUT, STDOUT], $pipes);
+    proc_close($process);
 }
