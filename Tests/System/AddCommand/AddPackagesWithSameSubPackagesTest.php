@@ -24,10 +24,10 @@ test(
             'Config file has not been created properly.'
         );
         $meta = Json\to_array(root() . 'TestRequirements/Fixtures/EmptyProject/saeghe.config-lock.json');
-        assert_true(2 === count($meta['packages']), 'Count of packages in meta file is not correct.');
+        assert_true(4 === count($meta['packages']), 'Count of packages in meta file is not correct.');
         assert_true((
-                $meta['packages'][array_key_first($meta['packages'])]['repo'] === 'test-runner'
-                && $meta['packages'][array_key_last($meta['packages'])]['repo'] === 'cli'
+                array_key_exists('git@github.com:saeghe/test-runner.git', $meta['packages'])
+                && array_key_exists('https://github.com/saeghe/cli.git', $meta['packages'])
             ),
             'Meta file has not been created properly.'
         );

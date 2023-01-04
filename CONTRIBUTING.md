@@ -27,7 +27,7 @@ If you propose a new feature, please be willing to implement at least some of th
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within Saeghe, please send an email to [Morteza Poussaneh](mailto:morteza@protonmail.com?subject=[GitHub]%20Security%20Vulnerabilities%20Report). 
+If you discover a security vulnerability within Saeghe, please email [Morteza Poussaneh](mailto:morteza@protonmail.com?subject=[GitHub]%20Security%20Vulnerabilities%20Report). 
 All security vulnerabilities will be promptly addressed.
 
 ## Code of Conduct

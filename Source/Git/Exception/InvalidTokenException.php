@@ -2,7 +2,9 @@
 
 namespace Saeghe\Saeghe\Git\Exception;
 
-class InvalidTokenException extends \InvalidArgumentException
+use InvalidArgumentException;
+
+class InvalidTokenException extends InvalidArgumentException
 {
     public function __construct(string $message)
     {

@@ -2,6 +2,7 @@
 
 namespace Saeghe\Saeghe;
 
+use Closure;
 use Saeghe\Datatype\Str;
 use function Saeghe\Datatype\Arr\has;
 
@@ -76,7 +77,7 @@ class PhpFile
         return has($this->tokens, fn ($token) => is_array($token) && $token[0] === T_NAMESPACE);
     }
 
-    public function ignore(\Closure $filter, ?bool $initial = false): static
+    public function ignore(Closure $filter, ?bool $initial = false): static
     {
         $tokens = [];
 

@@ -4,6 +4,7 @@ namespace Tests\GitTest\GitHubTest;
 
 use Saeghe\FileManager\Path;
 use Saeghe\FileManager\FileType\Json;
+use function file_exists;
 use function Saeghe\Saeghe\Providers\GitHub\clone_to;
 use function Saeghe\Saeghe\Providers\GitHub\download;
 use function Saeghe\Saeghe\Providers\GitHub\extract_owner;
@@ -121,7 +122,7 @@ test(
             ),
             'config file does not found'
         );
-        assert_false(\file_exists(realpath(sys_get_temp_dir(). '/saeghe/installer/cache/saeghe/released-package.zip/')), 'zip file is not deleted');
+        assert_false(file_exists(realpath(sys_get_temp_dir(). '/saeghe/installer/cache/saeghe/released-package.zip/')), 'zip file is not deleted');
 
         return $packages_directory;
     },

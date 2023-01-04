@@ -57,7 +57,7 @@ class ClassUseNamespaceTwice extends Application\ExtendClass
     }
 }
 EOD;
-        $result = PhpFile::from_content($content)->ignore(function ($token, $initial) {
+        $result = PhpFile::from_content($content)->ignore(function ($token) {
             return ! is_string($token);
         });
 

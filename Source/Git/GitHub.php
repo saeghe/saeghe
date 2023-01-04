@@ -3,6 +3,7 @@
 namespace Saeghe\Saeghe\Providers\GitHub;
 
 use Saeghe\Saeghe\Git\Exception\InvalidTokenException;
+use ZipArchive;
 use function Saeghe\FileManager\Directory\delete_recursive;
 use function Saeghe\FileManager\Directory\ls;
 use function Saeghe\FileManager\Directory\preserve_copy_recursively;
@@ -129,7 +130,7 @@ function download(string $destination, string $owner, string $repo, string $vers
     curl_close($ch);
     fclose($fp);
 
-    $zip = new \ZipArchive;
+    $zip = new ZipArchive;
     $res = $zip->open($zip_file);
 
     if ($res === TRUE) {
