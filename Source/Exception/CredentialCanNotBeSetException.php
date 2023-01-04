@@ -2,7 +2,9 @@
 
 namespace Saeghe\Saeghe\Exception;
 
-class CredentialCanNotBeSetException extends \Exception
+use Exception;
+
+class CredentialCanNotBeSetException extends Exception
 {
     public function __construct(string $message = "")
     {

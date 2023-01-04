@@ -14,7 +14,7 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add git@github.com:saeghe/complex-package.git --project=TestRequirements/Fixtures/ProjectWithTests');
 
-        assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
+        assert_packages_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
         assert_config_file_has_desired_data('Config file for adding complex package does not have desired data!' . $output);
         assert_meta_file_has_desired_data('Meta data for adding complex package does not have desired data!' . $output);
     },
@@ -36,7 +36,7 @@ test(
     case: function () {
         $output = shell_exec('php ' . root() . 'saeghe add https://github.com/saeghe/complex-package.git --project=TestRequirements/Fixtures/ProjectWithTests');
 
-        assert_pacakges_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
+        assert_packages_added_to_packages_directory('Packages does not added to the packages directory!' . $output);
     },
     before: function () {
         copy(
@@ -66,7 +66,7 @@ function delete_packages_directory()
     delete_recursive(realpath(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages'));
 }
 
-function assert_pacakges_added_to_packages_directory($message)
+function assert_packages_added_to_packages_directory($message)
 {
     assert_true((
             file_exists(root() . 'TestRequirements/Fixtures/ProjectWithTests/Packages/saeghe/simple-package')
