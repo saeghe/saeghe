@@ -1,3 +1,8 @@
+> **Warning**
+> **Saeghe** is a difficult name to pronounce. Therefore, Saeghe project has been renamed to **phpkg**.
+> _This repo no longer receives updates._
+> Please visit the replaced repository at [php-repo](https://github.com/php-repos/phpkg-installation)
+
 # Contribution Guide
 
 ## Bug Reports
